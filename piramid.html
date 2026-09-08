@@ -1,12 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-
-<title>PSYCHEDELIC LABYRINTH</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>UNIVERSO — RAYCASTER 2.5D</title>
 
 <style>
 *{
@@ -15,7 +12,6 @@
     padding:0;
     user-select:none;
     -webkit-user-select:none;
-    touch-action:none;
 }
 
 html,body{
@@ -26,403 +22,336 @@ html,body{
     font-family:Arial,sans-serif;
 }
 
-#game{
+canvas{
     position:fixed;
-    inset:0;
-    overflow:hidden;
-    background:#000;
-}
-
-#view{
-    position:absolute;
     inset:0;
     width:100%;
     height:100%;
-    transition:filter .08s linear;
+    display:block;
+}
+
+#galaxyCanvas{
+    z-index:1;
+}
+
+#worldCanvas{
+    z-index:2;
+    display:none;
 }
 
 #hud{
-    position:absolute;
+    position:fixed;
     inset:0;
-    color:white;
+    z-index:20;
     pointer-events:none;
+    color:white;
+    text-shadow:0 2px 5px #000;
 }
 
-#topBar{
+#title{
     position:absolute;
-    left:14px;
-    right:200px;
-    top:12px;
-    height:65px;
-    display:flex;
-    gap:15px;
-}
-
-.stat{
-    flex:1;
-    max-width:300px;
-}
-
-.statTitle{
-    font-size:10px;
+    top:16px;
+    left:18px;
+    font-size:12px;
     letter-spacing:4px;
-    margin-bottom:5px;
     opacity:.8;
-}
-
-.bar{
-    height:13px;
-    border:1px solid rgba(255,255,255,.5);
-    background:rgba(0,0,0,.45);
-    overflow:hidden;
-}
-
-.barFill{
-    height:100%;
-    width:100%;
-}
-
-#hpFill{
-    background:linear-gradient(
-        90deg,
-        #ff003c,
-        #ff00cc,
-        #00ffff
-    );
-}
-
-#xpFill{
-    background:linear-gradient(
-        90deg,
-        #00ffff,
-        #5b00ff,
-        #ff00ff
-    );
-}
-
-#levelText{
-    position:absolute;
-    margin-top:-13px;
-    right:6px;
-    font-size:9px;
-    letter-spacing:2px;
 }
 
 #stats{
     position:absolute;
-    left:14px;
-    top:88px;
-    font-size:9px;
-    line-height:17px;
-    letter-spacing:1px;
-    text-shadow:0 0 8px #000;
+    top:45px;
+    left:18px;
+    font-size:10px;
+    line-height:1.7;
+    opacity:.7;
 }
 
-/* =========================================================
-   MINIMAPA
-   ========================================================= */
-
-#miniMap{
+#target{
     position:absolute;
-    right:14px;
-    top:12px;
-    width:170px;
-    height:170px;
-    border:1px solid rgba(0,255,255,.7);
-    background:rgba(0,0,15,.65);
-    box-shadow:
-        0 0 15px rgba(0,255,255,.25),
-        inset 0 0 25px rgba(0,0,0,.8);
+    left:50%;
+    top:15%;
+    transform:translateX(-50%);
+    text-align:center;
+    opacity:0;
+    transition:.35s;
 }
 
-#mapCanvas{
-    width:100%;
-    height:100%;
+#targetName{
+    font-size:18px;
+    letter-spacing:3px;
 }
 
-/* =========================================================
-   CRUCETA
-   ========================================================= */
+#targetType{
+    font-size:10px;
+    margin-top:6px;
+    opacity:.7;
+}
 
 #crosshair{
     position:absolute;
     left:50%;
     top:50%;
-    width:25px;
-    height:25px;
+    width:16px;
+    height:16px;
     transform:translate(-50%,-50%);
+    opacity:.5;
 }
 
 #crosshair:before,
 #crosshair:after{
     content:"";
     position:absolute;
-    background:#fff;
-    box-shadow:0 0 8px #fff;
+    background:white;
 }
 
 #crosshair:before{
-    width:23px;
-    height:2px;
-    left:1px;
-    top:11px;
+    width:1px;
+    height:16px;
+    left:7px;
 }
 
 #crosshair:after{
-    width:2px;
-    height:23px;
-    left:11px;
-    top:1px;
+    height:1px;
+    width:16px;
+    top:7px;
 }
 
-/* =========================================================
-   D-PAD
-   ========================================================= */
-
-#dpad{
+#spaceControls{
     position:absolute;
-    left:25px;
-    bottom:28px;
-    width:155px;
-    height:155px;
+    right:18px;
+    bottom:18px;
+    display:flex;
+    gap:8px;
     pointer-events:auto;
 }
 
-.padCenter{
-    position:absolute;
-    left:50%;
-    top:50%;
-    width:70px;
-    height:70px;
-    transform:translate(-50%,-50%);
-    border:2px solid rgba(255,255,255,.35);
-    border-radius:50%;
-    background:rgba(0,0,0,.25);
-}
-
-.padLine{
-    position:absolute;
-    background:rgba(255,255,255,.25);
-}
-
-.padLine.v{
-    width:2px;
-    height:130px;
-    left:76px;
-    top:12px;
-}
-
-.padLine.h{
-    height:2px;
-    width:130px;
-    left:12px;
-    top:76px;
-}
-
-.padBtn{
-    position:absolute;
-    width:58px;
-    height:58px;
-    border-radius:50%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:#fff;
-    font-size:21px;
+button{
+    color:white;
+    background:rgba(0,0,0,.5);
     border:1px solid rgba(255,255,255,.35);
-    background:rgba(5,0,20,.5);
-    box-shadow:0 0 12px rgba(255,0,255,.2);
+    border-radius:8px;
+    padding:10px 14px;
+    font-size:10px;
+    cursor:pointer;
+    backdrop-filter:blur(5px);
 }
 
-.padBtn.active{
-    transform:scale(.88);
-    background:rgba(255,255,255,.25);
-    box-shadow:0 0 25px #fff;
+button:hover{
+    background:rgba(255,255,255,.15);
 }
 
-#forward{
-    left:48px;
-    top:0;
-}
-
-#back{
-    left:48px;
-    bottom:0;
-}
-
-#turnLeft{
-    left:0;
-    top:48px;
-}
-
-#turnRight{
-    right:0;
-    top:48px;
-}
-
-/* =========================================================
-   BOTONES
-   ========================================================= */
-
-#actions{
+#ship{
     position:absolute;
-    right:22px;
-    bottom:27px;
-    width:185px;
-    height:185px;
+    z-index:15;
+    left:50%;
+    bottom:3%;
+    width:180px;
+    height:115px;
+    transform:translateX(-50%);
+    pointer-events:none;
+    transition:transform .2s;
+}
+
+.hull{
+    position:absolute;
+    left:20px;
+    bottom:0;
+    width:140px;
+    height:35px;
+    background:linear-gradient(#70492e 0 25%,#28160d 25%);
+    border:2px solid #bb8547;
+    clip-path:polygon(4% 0,96% 0,82% 100%,18% 100%);
+    box-shadow:0 0 18px #9a5d25;
+}
+
+.deck{
+    position:absolute;
+    left:40px;
+    bottom:29px;
+    width:100px;
+    height:12px;
+    background:#a66f39;
+    border:2px solid #d2a25f;
+}
+
+.mast{
+    position:absolute;
+    left:84px;
+    bottom:37px;
+    width:7px;
+    height:75px;
+    background:#9d6732;
+}
+
+.sail{
+    position:absolute;
+    left:91px;
+    bottom:54px;
+    width:62px;
+    height:55px;
+    background:linear-gradient(135deg,#e2d2a8,#806d4c);
+    clip-path:polygon(0 0,100% 15%,100% 100%,0 80%);
+    filter:drop-shadow(0 0 8px #8d7048);
+}
+
+.sail2{
+    position:absolute;
+    left:29px;
+    bottom:56px;
+    width:55px;
+    height:43px;
+    background:linear-gradient(135deg,#bca980,#62543c);
+    clip-path:polygon(0 10%,100% 0,100% 85%,0 100%);
+    opacity:.75;
+}
+
+/* =========================
+   WORLD HUD
+========================= */
+
+#worldHud{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:30;
+    pointer-events:none;
+    color:white;
+}
+
+#worldTitle{
+    position:absolute;
+    top:16px;
+    left:18px;
+    font-size:11px;
+    letter-spacing:3px;
+    opacity:.75;
+}
+
+#worldStats{
+    position:absolute;
+    top:43px;
+    left:18px;
+    font-size:10px;
+    line-height:1.7;
+    opacity:.7;
+}
+
+#minimap{
+    position:absolute;
+    right:15px;
+    top:15px;
+    width:145px;
+    height:145px;
+    border:1px solid rgba(255,255,255,.3);
+    background:rgba(0,0,0,.35);
+}
+
+#worldControls{
+    position:absolute;
+    inset:0;
     pointer-events:none;
 }
 
-.action{
+#joystick{
     position:absolute;
-    width:68px;
-    height:68px;
+    left:25px;
+    bottom:25px;
+    width:125px;
+    height:125px;
+    border:2px solid rgba(255,255,255,.22);
     border-radius:50%;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    border:1px solid rgba(255,255,255,.45);
-    background:rgba(10,0,25,.5);
-    color:white;
-    font-size:25px;
-    font-weight:bold;
-    box-shadow:0 0 15px rgba(255,0,255,.2);
     pointer-events:auto;
+    touch-action:none;
 }
 
-.action small{
+#stick{
     position:absolute;
-    bottom:6px;
-    font-size:7px;
-    letter-spacing:1px;
-    opacity:.65;
+    width:55px;
+    height:55px;
+    left:35px;
+    top:35px;
+    border-radius:50%;
+    background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.4);
 }
 
-.action.active{
-    transform:scale(.84);
-    background:rgba(255,255,255,.3);
-    box-shadow:0 0 30px white;
-}
-
-#btnA{
-    right:58px;
-    top:0;
-}
-
-#btnB{
-    right:0;
-    top:58px;
-}
-
-#btnC{
-    right:58px;
-    bottom:0;
-}
-
-#btnD{
-    left:0;
-    top:58px;
-}
-
-/* =========================================================
-   MENSAJES
-   ========================================================= */
-
-#message{
+.worldButton{
     position:absolute;
+    pointer-events:auto;
+    touch-action:none;
+    width:65px;
+    height:65px;
+    border-radius:50%;
+    padding:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.4);
+}
+
+#jump{
+    right:28px;
+    bottom:115px;
+}
+
+#dash{
+    right:105px;
+    bottom:32px;
+}
+
+#backGalaxy{
+    right:20px;
+    bottom:20px;
+    width:auto;
+    height:auto;
+    border-radius:7px;
+    padding:9px 12px;
+}
+
+#fade{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    background:#000;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .5s;
+}
+
+#arrivalText{
+    position:fixed;
     left:50%;
-    top:27%;
-    transform:translateX(-50%);
+    top:50%;
+    transform:translate(-50%,-50%);
+    z-index:110;
+    color:white;
+    font-size:16px;
+    letter-spacing:5px;
+    opacity:0;
     text-align:center;
-    opacity:0;
-    transition:.25s;
-    text-shadow:
-        0 0 10px #000,
-        0 0 30px #ff00ff;
+    pointer-events:none;
 }
 
-#message.show{
-    opacity:1;
-}
-
-#message h1{
-    font-size:30px;
-    letter-spacing:8px;
-}
-
-#message p{
+#arrivalSub{
     margin-top:10px;
-    font-size:10px;
-    letter-spacing:3px;
+    font-size:9px;
+    letter-spacing:2px;
+    opacity:.6;
 }
 
-/* =========================================================
-   EFECTOS
-   ========================================================= */
-
-#flash{
-    position:absolute;
-    inset:0;
-    background:#fff;
-    opacity:0;
-    mix-blend-mode:screen;
-}
-
-#vignette{
-    position:absolute;
-    inset:0;
-    background:
-        radial-gradient(
-            ellipse at center,
-            transparent 40%,
-            rgba(0,0,0,.18) 70%,
-            rgba(0,0,0,.8) 100%
-        );
-}
-
-#scanlines{
-    position:absolute;
-    inset:0;
-    opacity:.045;
-    background:
-        repeating-linear-gradient(
-            0deg,
-            transparent 0px,
-            transparent 2px,
-            white 3px
-        );
-}
-
-@media(max-width:700px){
-
-    #topBar{
-        right:130px;
-        height:55px;
+@media(max-width:600px){
+    #title{
+        font-size:9px;
     }
 
-    #miniMap{
-        width:105px;
-        height:105px;
-        top:73px;
+    #ship{
+        transform:translateX(-50%) scale(.75);
+        bottom:1%;
     }
 
-    #stats{
-        top:65px;
-        font-size:8px;
-    }
-
-    #dpad{
-        left:5px;
-        bottom:12px;
-        transform:scale(.82);
-        transform-origin:left bottom;
-    }
-
-    #actions{
-        right:3px;
-        bottom:10px;
-        transform:scale(.82);
-        transform-origin:right bottom;
+    #minimap{
+        width:115px;
+        height:115px;
     }
 }
 </style>
@@ -430,821 +359,2625 @@ html,body{
 
 <body>
 
-<div id="game">
-
-<canvas id="view"></canvas>
+<canvas id="galaxyCanvas"></canvas>
+<canvas id="worldCanvas"></canvas>
 
 <div id="hud">
 
-    <div id="topBar">
-
-        <div class="stat">
-            <div class="statTitle">VIDA</div>
-            <div class="bar">
-                <div id="hpFill" class="barFill"></div>
-            </div>
-        </div>
-
-        <div class="stat">
-            <div class="statTitle">NIVEL</div>
-            <div class="bar">
-                <div id="xpFill" class="barFill"></div>
-                <div id="levelText">NIV 1</div>
-            </div>
-        </div>
-
-    </div>
+    <div id="title">UNIVERSO EXPLORABLE</div>
 
     <div id="stats">
-        EXP: <span id="xpText">0</span><br>
-        OBJETOS: <span id="objectsText">0</span><br>
-        LABERINTOS: <span id="mazesText">0</span><br>
-        TIEMPO: <span id="timeText">00:00</span>
+        SECTOR <span id="sector">0000</span><br>
+        DISTANCIA <span id="distance">0</span><br>
+        VELOCIDAD <span id="speed">1.0</span>
     </div>
 
-    <div id="miniMap">
-        <canvas id="mapCanvas"></canvas>
+    <div id="target">
+        <div id="targetName"></div>
+        <div id="targetType"></div>
     </div>
 
     <div id="crosshair"></div>
 
-    <div id="message">
-        <h1 id="messageTitle"></h1>
-        <p id="messageText"></p>
+    <div id="spaceControls">
+        <button id="pause">PAUSAR</button>
+        <button id="newUniverse">NUEVO UNIVERSO</button>
     </div>
 
-    <!-- =====================================================
-         CONTROLES
-         ===================================================== -->
-
-    <div id="dpad">
-
-        <div class="padCenter"></div>
-
-        <div class="padLine v"></div>
-        <div class="padLine h"></div>
-
-        <div class="padBtn" id="forward">▲</div>
-        <div class="padBtn" id="back">▼</div>
-        <div class="padBtn" id="turnLeft">◀</div>
-        <div class="padBtn" id="turnRight">▶</div>
-
+    <div id="ship">
+        <div class="sail2"></div>
+        <div class="sail"></div>
+        <div class="mast"></div>
+        <div class="deck"></div>
+        <div class="hull"></div>
     </div>
-
-    <div id="actions">
-
-        <div class="action" id="btnA">
-            ↑
-            <small>SALTO</small>
-        </div>
-
-        <div class="action" id="btnB">
-            »
-            <small>DASH</small>
-        </div>
-
-        <div class="action" id="btnC">
-            ◎
-            <small>PULSO</small>
-        </div>
-
-        <div class="action" id="btnD">
-            ✦
-            <small>IMÁN</small>
-        </div>
-
-    </div>
-
-    <div id="flash"></div>
-    <div id="vignette"></div>
-    <div id="scanlines"></div>
 
 </div>
+
+<div id="worldHud">
+
+    <div id="worldTitle">
+        EXPLORACIÓN PLANETARIA // RAYCASTER 2.5D
+    </div>
+
+    <div id="worldStats">
+        PLANETA: <span id="planetName">---</span><br>
+        POSICIÓN: <span id="worldPos">0, 0</span>
+    </div>
+
+    <canvas id="minimap"></canvas>
+
+    <div id="worldControls">
+
+        <div id="joystick">
+            <div id="stick"></div>
+        </div>
+
+        <button class="worldButton" id="jump">
+            SALTO
+        </button>
+
+        <button class="worldButton" id="dash">
+            DASH
+        </button>
+
+        <button id="backGalaxy">
+            ↑ UNIVERSO
+        </button>
+
+    </div>
+
+</div>
+
+<div id="fade"></div>
+
+<div id="arrivalText">
+    ENTRANDO EN EL SISTEMA
+    <div id="arrivalSub"></div>
 </div>
 
 <script>
 "use strict";
 
-/* ============================================================
-   CONFIGURACIÓN
-   ============================================================ */
+/* ==========================================================
+   CANVAS
+========================================================== */
 
-const CFG={
+const galaxyCanvas =
+    document.getElementById("galaxyCanvas");
 
-    FOV:Math.PI/3,
+const gctx =
+    galaxyCanvas.getContext("2d");
 
-    RAYS:360,
+const worldCanvas =
+    document.getElementById("worldCanvas");
 
-    MAX_DEPTH:40,
+const wctx =
+    worldCanvas.getContext("2d");
 
-    WALK_SPEED:4.8,
+const mini =
+    document.getElementById("minimap");
 
-    ACCELERATION:13,
+const mctx =
+    mini.getContext("2d");
 
-    FRICTION:9,
+let W=innerWidth;
+let H=innerHeight;
 
-    TURN_SPEED:2.7,
+function resize(){
 
-    GRAVITY:19,
+    W=innerWidth;
+    H=innerHeight;
 
-    JUMP_FORCE:7.2,
+    galaxyCanvas.width=W;
+    galaxyCanvas.height=H;
 
-    DASH_SPEED:14,
+    worldCanvas.width=W;
+    worldCanvas.height=H;
 
-    DASH_TIME:.20,
+    mini.width=145;
+    mini.height=145;
+}
 
-    DASH_COOLDOWN:.9,
-
-    XP_OBJECT:25,
-
-    XP_BASE:100,
-
-    BASE_SIZE:15,
-
-    SIZE_PER_LEVEL:2,
-
-    MAX_SIZE:31,
-
-    PICKUP_DISTANCE:.62,
-
-    EXIT_DISTANCE:.68,
-
-    SAVE_KEY:"PSYCHEDELIC_LABYRINTH_V3"
-};
+addEventListener("resize",resize);
+resize();
 
 
-/* ============================================================
-   PALETAS POR NIVEL
-   Cada nivel posee una identidad visual diferente.
-   ============================================================ */
+/* ==========================================================
+   SEMILLA
+========================================================== */
 
-const PALETTES=[
+let seed=
+    Number(localStorage.getItem("UNIVERSE_SEED")) ||
+    Math.floor(Math.random()*999999999);
 
-    {
-        name:"NEON DREAM",
-        a:300,
-        b:180,
-        c:40
-    },
+localStorage.setItem("UNIVERSE_SEED",seed);
 
-    {
-        name:"ACID OCEAN",
-        a:175,
-        b:270,
-        c:90
-    },
 
-    {
-        name:"ULTRAVIOLET",
-        a:265,
-        b:320,
-        c:190
-    },
+/* ==========================================================
+   RANDOM DETERMINISTA
+========================================================== */
 
-    {
-        name:"MAGENTA VOID",
-        a:320,
-        b:20,
-        c:230
-    },
+function hash(n){
 
-    {
-        name:"COSMIC FIRE",
-        a:20,
-        b:60,
-        c:280
-    },
+    n=Math.sin(n*12.9898+78.233)*43758.5453123;
 
-    {
-        name:"TOXIC DREAM",
-        a:105,
-        b:180,
-        c:300
-    },
+    return n-Math.floor(n);
+}
 
-    {
-        name:"HYPERSPACE",
-        a:210,
-        b:340,
-        c:40
-    },
+function random(seed,a,b){
+    return a+hash(seed)*(b-a);
+}
 
-    {
-        name:"CHAOS",
-        a:45,
-        b:170,
-        c:285
-    }
-];
-
-function palette(){
-
-    return PALETTES[
-        (save.level-1)%
-        PALETTES.length
+function choice(seed,array){
+    return array[
+        Math.floor(hash(seed)*array.length)
     ];
 }
 
 
-/* ============================================================
-   CANVAS
-   ============================================================ */
+/* ==========================================================
+   ESTADO GALAXIA
+========================================================== */
 
-const canvas=
-    document.getElementById("view");
+let shipDistance=0;
+let shipSpeed=1;
+let paused=false;
 
-const ctx=
-    canvas.getContext("2d");
+let galaxyObjects=[];
 
-const mapCanvas=
-    document.getElementById("mapCanvas");
+let sectorActual=-999;
 
-const mapCtx=
-    mapCanvas.getContext("2d");
+const SECTOR_SIZE=1800;
 
-let W=0;
-let H=0;
 
-function resize(){
+/* ==========================================================
+   TIPOS
+========================================================== */
 
-    W=Math.max(
-        480,
-        Math.floor(innerWidth*.8)
-    );
+const TYPES=[
+    "star",
+    "star",
+    "star",
+    "planet",
+    "planet",
+    "asteroid",
+    "comet",
+    "nebula",
+    "nebula",
+    "galaxy",
+    "pulsar",
+    "quasar",
+    "blackhole",
+    "supernova",
+    "anomaly"
+];
 
-    H=Math.max(
-        270,
-        Math.floor(innerHeight*.8)
-    );
+const palettes=[
+    ["#ff512f","#ffcc66","#fff4d0"],
+    ["#38d9ff","#6f63ff","#ffffff"],
+    ["#ff3cac","#8b5cf6","#e9d5ff"],
+    ["#3fffd0","#17b99d","#efffff"],
+    ["#ff8b00","#ffd000","#fff2bd"],
+    ["#b477ff","#6d28d9","#f1ddff"],
+    ["#ef4444","#991b1b","#ffd5d5"]
+];
 
-    canvas.width=W;
-    canvas.height=H;
 
-    mapCanvas.width=340;
-    mapCanvas.height=340;
-}
+/* ==========================================================
+   GENERACIÓN DE OBJETOS
+========================================================== */
 
-addEventListener(
-    "resize",
-    resize
-);
+function generateSector(s){
 
-resize();
+    const arr=[];
 
+    const base=
+        seed*.00001+
+        s*9187.317;
 
-/* ============================================================
-   GUARDADO
-   ============================================================ */
+    const count=
+        Math.floor(60+hash(base)*45);
 
-const DEFAULT_SAVE={
+    for(let i=0;i<count;i++){
 
-    level:1,
+        const rs=
+            base+i*731.71;
 
-    xp:0,
+        let type;
 
-    totalXP:0,
+        const rarity=hash(rs+100);
 
-    completedMazes:0,
+        if(rarity<.006)
+            type="blackhole";
 
-    totalTime:0,
+        else if(rarity<.015)
+            type="quasar";
 
-    totalObjects:0
-};
+        else if(rarity<.032)
+            type="pulsar";
 
-function loadSave(){
+        else if(rarity<.055)
+            type="galaxy";
 
-    try{
+        else if(rarity<.11)
+            type="nebula";
 
-        const saved=
-            JSON.parse(
-                localStorage.getItem(
-                    CFG.SAVE_KEY
-                )
-            );
+        else
+            type=choice(rs,TYPES);
 
-        return {
-            ...DEFAULT_SAVE,
-            ...(saved||{})
-        };
+        arr.push({
 
-    }catch(e){
+            id:s+"_"+i,
 
-        return {
-            ...DEFAULT_SAVE
-        };
-    }
-}
+            sector:s,
 
-let save=loadSave();
+            type,
 
+            x:random(rs,-W*.9,W*.9),
 
-function saveGame(){
+            y:random(rs+10,-H*.8,H*.8),
 
-    localStorage.setItem(
-        CFG.SAVE_KEY,
-        JSON.stringify(save)
-    );
-}
+            depth:random(rs+20,.15,1),
 
+            size:random(rs+30,.35,1.8),
 
-/* ============================================================
-   JUGADOR
-   ============================================================ */
+            rotation:random(rs+40,0,Math.PI*2),
 
-const player={
+            phase:random(rs+50,0,Math.PI*2),
 
-    x:1.5,
+            palette:choice(rs+60,palettes),
 
-    y:1.5,
+            seed:rs,
 
-    angle:0,
+            discovered:false
 
-    vx:0,
-
-    vy:0,
-
-    /*
-       z es la altura REAL de los pies
-       respecto al suelo.
-    */
-
-    z:0,
-
-    vz:0,
-
-    grounded:true,
-
-    health:100,
-
-    dashTimer:0,
-
-    dashCooldown:0,
-
-    pulse:0,
-
-    magnet:false,
-
-    moveInput:0,
-
-    turnInput:0
-};
-
-
-/* ============================================================
-   LABERINTO
-   ============================================================ */
-
-let maze=[];
-
-let mazeW=0;
-
-let mazeH=0;
-
-let objects=[];
-
-let exit={
-
-    x:0,
-
-    y:0
-};
-
-let spawn={
-
-    x:0,
-
-    y:0
-};
-
-let levelTime=0;
-
-let currentLevelObjects=0;
-
-
-/* ============================================================
-   GENERACIÓN PROCEDURAL
-   ============================================================ */
-
-function generateMaze(level){
-
-    /*
-       Tamaño impar.
-       A mayor nivel, mayor laberinto.
-    */
-
-    let size=
-        CFG.BASE_SIZE+
-        (level-1)*
-        CFG.SIZE_PER_LEVEL;
-
-    size=
-        Math.min(
-            CFG.MAX_SIZE,
-            size
-        );
-
-    if(size%2===0)
-        size++;
-
-    mazeW=size;
-    mazeH=size;
-
-    maze=
-        Array.from(
-            {length:mazeH},
-            ()=>Array(
-                mazeW
-            ).fill(1)
-        );
-
-
-    /*
-       DFS / Recursive Backtracker.
-    */
-
-    const stack=[];
-
-    function carve(x,y){
-
-        maze[y][x]=0;
-
-        stack.push([x,y]);
-
-        while(stack.length){
-
-            const current=
-                stack[
-                    stack.length-1
-                ];
-
-            const cx=current[0];
-            const cy=current[1];
-
-            const dirs=[
-
-                [2,0],
-                [-2,0],
-                [0,2],
-                [0,-2]
-
-            ];
-
-            /*
-               Mezcla las direcciones.
-            */
-
-            for(
-                let i=dirs.length-1;
-                i>0;
-                i--
-            ){
-
-                const j=
-                    Math.floor(
-                        Math.random()*
-                        (i+1)
-                    );
-
-                [
-                    dirs[i],
-                    dirs[j]
-                ]=[
-                    dirs[j],
-                    dirs[i]
-                ];
-            }
-
-            let carved=false;
-
-            for(const d of dirs){
-
-                const nx=
-                    cx+d[0];
-
-                const ny=
-                    cy+d[1];
-
-                if(
-                    nx>0 &&
-                    nx<mazeW-1 &&
-                    ny>0 &&
-                    ny<mazeH-1 &&
-                    maze[ny][nx]===1
-                ){
-
-                    maze[
-                        cy+d[1]/2
-                    ][
-                        cx+d[0]/2
-                    ]=0;
-
-                    carve(nx,ny);
-
-                    carved=true;
-
-                    break;
-                }
-            }
-
-            if(!carved)
-                stack.pop();
-        }
-    }
-
-    carve(1,1);
-
-
-    /*
-       ========================================================
-       NUEVO SISTEMA DE SPAWN Y SALIDA
-       ========================================================
-
-       NO se utilizan posiciones fijas.
-
-       Se obtiene la lista completa de celdas transitables.
-       Después se escogen dos puntos aleatorios.
-
-       Pueden:
-       - estar lejos
-       - estar relativamente cerca
-       - estar en extremos diferentes
-       - quedar separados por una pared
-       
-       Lo importante es que ambos estén dentro del laberinto
-       y que el jugador deba encontrar el recorrido.
-    */
-
-    const free=[];
-
-    for(
-        let y=1;
-        y<mazeH-1;
-        y++
-    ){
-
-        for(
-            let x=1;
-            x<mazeW-1;
-            x++
-        ){
-
-            if(
-                maze[y][x]===0
-            ){
-
-                free.push({
-                    x,
-                    y
-                });
-            }
-        }
-    }
-
-
-    /*
-       Spawn aleatorio.
-    */
-
-    const start=
-        free[
-            Math.floor(
-                Math.random()*
-                free.length
-            )
-        ];
-
-
-    /*
-       Salida aleatoria independiente.
-       NO se fuerza una distancia mínima.
-       Así pueden quedar juntas pero separadas
-       por paredes.
-    */
-
-    let end=
-        free[
-            Math.floor(
-                Math.random()*
-                free.length
-            )
-        ];
-
-    /*
-       Evitamos exactamente la misma celda.
-    */
-
-    let safety=0;
-
-    while(
-        end.x===start.x &&
-        end.y===start.y &&
-        safety++<100
-    ){
-
-        end=
-            free[
-                Math.floor(
-                    Math.random()*
-                    free.length
-                )
-            ];
-    }
-
-
-    spawn.x=start.x+.5;
-    spawn.y=start.y+.5;
-
-    exit.x=end.x+.5;
-    exit.y=end.y+.5;
-
-
-    /*
-       Posición inicial.
-    */
-
-    player.x=spawn.x;
-    player.y=spawn.y;
-
-    /*
-       Dirección inicial aleatoria.
-    */
-
-    player.angle=
-        Math.random()*
-        Math.PI*2;
-
-    player.vx=0;
-    player.vy=0;
-
-    player.z=0;
-    player.vz=0;
-
-    player.grounded=true;
-
-    generateObjects(level);
-
-    levelTime=0;
-
-    showMessage(
-        "NIVEL "+level,
-        palette().name
-    );
-}
-
-
-/* ============================================================
-   OBJETOS
-   ============================================================ */
-
-function generateObjects(level){
-
-    objects=[];
-
-    const amount=
-        Math.min(
-            5+
-            level*2,
-            40
-        );
-
-    const occupied=[];
-
-    /*
-       Spawn y salida no reciben objetos.
-    */
-
-    occupied.push({
-        x:Math.floor(player.x),
-        y:Math.floor(player.y)
-    });
-
-    occupied.push({
-        x:Math.floor(exit.x),
-        y:Math.floor(exit.y)
-    });
-
-    let attempts=0;
-
-    while(
-        objects.length<amount &&
-        attempts<5000
-    ){
-
-        attempts++;
-
-        const x=
-            Math.floor(
-                Math.random()*
-                (mazeW-2)
-            )+1;
-
-        const y=
-            Math.floor(
-                Math.random()*
-                (mazeH-2)
-            )+1;
-
-        if(
-            maze[y][x]!==0
-        ) continue;
-
-        let used=false;
-
-        for(const p of occupied){
-
-            if(
-                p.x===x &&
-                p.y===y
-            ){
-
-                used=true;
-                break;
-            }
-        }
-
-        if(used) continue;
-
-        let near=false;
-
-        for(const o of objects){
-
-            if(
-                Math.hypot(
-                    o.x-(x+.5),
-                    o.y-(y+.5)
-                )<1.5
-            ){
-
-                near=true;
-                break;
-            }
-        }
-
-        if(near) continue;
-
-        objects.push({
-
-            x:x+.5,
-
-            y:y+.5,
-
-            z:.6,
-
-            phase:
-                Math.random()*
-                Math.PI*2,
-
-            rot:
-                Math.random()*
-                Math.PI*2,
-
-            vx:0,
-
-            vy:0,
-
-            value:CFG.XP_OBJECT
         });
     }
 
-    currentLevelObjects=0;
+    /*
+       Gran nebulosa especial
+    */
+
+    if(hash(base+999)<.55){
+
+        arr.push({
+
+            id:s+"_special_nebula",
+
+            sector:s,
+
+            type:"nebula",
+
+            x:random(base+500,-W*.6,W*.6),
+
+            y:random(base+600,-H*.5,H*.5),
+
+            depth:.6,
+
+            size:random(base+700,3,6),
+
+            rotation:random(base+800,0,6.28),
+
+            phase:0,
+
+            palette:choice(base+900,palettes),
+
+            seed:base+1000,
+
+            discovered:false
+
+        });
+    }
+
+    return arr;
 }
 
 
-/* ============================================================
-   COLISIÓN
-   ============================================================ */
+function updateGalaxy(){
+
+    const s=
+        Math.floor(shipDistance/SECTOR_SIZE);
+
+    if(s===sectorActual)
+        return;
+
+    sectorActual=s;
+
+    galaxyObjects=[];
+
+    for(let i=s-2;i<=s+3;i++){
+
+        if(i>=0)
+            galaxyObjects.push(
+                ...generateSector(i)
+            );
+    }
+
+    document.getElementById("sector")
+        .textContent=
+        String(s).padStart(4,"0");
+}
+
+
+/* ==========================================================
+   PROYECCIÓN GALÁCTICA
+========================================================== */
+
+function projectGalaxy(o){
+
+    const relative=
+        o.sector*SECTOR_SIZE-
+        shipDistance;
+
+    const perspective=
+        1/Math.max(.12,relative/1800);
+
+    return {
+
+        x:
+            W*.5+
+            o.x*perspective,
+
+        y:
+            H*.5+
+            o.y*perspective,
+
+        scale:
+            perspective*o.size,
+
+        distance:relative
+
+    };
+}
+
+
+/* ==========================================================
+   FONDO
+========================================================== */
+
+function galaxyBackground(){
+
+    gctx.fillStyle="#000";
+    gctx.fillRect(0,0,W,H);
+
+    const grd=
+        gctx.createRadialGradient(
+            W*.5,H*.5,0,
+            W*.5,H*.5,
+            Math.max(W,H)
+        );
+
+    grd.addColorStop(0,"#090d24");
+    grd.addColorStop(.45,"#03050e");
+    grd.addColorStop(1,"#000");
+
+    gctx.fillStyle=grd;
+    gctx.fillRect(0,0,W,H);
+}
+
+
+/* ==========================================================
+   ESTRELLAS DE FONDO
+========================================================== */
+
+function backgroundStars(time){
+
+    for(let i=0;i<350;i++){
+
+        const rs=
+            seed+i*31.17;
+
+        let x=
+            hash(rs)*W;
+
+        const y=
+            hash(rs+55)*H;
+
+        const depth=
+            hash(rs+100);
+
+        x-=
+            shipDistance*
+            (.00015+depth*.001);
+
+        x=((x%W)+W)%W;
+
+        const pulse=
+            .4+
+            .4*Math.sin(
+                time*.001+
+                hash(rs+200)*6
+            );
+
+        gctx.globalAlpha=
+            pulse*(.25+depth*.65);
+
+        gctx.fillStyle=
+            depth>.94
+            ? "#bcecff"
+            : depth>.7
+            ? "#ffffff"
+            : "#777f9c";
+
+        const size=
+            depth>.8?1.5:1;
+
+        gctx.fillRect(x,y,size,size);
+    }
+
+    gctx.globalAlpha=1;
+}
+
+
+/* ==========================================================
+   GLOW
+========================================================== */
+
+function glow(ctx,x,y,r,color,a){
+
+    const gr=
+        ctx.createRadialGradient(
+            x,y,0,
+            x,y,r
+        );
+
+    gr.addColorStop(0,color);
+    gr.addColorStop(.25,color);
+    gr.addColorStop(1,"transparent");
+
+    ctx.globalAlpha=a;
+    ctx.fillStyle=gr;
+
+    ctx.beginPath();
+    ctx.arc(x,y,r,0,Math.PI*2);
+    ctx.fill();
+
+    ctx.globalAlpha=1;
+}
+
+
+/* ==========================================================
+   ESTRELLA
+========================================================== */
+
+function drawStar(o,p){
+
+    const r=
+        Math.max(1.2,5*p.scale);
+
+    glow(
+        gctx,
+        p.x,p.y,
+        r*8,
+        o.palette[1],
+        .18
+    );
+
+    gctx.save();
+    gctx.translate(p.x,p.y);
+
+    gctx.fillStyle=o.palette[1];
+
+    if(hash(o.seed)<.5){
+
+        gctx.beginPath();
+
+        gctx.moveTo(0,-r*3);
+        gctx.lineTo(r*.6,-r*.6);
+        gctx.lineTo(r*3,0);
+        gctx.lineTo(r*.6,r*.6);
+        gctx.lineTo(0,r*3);
+        gctx.lineTo(-r*.6,r*.6);
+        gctx.lineTo(-r*3,0);
+        gctx.lineTo(-r*.6,-r*.6);
+
+        gctx.closePath();
+        gctx.fill();
+
+    }else{
+
+        gctx.beginPath();
+        gctx.arc(0,0,r,0,Math.PI*2);
+        gctx.fill();
+    }
+
+    gctx.restore();
+}
+
+
+/* ==========================================================
+   PLANETA
+========================================================== */
+
+function drawPlanet(o,p){
+
+    const r=
+        Math.max(3,15*p.scale);
+
+    gctx.save();
+
+    gctx.translate(p.x,p.y);
+    gctx.rotate(o.rotation);
+
+    glow(
+        gctx,0,0,
+        r*3,
+        o.palette[0],
+        .12
+    );
+
+    gctx.fillStyle=o.palette[0];
+
+    const shape=
+        Math.floor(hash(o.seed+500)*5);
+
+    gctx.beginPath();
+
+    if(shape===0){
+
+        gctx.arc(0,0,r,0,Math.PI*2);
+
+    }else if(shape===1){
+
+        gctx.rect(-r,-r,r*2,r*2);
+
+    }else if(shape===2){
+
+        for(let i=0;i<6;i++){
+
+            const a=i*Math.PI/3;
+            const x=Math.cos(a)*r;
+            const y=Math.sin(a)*r;
+
+            if(i===0)
+                gctx.moveTo(x,y);
+            else
+                gctx.lineTo(x,y);
+        }
+
+        gctx.closePath();
+
+    }else if(shape===3){
+
+        gctx.moveTo(0,-r);
+        gctx.lineTo(r,r);
+        gctx.lineTo(-r,r);
+        gctx.closePath();
+
+    }else{
+
+        gctx.moveTo(0,-r);
+        gctx.lineTo(r,0);
+        gctx.lineTo(0,r);
+        gctx.lineTo(-r,0);
+        gctx.closePath();
+    }
+
+    gctx.fill();
+
+    gctx.globalAlpha=.3;
+    gctx.fillStyle=o.palette[2];
+
+    for(let i=0;i<3;i++){
+
+        gctx.fillRect(
+            -r,
+            -r+i*r*.55,
+            r*2,
+            r*.12
+        );
+    }
+
+    if(hash(o.seed+800)<.35){
+
+        gctx.globalAlpha=.85;
+
+        gctx.strokeStyle=o.palette[2];
+        gctx.lineWidth=Math.max(1,r*.12);
+
+        gctx.beginPath();
+
+        gctx.ellipse(
+            0,0,
+            r*1.8,
+            r*.55,
+            0,0,Math.PI*2
+        );
+
+        gctx.stroke();
+    }
+
+    gctx.restore();
+}
+
+
+/* ==========================================================
+   NEBULOSA
+========================================================== */
+
+function drawNebula(o,p,time){
+
+    const R=100*p.scale;
+
+    if(R<4)return;
+
+    gctx.save();
+
+    gctx.translate(p.x,p.y);
+    gctx.rotate(o.rotation);
+
+    const shape=
+        Math.floor(hash(o.seed+11)*6);
+
+    if(shape===0){
+
+        for(let i=0;i<55;i++){
+
+            const a=
+                hash(o.seed+i*7)*Math.PI*2;
+
+            const d=
+                Math.sqrt(hash(o.seed+i*17))*R;
+
+            glow(
+                gctx,
+                Math.cos(a)*d,
+                Math.sin(a)*d*.55,
+                R*(.04+hash(o.seed+i*29)*.16),
+                o.palette[i%3],
+                .07
+            );
+        }
+
+    }else if(shape===1){
+
+        for(let i=0;i<120;i++){
+
+            const t=i/120*Math.PI*8;
+
+            const d=
+                R*.03+
+                R*.85*(i/120);
+
+            glow(
+                gctx,
+                Math.cos(t)*d,
+                Math.sin(t)*d*.5,
+                R*.055,
+                o.palette[i%3],
+                .08
+            );
+        }
+
+    }else if(shape===2){
+
+        for(let i=0;i<65;i++){
+
+            const a=i/65*Math.PI*2;
+
+            const d=
+                R*.65+
+                Math.sin(i*2.2)*R*.13;
+
+            glow(
+                gctx,
+                Math.cos(a)*d,
+                Math.sin(a)*d*.5,
+                R*.09,
+                o.palette[i%3],
+                .1
+            );
+        }
+
+    }else if(shape===3){
+
+        for(let i=0;i<100;i++){
+
+            const x=random(o.seed+i*2,-R,R);
+            const y=random(o.seed+i*3,-R*.6,R*.6);
+
+            glow(
+                gctx,x,y,
+                R*.06,
+                o.palette[i%3],
+                .065
+            );
+        }
+
+    }else if(shape===4){
+
+        for(let i=0;i<60;i++){
+
+            const y=
+                -R+
+                i/60*R*2;
+
+            const x=
+                Math.sin(i*.7)*R*.4;
+
+            glow(
+                gctx,x,y,
+                R*.13,
+                o.palette[i%3],
+                .08
+            );
+        }
+
+    }else{
+
+        for(let i=0;i<100;i++){
+
+            const t=i/100*Math.PI*9;
+
+            const d=
+                R*.05+
+                R*.75*(i/100);
+
+            glow(
+                gctx,
+                Math.cos(t)*d,
+                Math.sin(t)*d*.55,
+                R*.055,
+                o.palette[i%3],
+                .075
+            );
+        }
+    }
+
+    gctx.restore();
+}
+
+
+/* ==========================================================
+   GALAXIA
+========================================================== */
+
+function drawGalaxy(o,p,time){
+
+    const R=100*p.scale;
+
+    if(R<5)return;
+
+    gctx.save();
+
+    gctx.translate(p.x,p.y);
+    gctx.rotate(o.rotation);
+
+    glow(
+        gctx,0,0,
+        R*1.6,
+        o.palette[1],
+        .13
+    );
+
+    gctx.globalAlpha=.7;
+    gctx.fillStyle=o.palette[2];
+
+    gctx.beginPath();
+    gctx.arc(0,0,R*.2,0,Math.PI*2);
+    gctx.fill();
+
+    for(let arm=0;arm<2;arm++){
+
+        for(let i=0;i<110;i++){
+
+            const t=
+                i/110*Math.PI*5;
+
+            const d=
+                R*.06+
+                R*.9*(i/110);
+
+            const a=
+                t+
+                arm*Math.PI;
+
+            gctx.globalAlpha=
+                .1+
+                (1-i/110)*.25;
+
+            gctx.fillStyle=
+                o.palette[i%3];
+
+            gctx.fillRect(
+                Math.cos(a)*d,
+                Math.sin(a)*d*.38,
+                Math.max(1,2*p.scale),
+                Math.max(1,2*p.scale)
+            );
+        }
+    }
+
+    gctx.restore();
+}
+
+
+/* ==========================================================
+   PÚLSAR
+========================================================== */
+
+function drawPulsar(o,p,time){
+
+    const r=Math.max(4,8*p.scale);
+
+    const pulse=
+        .5+
+        .5*Math.sin(
+            time*.006+
+            o.phase
+        );
+
+    glow(
+        gctx,
+        p.x,p.y,
+        r*8,
+        "#83ddff",
+        .3
+    );
+
+    gctx.fillStyle="#efffff";
+
+    gctx.beginPath();
+
+    gctx.arc(
+        p.x,p.y,
+        r*(.7+pulse*.25),
+        0,Math.PI*2
+    );
+
+    gctx.fill();
+
+    gctx.save();
+
+    gctx.translate(p.x,p.y);
+
+    gctx.rotate(
+        time*.001+
+        o.rotation
+    );
+
+    gctx.globalAlpha=.2;
+
+    gctx.fillStyle="#73dcff";
+
+    gctx.beginPath();
+
+    gctx.moveTo(0,0);
+    gctx.lineTo(r*2,-r*.18);
+    gctx.lineTo(r*15,-r*.025);
+    gctx.lineTo(r*15,r*.025);
+    gctx.lineTo(r*2,r*.18);
+
+    gctx.closePath();
+    gctx.fill();
+
+    gctx.rotate(Math.PI);
+
+    gctx.beginPath();
+
+    gctx.moveTo(0,0);
+    gctx.lineTo(r*2,-r*.18);
+    gctx.lineTo(r*15,-r*.025);
+    gctx.lineTo(r*15,r*.025);
+    gctx.lineTo(r*2,r*.18);
+
+    gctx.closePath();
+    gctx.fill();
+
+    gctx.restore();
+}
+
+
+/* ==========================================================
+   CUÁSAR
+========================================================== */
+
+function drawQuasar(o,p,time){
+
+    const r=Math.max(5,10*p.scale);
+
+    glow(
+        gctx,
+        p.x,p.y,
+        r*12,
+        "#fff",
+        .3
+    );
+
+    glow(
+        gctx,
+        p.x,p.y,
+        r*4,
+        o.palette[0],
+        .35
+    );
+
+    gctx.save();
+
+    gctx.translate(p.x,p.y);
+
+    gctx.rotate(
+        o.rotation+
+        time*.0002
+    );
+
+    gctx.strokeStyle=o.palette[1];
+    gctx.lineWidth=Math.max(1,r*.14);
+    gctx.globalAlpha=.75;
+
+    gctx.beginPath();
+
+    gctx.ellipse(
+        0,0,
+        r*4,
+        r,
+        0,0,Math.PI*2
+    );
+
+    gctx.stroke();
+
+    gctx.globalAlpha=.25;
+    gctx.fillStyle=o.palette[2];
+
+    gctx.beginPath();
+    gctx.moveTo(0,-r);
+    gctx.lineTo(r*.8,-r*13);
+    gctx.lineTo(-r*.8,-r*13);
+    gctx.closePath();
+    gctx.fill();
+
+    gctx.beginPath();
+    gctx.moveTo(0,r);
+    gctx.lineTo(r*.8,r*13);
+    gctx.lineTo(-r*.8,r*13);
+    gctx.closePath();
+    gctx.fill();
+
+    gctx.restore();
+}
+
+
+/* ==========================================================
+   AGUJERO NEGRO
+========================================================== */
+
+function drawBlackHole(o,p,time){
+
+    const r=Math.max(8,30*p.scale);
+
+    gctx.save();
+
+    gctx.translate(p.x,p.y);
+
+    gctx.rotate(
+        o.rotation+
+        time*.00025
+    );
+
+    glow(
+        gctx,0,0,
+        r*3,
+        "#ff7422",
+        .12
+    );
+
+    gctx.strokeStyle="#ff9b43";
+    gctx.lineWidth=Math.max(2,r*.17);
+    gctx.globalAlpha=.8;
+
+    gctx.beginPath();
+
+    gctx.ellipse(
+        0,0,
+        r*2.3,
+        r*.65,
+        0,0,Math.PI*2
+    );
+
+    gctx.stroke();
+
+    gctx.strokeStyle="#ffd08a";
+    gctx.lineWidth=Math.max(1,r*.07);
+
+    gctx.beginPath();
+
+    gctx.ellipse(
+        0,0,
+        r*1.5,
+        r*.42,
+        0,0,Math.PI*2
+    );
+
+    gctx.stroke();
+
+    gctx.fillStyle="#000";
+    gctx.globalAlpha=1;
+
+    gctx.beginPath();
+
+    gctx.arc(
+        0,0,r,
+        0,Math.PI*2
+    );
+
+    gctx.fill();
+
+    gctx.restore();
+}
+
+
+/* ==========================================================
+   SUPERNOVA
+========================================================== */
+
+function drawSupernova(o,p,time){
+
+    const age=
+        (time*.0003+o.phase)%1;
+
+    const r=
+        10*p.scale+
+        age*100*p.scale;
+
+    const a=1-age;
+
+    glow(
+        gctx,
+        p.x,p.y,
+        r,
+        o.palette[1],
+        a*.3
+    );
+
+    gctx.save();
+
+    gctx.translate(p.x,p.y);
+
+    gctx.globalAlpha=a;
+
+    gctx.strokeStyle=o.palette[2];
+
+    for(let i=0;i<18;i++){
+
+        const ang=
+            i/18*Math.PI*2;
+
+        gctx.beginPath();
+
+        gctx.moveTo(
+            Math.cos(ang)*r*.1,
+            Math.sin(ang)*r*.1
+        );
+
+        gctx.lineTo(
+            Math.cos(ang)*r,
+            Math.sin(ang)*r
+        );
+
+        gctx.stroke();
+    }
+
+    gctx.restore();
+}
+
+
+/* ==========================================================
+   COMETA
+========================================================== */
+
+function drawComet(o,p){
+
+    const r=Math.max(2,6*p.scale);
+
+    gctx.save();
+
+    gctx.translate(p.x,p.y);
+    gctx.rotate(o.rotation);
+
+    const gr=
+        gctx.createLinearGradient(
+            -r*20,0,
+            0,0
+        );
+
+    gr.addColorStop(0,"transparent");
+    gr.addColorStop(.8,o.palette[1]);
+    gr.addColorStop(1,"#fff");
+
+    gctx.globalAlpha=.45;
+    gctx.fillStyle=gr;
+
+    gctx.beginPath();
+
+    gctx.moveTo(-r*20,-r*.6);
+    gctx.lineTo(0,-r*.15);
+    gctx.lineTo(0,r*.15);
+    gctx.lineTo(-r*20,r*.6);
+
+    gctx.closePath();
+    gctx.fill();
+
+    gctx.globalAlpha=1;
+    gctx.fillStyle="#fff";
+
+    gctx.beginPath();
+    gctx.arc(0,0,r,0,Math.PI*2);
+    gctx.fill();
+
+    gctx.restore();
+}
+
+
+/* ==========================================================
+   ASTEROIDE
+========================================================== */
+
+function drawAsteroid(o,p){
+
+    const r=Math.max(2,8*p.scale);
+
+    gctx.save();
+
+    gctx.translate(p.x,p.y);
+    gctx.rotate(o.rotation);
+
+    gctx.fillStyle="#72747c";
+
+    gctx.beginPath();
+
+    for(let i=0;i<8;i++){
+
+        const a=i/8*Math.PI*2;
+
+        const rr=
+            r*(.6+
+            hash(o.seed+i)*.5);
+
+        const x=Math.cos(a)*rr;
+        const y=Math.sin(a)*rr;
+
+        if(i===0)
+            gctx.moveTo(x,y);
+        else
+            gctx.lineTo(x,y);
+    }
+
+    gctx.closePath();
+    gctx.fill();
+
+    gctx.restore();
+}
+
+
+/* ==========================================================
+   ANOMALÍA
+========================================================== */
+
+function drawAnomaly(o,p,time){
+
+    const r=Math.max(8,22*p.scale);
+
+    gctx.save();
+
+    gctx.translate(p.x,p.y);
+    gctx.rotate(time*.0007);
+
+    for(let i=0;i<5;i++){
+
+        gctx.rotate(Math.PI/2.5);
+
+        gctx.strokeStyle=
+            palettes[i%palettes.length][i%3];
+
+        gctx.globalAlpha=.5;
+        gctx.lineWidth=2;
+
+        gctx.beginPath();
+
+        gctx.moveTo(0,-r*.2);
+        gctx.lineTo(r,r);
+        gctx.lineTo(-r,r*.4);
+        gctx.closePath();
+
+        gctx.stroke();
+    }
+
+    gctx.restore();
+}
+
+
+/* ==========================================================
+   DIBUJAR OBJETO
+========================================================== */
+
+function drawGalaxyObject(o,time){
+
+    const p=projectGalaxy(o);
+
+    if(
+        p.x<-400 ||
+        p.x>W+400 ||
+        p.y<-400 ||
+        p.y>H+400
+    )
+        return;
+
+    if(p.distance<-1000)
+        return;
+
+    switch(o.type){
+
+        case "star":
+            drawStar(o,p);
+            break;
+
+        case "planet":
+            drawPlanet(o,p);
+            break;
+
+        case "nebula":
+            drawNebula(o,p,time);
+            break;
+
+        case "galaxy":
+            drawGalaxy(o,p,time);
+            break;
+
+        case "pulsar":
+            drawPulsar(o,p,time);
+            break;
+
+        case "quasar":
+            drawQuasar(o,p,time);
+            break;
+
+        case "blackhole":
+            drawBlackHole(o,p,time);
+            break;
+
+        case "supernova":
+            drawSupernova(o,p,time);
+            break;
+
+        case "comet":
+            drawComet(o,p);
+            break;
+
+        case "asteroid":
+            drawAsteroid(o,p);
+            break;
+
+        case "anomaly":
+            drawAnomaly(o,p,time);
+            break;
+    }
+}
+
+
+/* ==========================================================
+   HIPERVELOCIDAD
+========================================================== */
+
+function hyperspace(){
+
+    gctx.globalAlpha=.2;
+
+    const amount=
+        Math.floor(shipSpeed*15);
+
+    for(let i=0;i<amount;i++){
+
+        const a=
+            hash(
+                seed+
+                i*33+
+                Math.floor(shipDistance)
+            )*
+            Math.PI*2;
+
+        const r1=
+            20+
+            hash(i+44)*300;
+
+        const r2=
+            r1+
+            shipSpeed*40;
+
+        gctx.strokeStyle="#b8ddff";
+
+        gctx.beginPath();
+
+        gctx.moveTo(
+            W*.5+Math.cos(a)*r1,
+            H*.5+Math.sin(a)*r1
+        );
+
+        gctx.lineTo(
+            W*.5+Math.cos(a)*r2,
+            H*.5+Math.sin(a)*r2
+        );
+
+        gctx.stroke();
+    }
+
+    gctx.globalAlpha=1;
+}
+
+
+/* ==========================================================
+   LOOP UNIVERSO
+========================================================== */
+
+let lastTime=performance.now();
+
+function galaxyLoop(time){
+
+    const dt=
+        Math.min(50,time-lastTime);
+
+    lastTime=time;
+
+    if(!paused){
+
+        shipDistance+=
+            shipSpeed*
+            dt*
+            .045;
+
+        document.getElementById("distance")
+            .textContent=
+            Math.floor(shipDistance);
+
+        document.getElementById("speed")
+            .textContent=
+            shipSpeed.toFixed(1);
+
+        updateGalaxy();
+    }
+
+    galaxyBackground();
+    backgroundStars(time);
+
+    /*
+       Lejanos primero.
+    */
+
+    galaxyObjects.sort((a,b)=>{
+
+        const da=
+            a.sector*SECTOR_SIZE-
+            shipDistance;
+
+        const db=
+            b.sector*SECTOR_SIZE-
+            shipDistance;
+
+        return db-da;
+    });
+
+    for(const o of galaxyObjects)
+        drawGalaxyObject(o,time);
+
+    hyperspace();
+
+    requestAnimationFrame(galaxyLoop);
+}
+
+updateGalaxy();
+requestAnimationFrame(galaxyLoop);
+
+
+/* ==========================================================
+   SELECCIÓN DE OBJETOS
+========================================================== */
+
+function findObjectAt(x,y){
+
+    let best=null;
+    let bestD=Infinity;
+
+    for(const o of galaxyObjects){
+
+        const p=projectGalaxy(o);
+
+        if(p.distance<0)
+            continue;
+
+        const dx=p.x-x;
+        const dy=p.y-y;
+
+        const d=Math.sqrt(dx*dx+dy*dy);
+
+        const radius=
+            Math.max(12,25*p.scale);
+
+        if(d<radius && d<bestD){
+
+            best=o;
+            bestD=d;
+        }
+    }
+
+    return best;
+}
+
+
+let selectedObject=null;
+
+function selectObject(x,y){
+
+    if(mode!=="galaxy")
+        return;
+
+    const o=
+        findObjectAt(x,y);
+
+    if(!o)
+        return;
+
+    selectedObject=o;
+
+    const names={
+        star:"ESTRELLA",
+        planet:"PLANETA",
+        nebula:"NEBULOSA",
+        galaxy:"GALAXIA",
+        pulsar:"PÚLSAR",
+        quasar:"CUÁSAR",
+        blackhole:"AGUJERO NEGRO",
+        supernova:"SUPERNOVA",
+        comet:"COMETA",
+        asteroid:"ASTEROIDE",
+        anomaly:"ANOMALÍA"
+    };
+
+    document.getElementById("targetName")
+        .textContent=
+        names[o.type];
+
+    document.getElementById("targetType")
+        .textContent=
+        "TOCA NUEVAMENTE PARA VIAJAR";
+
+    document.getElementById("target")
+        .style.opacity=1;
+
+    /*
+       Una segunda pulsación confirma.
+    */
+
+    if(o===lastSelected){
+
+        approachObject(o);
+
+    }else{
+
+        lastSelected=o;
+
+    }
+}
+
+let lastSelected=null;
+
+galaxyCanvas.addEventListener(
+    "pointerdown",
+    e=>{
+        selectObject(
+            e.clientX,
+            e.clientY
+        );
+    }
+);
+
+
+/* ==========================================================
+   VIAJE AL OBJETO
+========================================================== */
+
+function approachObject(o){
+
+    paused=true;
+
+    document.getElementById("targetType")
+        .textContent=
+        "ACELERACIÓN HIPERESPACIAL";
+
+    let progress=0;
+
+    const startDistance=shipDistance;
+
+    /*
+       El objeto debe llegar visualmente
+       al centro.
+    */
+
+    const targetSector=
+        o.sector*SECTOR_SIZE+
+        500;
+
+    const targetDistance=
+        Math.max(
+            shipDistance+100,
+            targetSector
+        );
+
+    const duration=2300;
+
+    const start=performance.now();
+
+    function travel(t){
+
+        const k=
+            Math.min(
+                1,
+                (t-start)/duration
+            );
+
+        /*
+           Ease in/out.
+        */
+
+        const e=
+            k<.5
+            ? 2*k*k
+            : 1-Math.pow(-2*k+2,2)/2;
+
+        shipDistance=
+            startDistance+
+            (targetDistance-startDistance)*e;
+
+        shipSpeed=
+            1+
+            e*4;
+
+        /*
+           Inclinar barco.
+        */
+
+        const ship=
+            document.getElementById("ship");
+
+        ship.style.transform=
+            "translateX(-50%) rotate("+
+            Math.sin(k*Math.PI)*8+
+            "deg) scale("+
+            (1+k*.12)+")";
+
+        if(k<1){
+
+            requestAnimationFrame(travel);
+
+        }else{
+
+            shipSpeed=1;
+
+            ship.style.transform=
+                "translateX(-50%)";
+
+            createSystemForObject(o);
+        }
+    }
+
+    requestAnimationFrame(travel);
+}
+
+
+/* ==========================================================
+   SISTEMA ESTELAR
+========================================================== */
+
+let selectedSystem=null;
+
+function createSystemForObject(o){
+
+    const fade=
+        document.getElementById("fade");
+
+    fade.style.opacity=1;
+
+    setTimeout(()=>{
+
+        /*
+           Creamos sistema.
+        */
+
+        selectedSystem={
+            seed:o.seed,
+            name:
+                "SISTEMA "+
+                Math.floor(hash(o.seed)*9999),
+            object:o
+        };
+
+        /*
+           En una estrella/galaxia/objeto cósmico
+           creamos un sistema visual.
+        */
+
+        fade.style.opacity=0;
+
+        document.getElementById("targetType")
+            .textContent=
+            "SISTEMA ESTELAR LOCALIZADO";
+
+        /*
+           Si es un planeta directamente,
+           entramos en él.
+        */
+
+        if(o.type==="planet"){
+
+            setTimeout(()=>{
+                enterPlanet(o);
+            },800);
+
+        }else{
+
+            showSystemView(o);
+        }
+
+    },700);
+}
+
+
+/* ==========================================================
+   VISTA DEL SISTEMA
+========================================================== */
+
+function showSystemView(o){
+
+    const target=
+        document.getElementById("target");
+
+    target.style.opacity=1;
+
+    document.getElementById("targetName")
+        .textContent=
+        "SISTEMA DESCUBIERTO";
+
+    document.getElementById("targetType")
+        .textContent=
+        "TAP SOBRE UN PLANETA PARA DESCENDER";
+
+    /*
+       Generamos planetas orbitando el objetivo.
+    */
+
+    galaxyObjects=[];
+
+    const base=o.seed;
+
+    for(let i=0;i<8;i++){
+
+        const a=
+            i/8*Math.PI*2+
+            hash(base+i)*.7;
+
+        const d=
+            100+
+            i*85+
+            hash(base+i*2)*50;
+
+        galaxyObjects.push({
+
+            id:"system_planet_"+i,
+
+            sector:0,
+
+            type:"planet",
+
+            x:
+                Math.cos(a)*d,
+
+            y:
+                Math.sin(a)*d,
+
+            depth:.5,
+
+            size:
+                .4+
+                hash(base+i*10)*.8,
+
+            rotation:
+                hash(base+i*20)*6.28,
+
+            phase:0,
+
+            palette:
+                choice(base+i*30,palettes),
+
+            seed:
+                base+i*100,
+
+            discovered:false,
+
+            systemPlanet:true
+
+        });
+    }
+
+    /*
+       Sol central.
+    */
+
+    galaxyObjects.push({
+
+        id:"system_sun",
+
+        sector:0,
+
+        type:"star",
+
+        x:0,
+        y:0,
+
+        depth:.4,
+        size:5,
+
+        rotation:0,
+        phase:0,
+
+        palette:o.palette,
+
+        seed:o.seed,
+
+        discovered:true
+
+    });
+
+    /*
+       Cámara del sistema fija.
+    */
+
+    shipDistance=0;
+    sectorActual=-1;
+
+    /*
+       Cambiamos proyección para que los planetas
+       sean visibles como sistema.
+    */
+
+    systemMode=true;
+}
+
+
+/* ==========================================================
+   SISTEMA MODE
+========================================================== */
+
+let systemMode=false;
+
+
+/*
+   Sobrescribimos la proyección mientras
+   estamos observando el sistema.
+*/
+
+const originalProjectGalaxy=
+    projectGalaxy;
+
+function projectSystem(o){
+
+    if(!systemMode)
+        return originalProjectGalaxy(o);
+
+    return {
+
+        x:
+            W*.5+
+            o.x,
+
+        y:
+            H*.5+
+            o.y,
+
+        scale:
+            o.size,
+
+        distance:1000
+    };
+}
+
+
+/*
+   Selección de planetas del sistema.
+*/
+
+function findSystemPlanet(x,y){
+
+    for(const o of galaxyObjects){
+
+        if(!o.systemPlanet)
+            continue;
+
+        const p=projectSystem(o);
+
+        const dx=p.x-x;
+        const dy=p.y-y;
+
+        const d=Math.sqrt(dx*dx+dy*dy);
+
+        if(d<
+            Math.max(
+                18,
+                30*p.scale
+            )
+        ){
+            return o;
+        }
+    }
+
+    return null;
+}
+
+
+galaxyCanvas.addEventListener(
+    "pointerdown",
+    e=>{
+
+        if(!systemMode)
+            return;
+
+        const planet=
+            findSystemPlanet(
+                e.clientX,
+                e.clientY
+            );
+
+        if(planet){
+
+            enterPlanet(planet);
+        }
+    }
+);
+
+
+/* ==========================================================
+   RENDER SISTEMA
+========================================================== */
+
+function renderSystem(time){
+
+    galaxyBackground();
+
+    /*
+       Nebulosa de fondo.
+    */
+
+    for(let i=0;i<20;i++){
+
+        const a=
+            i/20*Math.PI*2;
+
+        const r=
+            250+
+            Math.sin(time*.0002+i)*70;
+
+        glow(
+            gctx,
+            W*.5+Math.cos(a)*r,
+            H*.5+Math.sin(a)*r*.5,
+            80,
+            palettes[i%palettes.length][i%3],
+            .02
+        );
+    }
+
+    /*
+       Órbitas.
+    */
+
+    for(let i=1;i<8;i++){
+
+        gctx.strokeStyle=
+            "rgba(255,255,255,.08)";
+
+        gctx.beginPath();
+
+        gctx.arc(
+            W*.5,
+            H*.5,
+            100+i*85,
+            0,
+            Math.PI*2
+        );
+
+        gctx.stroke();
+    }
+
+    for(const o of galaxyObjects){
+
+        const p=projectSystem(o);
+
+        switch(o.type){
+
+            case "star":
+                drawStar(o,p);
+                break;
+
+            case "planet":
+                drawPlanet(o,p);
+                break;
+        }
+    }
+}
+
+
+/* ==========================================================
+   MODO ACTUAL
+========================================================== */
+
+let mode="galaxy";
+
+function renderMode(time){
+
+    if(mode==="system")
+        renderSystem(time);
+}
+
+
+/*
+   Segundo loop para sistema.
+*/
+
+function systemLoop(time){
+
+    if(mode==="system"){
+        renderSystem(time);
+    }
+
+    requestAnimationFrame(systemLoop);
+}
+
+requestAnimationFrame(systemLoop);
+
+
+/* ==========================================================
+   ENTRAR EN PLANETA
+========================================================== */
+
+function enterPlanet(o){
+
+    const fade=
+        document.getElementById("fade");
+
+    const text=
+        document.getElementById("arrivalText");
+
+    document.getElementById("arrivalSub")
+        .textContent=
+        "DESCENDIENDO A LA SUPERFICIE";
+
+    text.style.opacity=1;
+
+    fade.style.opacity=1;
+
+    setTimeout(()=>{
+
+        mode="world";
+
+        systemMode=false;
+
+        createPlanetWorld(o);
+
+        galaxyCanvas.style.display="none";
+        worldCanvas.style.display="block";
+
+        document.getElementById("hud")
+            .style.display="none";
+
+        document.getElementById("worldHud")
+            .style.display="block";
+
+        setTimeout(()=>{
+
+            fade.style.opacity=0;
+
+            text.style.opacity=0;
+
+        },500);
+
+    },900);
+}
+
+
+/* ==========================================================
+   RAYCASTER 2.5D
+========================================================== */
+
+const MAP_W=24;
+const MAP_H=24;
+
+let worldMap=[];
+
+let player={
+    x:12.5,
+    y:12.5,
+    angle:0,
+    z:0,
+    vz:0
+};
+
+const PLAYER_HEIGHT=1.7;
+
+const GRAVITY=8.5;
+
+let keys={};
+
+let moveX=0;
+let moveY=0;
+
+let lookDX=0;
+let lookDY=0;
+
+let cameraPitch=0;
+
+const FOV=
+    Math.PI/3;
+
+const RAYS=
+    Math.min(
+        500,
+        Math.max(
+            240,
+            Math.floor(W*.75)
+        )
+    );
+
+let zBuffer=
+    new Float32Array(RAYS);
+
+
+/* ==========================================================
+   GENERACIÓN DEL PLANETA
+========================================================== */
+
+function createPlanetWorld(o){
+
+    const s=o.seed;
+
+    worldMap=[];
+
+    /*
+       Primero todo vacío.
+    */
+
+    for(let y=0;y<MAP_H;y++){
+
+        worldMap[y]=[];
+
+        for(let x=0;x<MAP_W;x++){
+
+            worldMap[y][x]=1;
+        }
+    }
+
+    /*
+       Crear caminos conectados mediante
+       random walk.
+    */
+
+    let x=
+        2+
+        Math.floor(hash(s)*5);
+
+    let y=
+        2+
+        Math.floor(hash(s+2)*5);
+
+    const startX=x;
+    const startY=y;
+
+    for(let i=0;i<300;i++){
+
+        worldMap[y][x]=0;
+
+        /*
+           Crear pequeñas habitaciones.
+        */
+
+        if(hash(s+i*4)<.25){
+
+            const rw=
+                2+
+                Math.floor(hash(s+i*5)*4);
+
+            const rh=
+                2+
+                Math.floor(hash(s+i*6)*4);
+
+            for(let yy=-rh;yy<=rh;yy++){
+
+                for(let xx=-rw;xx<=rw;xx++){
+
+                    const nx=x+xx;
+                    const ny=y+yy;
+
+                    if(
+                        nx>1 &&
+                        nx<MAP_W-2 &&
+                        ny>1 &&
+                        ny<MAP_H-2
+                    ){
+                        worldMap[ny][nx]=0;
+                    }
+                }
+            }
+        }
+
+        const dir=
+            Math.floor(
+                hash(s+i*10)*4
+            );
+
+        if(dir===0)x++;
+        if(dir===1)x--;
+        if(dir===2)y++;
+        if(dir===3)y--;
+
+        x=Math.max(
+            1,
+            Math.min(MAP_W-2,x)
+        );
+
+        y=Math.max(
+            1,
+            Math.min(MAP_H-2,y)
+        );
+    }
+
+    /*
+       Garantizar borde sólido.
+    */
+
+    for(let i=0;i<MAP_W;i++){
+
+        worldMap[0][i]=1;
+        worldMap[MAP_H-1][i]=1;
+    }
+
+    for(let i=0;i<MAP_H;i++){
+
+        worldMap[i][0]=1;
+        worldMap[i][MAP_W-1]=1;
+    }
+
+    /*
+       Posición del jugador.
+    */
+
+    player.x=startX+.5;
+    player.y=startY+.5;
+
+    /*
+       Buscar celda libre si la inicial quedó cerrada.
+    */
+
+    if(isWall(
+        Math.floor(player.x),
+        Math.floor(player.y)
+    )){
+
+        outer:
+        for(let yy=1;yy<MAP_H-1;yy++){
+
+            for(let xx=1;xx<MAP_W-1;xx++){
+
+                if(worldMap[yy][xx]===0){
+
+                    player.x=xx+.5;
+                    player.y=yy+.5;
+
+                    break outer;
+                }
+            }
+        }
+    }
+
+    player.angle=0;
+    player.z=0;
+    player.vz=0;
+    cameraPitch=0;
+
+    document.getElementById("planetName")
+        .textContent=
+        "PLANETA "+
+        Math.floor(hash(s)*99999);
+
+    updateMinimap();
+}
+
+
+/* ==========================================================
+   COLISIONES
+========================================================== */
 
 function isWall(x,y){
 
-    const mx=Math.floor(x);
-    const my=Math.floor(y);
-
     if(
-        mx<0 ||
-        my<0 ||
-        mx>=mazeW ||
-        my>=mazeH
+        x<0 ||
+        y<0 ||
+        x>=MAP_W ||
+        y>=MAP_H
     )
         return true;
 
-    return maze[my][mx]===1;
+    return worldMap[y][x]===1;
 }
 
 
-function canMove(x,y){
+function blocked(x,y){
 
-    const r=.22;
+    const radius=.18;
 
     return (
-        !isWall(x-r,y-r)&&
-        !isWall(x+r,y-r)&&
-        !isWall(x-r,y+r)&&
-        !isWall(x+r,y+r)
+        isWall(
+            Math.floor(x-radius),
+            Math.floor(y-radius)
+        ) ||
+        isWall(
+            Math.floor(x+radius),
+            Math.floor(y-radius)
+        ) ||
+        isWall(
+            Math.floor(x-radius),
+            Math.floor(y+radius)
+        ) ||
+        isWall(
+            Math.floor(x+radius),
+            Math.floor(y+radius)
+        )
     );
 }
 
 
-function movePlayer(dx,dy){
+/* ==========================================================
+   DDA RAYCAST
+========================================================== */
+
+function castRay(rayAngle){
+
+    const dirX=Math.cos(rayAngle);
+    const dirY=Math.sin(rayAngle);
+
+    let mapX=
+        Math.floor(player.x);
+
+    let mapY=
+        Math.floor(player.y);
+
+    const deltaX=
+        Math.abs(1/(dirX||.000001));
+
+    const deltaY=
+        Math.abs(1/(dirY||.000001));
+
+    let stepX;
+    let stepY;
+
+    let sideX;
+    let sideY;
+
+    if(dirX<0){
+
+        stepX=-1;
+
+        sideX=
+            (player.x-mapX)*deltaX;
+
+    }else{
+
+        stepX=1;
+
+        sideX=
+            (mapX+1-player.x)*deltaX;
+    }
+
+    if(dirY<0){
+
+        stepY=-1;
+
+        sideY=
+            (player.y-mapY)*deltaY;
+
+    }else{
+
+        stepY=1;
+
+        sideY=
+            (mapY+1-player.y)*deltaY;
+    }
+
+    let side=0;
+
+    let distance=0;
+
+    for(let i=0;i<100;i++){
+
+        if(sideX<sideY){
+
+            sideX+=deltaX;
+            mapX+=stepX;
+            side=0;
+
+        }else{
+
+            sideY+=deltaY;
+            mapY+=stepY;
+            side=1;
+        }
+
+        if(isWall(mapX,mapY))
+            break;
+    }
+
+    if(side===0)
+        distance=
+            (mapX-player.x+
+            (1-stepX)/2)/
+            dirX;
+    else
+        distance=
+            (mapY-player.y+
+            (1-stepY)/2)/
+            dirY;
+
+    return {
+        distance:Math.max(.001,distance),
+        side
+    };
+}
+
+
+/* ==========================================================
+   RENDER RAYCASTER
+========================================================== */
+
+function renderWorld(){
+
+    /*
+       Cielo.
+    */
+
+    const ceiling=
+        wctx.createLinearGradient(
+            0,0,
+            0,H*.5
+        );
+
+    ceiling.addColorStop(
+        0,
+        "#050712"
+    );
+
+    ceiling.addColorStop(
+        1,
+        "#11162c"
+    );
+
+    wctx.fillStyle=ceiling;
+
+    wctx.fillRect(
+        0,0,W,H*.55
+    );
+
+    /*
+       Suelo.
+    */
+
+    const floor=
+        wctx.createLinearGradient(
+            0,H*.5,
+            0,H
+        );
+
+    floor.addColorStop(
+        0,
+        "#161218"
+    );
+
+    floor.addColorStop(
+        1,
+        "#050508"
+    );
+
+    wctx.fillStyle=floor;
+
+    wctx.fillRect(
+        0,H*.5,
+        W,H*.5
+    );
+
+    const pitch=
+        cameraPitch;
+
+    /*
+       Rayos.
+    */
+
+    for(let r=0;r<RAYS;r++){
+
+        const cameraX=
+            2*r/RAYS-1;
+
+        const rayAngle=
+            player.angle+
+            Math.atan(
+                cameraX*
+                Math.tan(FOV/2)
+            );
+
+        const hit=
+            castRay(rayAngle);
+
+        /*
+           Corrección fish-eye.
+        */
+
+        const corrected=
+            hit.distance*
+            Math.cos(
+                rayAngle-player.angle
+            );
+
+        zBuffer[r]=corrected;
+
+        const wallHeight=
+            H/
+            Math.max(
+                .001,
+                corrected
+            );
+
+        const horizon=
+            H*.5+
+            pitch+
+            player.z*90;
+
+        const top=
+            horizon-
+            wallHeight/2;
+
+        const bottom=
+            horizon+
+            wallHeight/2;
+
+        /*
+           Color según profundidad.
+        */
+
+        const shade=
+            Math.max(
+                .12,
+                1-corrected*.035
+            );
+
+        let base;
+
+        if(hit.side===0)
+            base=[130,92,61];
+        else
+            base=[100,70,48];
+
+        const rr=
+            Math.floor(base[0]*shade);
+
+        const gg=
+            Math.floor(base[1]*shade);
+
+        const bb=
+            Math.floor(base[2]*shade);
+
+        wctx.fillStyle=
+            `rgb(${rr},${gg},${bb})`;
+
+        const columnWidth=
+            W/RAYS+1;
+
+        wctx.fillRect(
+            r*W/RAYS,
+            top,
+            columnWidth,
+            bottom-top
+        );
+    }
+
+    /*
+       Detalles horizontales del suelo.
+    */
+
+    wctx.globalAlpha=.08;
+
+    for(let i=1;i<12;i++){
+
+        const yy=
+            H*.5+
+            Math.pow(i/12,1.8)*
+            H*.5;
+
+        wctx.strokeStyle="#ffffff";
+
+        wctx.beginPath();
+
+        wctx.moveTo(0,yy);
+        wctx.lineTo(W,yy);
+
+        wctx.stroke();
+    }
+
+    wctx.globalAlpha=1;
+
+    /*
+       Retícula.
+    */
+
+    wctx.strokeStyle="rgba(255,255,255,.35)";
+    wctx.lineWidth=1;
+
+    wctx.beginPath();
+    wctx.moveTo(W*.5-7,H*.5);
+    wctx.lineTo(W*.5+7,H*.5);
+    wctx.moveTo(W*.5,H*.5-7);
+    wctx.lineTo(W*.5,H*.5+7);
+    wctx.stroke();
+}
+
+
+/* ==========================================================
+   MOVIMIENTO
+========================================================== */
+
+function updatePlayer(dt){
+
+    let forward=
+        -moveY;
+
+    let strafe=
+        moveX;
+
+    /*
+       Teclado.
+    */
+
+    if(keys["KeyW"])
+        forward+=1;
+
+    if(keys["KeyS"])
+        forward-=1;
+
+    if(keys["KeyA"])
+        strafe-=1;
+
+    if(keys["KeyD"])
+        strafe+=1;
+
+    const length=
+        Math.hypot(
+            forward,
+            strafe
+        );
+
+    if(length>1){
+
+        forward/=length;
+        strafe/=length;
+    }
+
+    const speedMove=
+        2.8*dt;
+
+    const dx=
+        (
+            Math.cos(player.angle)*forward-
+            Math.sin(player.angle)*strafe
+        )*speedMove;
+
+    const dy=
+        (
+            Math.sin(player.angle)*forward+
+            Math.cos(player.angle)*strafe
+        )*speedMove;
 
     const nx=
         player.x+dx;
@@ -1252,2247 +2985,644 @@ function movePlayer(dx,dy){
     const ny=
         player.y+dy;
 
-    if(
-        canMove(nx,player.y)
-    ){
-
+    if(!blocked(nx,player.y))
         player.x=nx;
+
+    if(!blocked(player.x,ny))
+        player.y=ny;
+
+    /*
+       Gravedad.
+    */
+
+    player.vz-=GRAVITY*dt;
+
+    player.z+=player.vz*dt;
+
+    if(player.z<0){
+
+        player.z=0;
+        player.vz=0;
     }
 
-    if(
-        canMove(player.x,ny)
-    ){
+    document.getElementById("worldPos")
+        .textContent=
+        player.x.toFixed(1)+
+        ", "+
+        player.y.toFixed(1);
+}
 
+
+/* ==========================================================
+   SALTO
+========================================================== */
+
+function jump(){
+
+    if(player.z<=.001){
+
+        player.vz=4.3;
+    }
+}
+
+
+/* ==========================================================
+   DASH
+========================================================== */
+
+function dash(){
+
+    const d=1.4;
+
+    const nx=
+        player.x+
+        Math.cos(player.angle)*d;
+
+    const ny=
+        player.y+
+        Math.sin(player.angle)*d;
+
+    if(!blocked(nx,ny)){
+
+        player.x=nx;
         player.y=ny;
     }
 }
 
 
-/* ============================================================
-   INPUT TECLADO
-   ============================================================ */
+/* ==========================================================
+   TECLADO
+========================================================== */
 
-const keys={};
+addEventListener("keydown",e=>{
 
-addEventListener(
-    "keydown",
+    keys[e.code]=true;
+
+    if(e.code==="Space")
+        jump();
+
+    if(e.code==="ShiftLeft")
+        dash();
+
+    if(e.code==="Escape")
+        returnToGalaxy();
+});
+
+addEventListener("keyup",e=>{
+
+    keys[e.code]=false;
+});
+
+
+/* ==========================================================
+   CÁMARA MOUSE
+========================================================== */
+
+let mouseDown=false;
+let lastMouseX=0;
+let lastMouseY=0;
+
+worldCanvas.addEventListener(
+    "pointerdown",
     e=>{
 
-        keys[e.code]=true;
+        mouseDown=true;
 
-        if(
-            e.code==="Space"
-        )
-            actionJump();
-
-        if(
-            e.code==="ShiftLeft"
-        )
-            actionDash();
-
-        if(
-            e.code==="KeyE"
-        )
-            actionPulse();
-
-        if(
-            e.code==="KeyQ"
-        )
-            actionMagnet();
+        lastMouseX=e.clientX;
+        lastMouseY=e.clientY;
     }
 );
 
 addEventListener(
-    "keyup",
+    "pointerup",
+    ()=>{
+        mouseDown=false;
+    }
+);
+
+addEventListener(
+    "pointermove",
     e=>{
-        keys[e.code]=false;
+
+        if(!mouseDown || mode!=="world")
+            return;
+
+        const dx=
+            e.clientX-lastMouseX;
+
+        const dy=
+            e.clientY-lastMouseY;
+
+        lastMouseX=e.clientX;
+        lastMouseY=e.clientY;
+
+        player.angle+=
+            dx*.004;
+
+        /*
+           Cámara vertical.
+        */
+
+        cameraPitch-=
+            dy*.8;
+
+        cameraPitch=
+            Math.max(
+                -120,
+                Math.min(
+                    120,
+                    cameraPitch
+                )
+            );
     }
 );
 
 
-/* ============================================================
-   CONTROLES TÁCTILES
-   ============================================================ */
+/* ==========================================================
+   JOYSTICK
+========================================================== */
 
-function bindHold(id,callback){
+const joystick=
+    document.getElementById("joystick");
 
-    const el=
-        document.getElementById(id);
+const stick=
+    document.getElementById("stick");
 
-    el.addEventListener(
-        "pointerdown",
-        e=>{
+let joyPointer=null;
 
-            e.preventDefault();
+joystick.addEventListener(
+    "pointerdown",
+    e=>{
 
-            el.classList.add("active");
+        joyPointer=e.pointerId;
 
-            callback(true);
+        joystick.setPointerCapture(
+            e.pointerId
+        );
+
+        updateJoystick(e);
+    }
+);
+
+joystick.addEventListener(
+    "pointermove",
+    e=>{
+
+        if(e.pointerId!==joyPointer)
+            return;
+
+        updateJoystick(e);
+    }
+);
+
+function updateJoystick(e){
+
+    const rect=
+        joystick.getBoundingClientRect();
+
+    const cx=
+        rect.left+rect.width/2;
+
+    const cy=
+        rect.top+rect.height/2;
+
+    let dx=e.clientX-cx;
+    let dy=e.clientY-cy;
+
+    const max=45;
+
+    const len=
+        Math.hypot(dx,dy);
+
+    if(len>max){
+
+        dx=dx/len*max;
+        dy=dy/len*max;
+    }
+
+    stick.style.transform=
+        `translate(${dx}px,${dy}px)`;
+
+    moveX=dx/max;
+    moveY=dy/max;
+}
+
+function resetJoystick(){
+
+    joyPointer=null;
+
+    stick.style.transform=
+        "translate(0,0)";
+
+    moveX=0;
+    moveY=0;
+}
+
+joystick.addEventListener(
+    "pointerup",
+    resetJoystick
+);
+
+joystick.addEventListener(
+    "pointercancel",
+    resetJoystick
+);
+
+
+/* ==========================================================
+   CÁMARA TÁCTIL DERECHA
+========================================================== */
+
+let touchLook=false;
+let touchLX=0;
+let touchLY=0;
+
+worldCanvas.addEventListener(
+    "touchstart",
+    e=>{
+
+        for(const t of e.changedTouches){
+
+            if(t.clientX>W*.42){
+
+                touchLook=true;
+
+                touchLX=t.clientX;
+                touchLY=t.clientY;
+            }
         }
-    );
 
-    function release(e){
+    },
+    {passive:false}
+);
+
+worldCanvas.addEventListener(
+    "touchmove",
+    e=>{
+
+        if(!touchLook)
+            return;
 
         e.preventDefault();
 
-        el.classList.remove("active");
-
-        callback(false);
-    }
-
-    el.addEventListener(
-        "pointerup",
-        release
-    );
-
-    el.addEventListener(
-        "pointercancel",
-        release
-    );
-
-    el.addEventListener(
-        "pointerleave",
-        release
-    );
-}
-
-bindHold(
-    "forward",
-    active=>{
-        player.moveInput=
-            active?1:0;
-    }
-);
-
-bindHold(
-    "back",
-    active=>{
-        player.moveInput=
-            active?-1:0;
-    }
-);
-
-bindHold(
-    "turnLeft",
-    active=>{
-        player.turnInput=
-            active?-1:0;
-    }
-);
-
-bindHold(
-    "turnRight",
-    active=>{
-        player.turnInput=
-            active?1:0;
-    }
-);
-
-
-function bindAction(id,fn){
-
-    const el=
-        document.getElementById(id);
-
-    el.addEventListener(
-        "pointerdown",
-        e=>{
-
-            e.preventDefault();
-
-            el.classList.add("active");
-
-            fn();
-
-            setTimeout(
-                ()=>{
-                    el.classList.remove(
-                        "active"
-                    );
-                },
-                150
-            );
-        }
-    );
-}
-
-bindAction(
-    "btnA",
-    actionJump
-);
-
-bindAction(
-    "btnB",
-    actionDash
-);
-
-bindAction(
-    "btnC",
-    actionPulse
-);
-
-bindAction(
-    "btnD",
-    actionMagnet
-);
-
-
-/* ============================================================
-   ACCIONES
-   ============================================================ */
-
-function actionJump(){
-
-    if(
-        !player.grounded
-    )
-        return;
-
-    player.vz=
-        CFG.JUMP_FORCE;
-
-    player.grounded=false;
-
-    flash(.25);
-}
-
-
-function actionDash(){
-
-    if(
-        player.dashCooldown>0
-    )
-        return;
-
-    player.dashTimer=
-        CFG.DASH_TIME;
-
-    player.dashCooldown=
-        CFG.DASH_COOLDOWN;
-
-    flash(.4);
-}
-
-
-function actionPulse(){
-
-    player.pulse=.6;
-
-    flash(.55);
-
-    for(const o of objects){
+        const t=
+            e.changedTouches[0];
 
         const dx=
-            o.x-player.x;
+            t.clientX-touchLX;
 
         const dy=
-            o.y-player.y;
+            t.clientY-touchLY;
 
-        const d=
-            Math.hypot(dx,dy);
+        touchLX=t.clientX;
+        touchLY=t.clientY;
 
-        if(
-            d<4
-        ){
+        player.angle+=
+            dx*.005;
 
-            o.vx+=
-                dx/
-                Math.max(d,.01)*
-                3;
+        cameraPitch-=
+            dy*.75;
 
-            o.vy+=
-                dy/
-                Math.max(d,.01)*
-                3;
-        }
-    }
-}
-
-
-function actionMagnet(){
-
-    player.magnet=
-        !player.magnet;
-
-    flash(.18);
-}
-
-
-/* ============================================================
-   MOVIMIENTO
-   ============================================================ */
-
-function updateMovement(dt){
-
-    let move=
-        player.moveInput;
-
-    let turn=
-        player.turnInput;
-
-    if(keys["KeyW"])
-        move=1;
-
-    if(keys["KeyS"])
-        move=-1;
-
-    if(keys["KeyA"])
-        turn=-1;
-
-    if(keys["KeyD"])
-        turn=1;
-
-
-    /*
-       Giro.
-    */
-
-    player.angle+=
-        turn*
-        CFG.TURN_SPEED*
-        dt;
-
-
-    /*
-       Movimiento hacia donde mira.
-    */
-
-    const dx=
-        Math.cos(player.angle)*
-        move;
-
-    const dy=
-        Math.sin(player.angle)*
-        move;
-
-    const targetVX=
-        dx*CFG.WALK_SPEED;
-
-    const targetVY=
-        dy*CFG.WALK_SPEED;
-
-
-    /*
-       Aceleración flotante.
-    */
-
-    const acceleration=
-        Math.min(
-            1,
-            CFG.ACCELERATION*dt
-        );
-
-    player.vx+=
-        (
-            targetVX-
-            player.vx
-        )*
-        acceleration;
-
-    player.vy+=
-        (
-            targetVY-
-            player.vy
-        )*
-        acceleration;
-
-
-    /*
-       Fricción.
-    */
-
-    if(
-        move===0
-    ){
-
-        const friction=
-            Math.exp(
-                -CFG.FRICTION*dt
-            );
-
-        player.vx*=friction;
-        player.vy*=friction;
-    }
-
-
-    /*
-       DASH.
-    */
-
-    if(
-        player.dashTimer>0
-    ){
-
-        player.dashTimer-=dt;
-
-        player.vx=
-            Math.cos(
-                player.angle
-            )*
-            CFG.DASH_SPEED;
-
-        player.vy=
-            Math.sin(
-                player.angle
-            )*
-            CFG.DASH_SPEED;
-    }
-
-
-    if(
-        player.dashCooldown>0
-    ){
-
-        player.dashCooldown-=dt;
-    }
-
-
-    movePlayer(
-        player.vx*dt,
-        player.vy*dt
-    );
-
-
-    /*
-       ========================================================
-       FÍSICA DEL SALTO
-       ========================================================
-
-       z = altura del jugador.
-
-       Al saltar:
-       vz positivo.
-
-       Durante la caída:
-       gravedad reduce vz.
-
-       El render utiliza z para desplazar
-       la cámara completa.
-    */
-
-    player.vz-=
-        CFG.GRAVITY*dt;
-
-    player.z+=
-        player.vz*dt;
-
-    if(
-        player.z<=0
-    ){
-
-        player.z=0;
-
-        player.vz=0;
-
-        player.grounded=true;
-    }
-}
-
-
-/* ============================================================
-   RAYCAST
-   ============================================================ */
-
-const zBuffer=[];
-
-function castRay(angle){
-
-    const sin=
-        Math.sin(angle);
-
-    const cos=
-        Math.cos(angle);
-
-    let distance=0;
-
-    const step=.025;
-
-    let hitX=player.x;
-
-    let hitY=player.y;
-
-    while(
-        distance<CFG.MAX_DEPTH
-    ){
-
-        distance+=step;
-
-        hitX=
-            player.x+
-            cos*distance;
-
-        hitY=
-            player.y+
-            sin*distance;
-
-        if(
-            isWall(
-                hitX,
-                hitY
-            )
-        ){
-
-            return {
-                distance,
-                x:hitX,
-                y:hitY
-            };
-        }
-    }
-
-    return {
-        distance:CFG.MAX_DEPTH,
-        x:hitX,
-        y:hitY
-    };
-}
-
-
-/* ============================================================
-   RENDER PRINCIPAL
-   ============================================================ */
-
-function render(){
-
-    const pal=palette();
-
-    /*
-       ========================================================
-       CÁMARA
-       ========================================================
-
-       Esta es la corrección importante del salto.
-
-       Si el jugador sube:
-           player.z aumenta.
-
-       La cámara se eleva.
-
-       El horizonte baja en pantalla.
-
-       Esto hace que el salto tenga una relación visual
-       coherente con el mundo.
-    */
-
-    const cameraBob=
-        Math.sin(time*14)*
-        Math.min(
-            .7,
-            Math.abs(player.vz)*
-            .025
-        );
-
-    const cameraHeight=
-        player.z+
-        cameraBob;
-
-    /*
-       Desplazamiento vertical de cámara.
-    */
-
-    const horizon=
-        H*.5+
-        cameraHeight*85;
-
-
-    /* ========================================================
-       CIELO NEBULOSO
-       ======================================================== */
-
-    const sky=
-        ctx.createLinearGradient(
-            0,
-            0,
-            0,
-            horizon
-        );
-
-    const hue=
-        (
-            pal.a+
-            time*18+
-            save.level*31
-        )%360;
-
-    sky.addColorStop(
-        0,
-        `hsl(
-            ${hue},
-            100%,
-            6%
-        )`
-    );
-
-    sky.addColorStop(
-        .35,
-        `hsl(
-            ${(hue+pal.b)%360},
-            100%,
-            17%
-        )`
-    );
-
-    sky.addColorStop(
-        1,
-        `hsl(
-            ${(hue+pal.c)%360},
-            100%,
-            10%
-        )`
-    );
-
-    ctx.fillStyle=sky;
-
-    ctx.fillRect(
-        0,
-        0,
-        W,
-        horizon
-    );
-
-
-    /*
-       Nebulosa animada.
-    */
-
-    ctx.save();
-
-    ctx.globalAlpha=.15;
-
-    for(
-        let i=0;
-        i<8;
-        i++
-    ){
-
-        const nx=
-            W*.5+
-            Math.sin(
-                time*.2+i*2
-            )*
-            W*.4;
-
-        const ny=
-            horizon*.35+
-            Math.cos(
-                time*.17+i
-            )*
-            H*.18;
-
-        const radius=
-            80+
-            i*35;
-
-        const g=
-            ctx.createRadialGradient(
-                nx,
-                ny,
-                0,
-                nx,
-                ny,
-                radius
-            );
-
-        g.addColorStop(
-            0,
-            `hsla(
-                ${(hue+i*45)%360},
-                100%,
-                65%,
-                .8
-            )`
-        );
-
-        g.addColorStop(
-            1,
-            "transparent"
-        );
-
-        ctx.fillStyle=g;
-
-        ctx.beginPath();
-
-        ctx.arc(
-            nx,
-            ny,
-            radius,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fill();
-    }
-
-    ctx.restore();
-
-
-    /* ========================================================
-       SUELO
-       ======================================================== */
-
-    const floor=
-        ctx.createLinearGradient(
-            0,
-            horizon,
-            0,
-            H
-        );
-
-    floor.addColorStop(
-        0,
-        `hsl(
-            ${(hue+pal.b)%360},
-            100%,
-            9%
-        )`
-    );
-
-    floor.addColorStop(
-        1,
-        `hsl(
-            ${(hue+pal.c)%360},
-            100%,
-            3%
-        )`
-    );
-
-    ctx.fillStyle=floor;
-
-    ctx.fillRect(
-        0,
-        horizon,
-        W,
-        H-horizon
-    );
-
-
-    /* ========================================================
-       RAYOS
-       ======================================================== */
-
-    for(
-        let i=0;
-        i<CFG.RAYS;
-        i++
-    ){
-
-        const cameraX=
-            i/
-            (CFG.RAYS-1);
-
-        const rayAngle=
-            player.angle-
-            CFG.FOV/2+
-            cameraX*
-            CFG.FOV;
-
-        const ray=
-            castRay(rayAngle);
-
-        const corrected=
-            ray.distance*
-            Math.cos(
-                rayAngle-
-                player.angle
-            );
-
-        zBuffer[i]=corrected;
-
-        const wallHeight=
-            H/
+        cameraPitch=
             Math.max(
-                corrected,
-                .001
-            );
-
-        /*
-           Importante:
-           el muro está centrado en el horizonte
-           de la cámara, no en H/2.
-
-           Esto hace que el salto cambie realmente
-           la perspectiva.
-        */
-
-        const top=
-            horizon-
-            wallHeight*.5;
-
-        const bottom=
-            horizon+
-            wallHeight*.5;
-
-
-        /*
-           Textura procedural.
-        */
-
-        const tex=
-            (
-                ray.x+
-                ray.y*.71
-            )%1;
-
-        const wave=
-            Math.sin(
-                tex*28+
-                time*3+
-                corrected*2
-            );
-
-        const wallHue=
-            (
-                hue+
-                tex*240+
-                wave*45+
-                corrected*9
-            )%360;
-
-        const light=
-            40+
-            wave*12;
-
-        ctx.fillStyle=
-            `hsl(
-                ${wallHue},
-                100%,
-                ${light}%
-            )`;
-
-        ctx.fillRect(
-            cameraX*W,
-            top,
-            W/CFG.RAYS+1,
-            bottom-top
-        );
-
-
-        /*
-           Franjas de textura.
-        */
-
-        const stripe=
-            Math.sin(
-                ray.distance*5+
-                tex*30+
-                time*2
-            );
-
-        if(
-            stripe>.35
-        ){
-
-            ctx.fillStyle=
-                `hsla(
-                    ${(wallHue+70)%360},
-                    100%,
-                    75%,
-                    .18
-                )`;
-
-            ctx.fillRect(
-                cameraX*W,
-                top,
-                W/CFG.RAYS+1,
-                3
-            );
-        }
-    }
-
-
-    renderVortex(
-        horizon,
-        hue
-    );
-
-    renderObjects(
-        horizon
-    );
-
-    renderExit(
-        horizon
-    );
-
-
-    /*
-       Pulso visual.
-    */
-
-    if(
-        player.pulse>0
-    ){
-
-        ctx.save();
-
-        ctx.globalAlpha=
-            player.pulse*.25;
-
-        ctx.strokeStyle=
-            `hsl(
-                ${(hue+100)%360},
-                100%,
-                80%
-            )`;
-
-        ctx.lineWidth=5;
-
-        ctx.beginPath();
-
-        ctx.arc(
-            W/2,
-            horizon,
-            (1-player.pulse)*650,
-            0,
-            Math.PI*2
-        );
-
-        ctx.stroke();
-
-        ctx.restore();
-    }
-}
-
-
-/* ============================================================
-   VÓRTICE DEL SUELO
-   ============================================================ */
-
-function renderVortex(
-    horizon,
-    baseHue
-){
-
-    ctx.save();
-
-    ctx.globalAlpha=.28;
-
-    const cx=W/2;
-
-    const cy=horizon;
-
-    for(
-        let i=1;
-        i<18;
-        i++
-    ){
-
-        const radius=
-            i*75+
-            (
-                time*55
-            )%75;
-
-        ctx.strokeStyle=
-            `hsl(
-                ${(baseHue+i*29)%360},
-                100%,
-                60%
-            )`;
-
-        ctx.lineWidth=
-            i%4===0?2:1;
-
-        ctx.beginPath();
-
-        for(
-            let a=0;
-            a<Math.PI*2;
-            a+=.12
-        ){
-
-            const distortion=
-                Math.sin(
-                    a*5+
-                    time*2+
-                    i
-                )*
-                (
-                    10+
-                    i*1.4
-                );
-
-            const r=
-                radius+
-                distortion;
-
-            const x=
-                cx+
-                Math.cos(
-                    a+
-                    time*.22
-                )*
-                r;
-
-            const y=
-                cy+
-                Math.sin(
-                    a+
-                    time*.22
-                )*
-                r*.38;
-
-            if(a===0)
-                ctx.moveTo(x,y);
-            else
-                ctx.lineTo(x,y);
-        }
-
-        ctx.stroke();
-    }
-
-    ctx.restore();
-}
-
-
-/* ============================================================
-   OBJETOS
-   ============================================================ */
-
-function renderObjects(horizon){
-
-    const list=[];
-
-    for(const o of objects){
-
-        const dx=
-            o.x-player.x;
-
-        const dy=
-            o.y-player.y;
-
-        const distance=
-            Math.hypot(dx,dy);
-
-        let angle=
-            Math.atan2(dy,dx)-
-            player.angle;
-
-        while(
-            angle>Math.PI
-        )
-            angle-=Math.PI*2;
-
-        while(
-            angle<-Math.PI
-        )
-            angle+=Math.PI*2;
-
-        if(
-            Math.abs(angle)>
-            CFG.FOV*.75
-        )
-            continue;
-
-        list.push({
-            o,
-            distance,
-            angle
-        });
-    }
-
-
-    list.sort(
-        (a,b)=>
-            b.distance-
-            a.distance
-    );
-
-
-    for(const s of list){
-
-        const o=s.o;
-
-        const screenX=
-            W/2+
-            Math.tan(s.angle)*
-            (
-                W/2
-            )/
-            Math.tan(
-                CFG.FOV/2
-            );
-
-        const size=
-            H/
-            Math.max(
-                s.distance,
-                .1
-            )*.65;
-
-        const rayIndex=
-            Math.floor(
-                screenX/W*
-                CFG.RAYS
-            );
-
-        if(
-            rayIndex>=0 &&
-            rayIndex<CFG.RAYS &&
-            zBuffer[rayIndex]<
-            s.distance
-        )
-            continue;
-
-
-        /*
-           El objeto también respeta la cámara vertical.
-        */
-
-        const objectHeight=
-            o.z+
-            Math.sin(
-                time*3+
-                o.phase
-            )*.12;
-
-        const y=
-            horizon-
-            objectHeight*
-            55-
-            size*.35;
-
-
-        drawEnergy(
-            screenX,
-            y,
-            size,
-            o.rot
-        );
-    }
-}
-
-
-function drawEnergy(
-    x,
-    y,
-    size,
-    rotation
-){
-
-    const p=palette();
-
-    ctx.save();
-
-    ctx.translate(
-        x,
-        y
-    );
-
-    ctx.rotate(
-        rotation+
-        time
-    );
-
-    const pulse=
-        1+
-        Math.sin(
-            time*5
-        )*.13;
-
-    ctx.scale(
-        pulse,
-        pulse
-    );
-
-    const hue=
-        (
-            p.a+
-            time*100+
-            x*.1
-        )%360;
-
-    ctx.shadowBlur=25;
-
-    ctx.shadowColor=
-        `hsl(
-            ${hue},
-            100%,
-            60%
-        )`;
-
-    ctx.strokeStyle=
-        `hsl(
-            ${hue},
-            100%,
-            75%
-        )`;
-
-    ctx.fillStyle=
-        `hsla(
-            ${(hue+p.b)%360},
-            100%,
-            55%,
-            .5
-        )`;
-
-    ctx.lineWidth=3;
-
-    /*
-       Octaedro.
-    */
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        0,
-        -size*.55
-    );
-
-    ctx.lineTo(
-        size*.38,
-        0
-    );
-
-    ctx.lineTo(
-        0,
-        size*.55
-    );
-
-    ctx.lineTo(
-        -size*.38,
-        0
-    );
-
-    ctx.closePath();
-
-    ctx.fill();
-
-    ctx.stroke();
-
-    ctx.beginPath();
-
-    ctx.moveTo(
-        0,
-        -size*.55
-    );
-
-    ctx.lineTo(
-        0,
-        size*.55
-    );
-
-    ctx.moveTo(
-        -size*.38,
-        0
-    );
-
-    ctx.lineTo(
-        size*.38,
-        0
-    );
-
-    ctx.stroke();
-
-    ctx.restore();
-}
-
-
-/* ============================================================
-   SALIDA
-   ============================================================ */
-
-function renderExit(horizon){
-
-    const dx=
-        exit.x-player.x;
-
-    const dy=
-        exit.y-player.y;
-
-    const distance=
-        Math.hypot(
-            dx,
-            dy
-        );
-
-    let angle=
-        Math.atan2(dy,dx)-
-        player.angle;
-
-    while(
-        angle>Math.PI
-    )
-        angle-=Math.PI*2;
-
-    while(
-        angle<-Math.PI
-    )
-        angle+=Math.PI*2;
-
-    if(
-        Math.abs(angle)>
-        CFG.FOV*.75
-    )
-        return;
-
-    const screenX=
-        W/2+
-        Math.tan(angle)*
-        (W/2)/
-        Math.tan(
-            CFG.FOV/2
-        );
-
-    const size=
-        H/
-        Math.max(
-            distance,
-            .1
-        );
-
-    const rayIndex=
-        Math.floor(
-            screenX/W*
-            CFG.RAYS
-        );
-
-    if(
-        rayIndex>=0 &&
-        rayIndex<CFG.RAYS &&
-        zBuffer[rayIndex]<
-        distance
-    )
-        return;
-
-
-    ctx.save();
-
-    ctx.translate(
-        screenX,
-        horizon-size*.45
-    );
-
-    ctx.rotate(
-        time*.8
-    );
-
-    const p=palette();
-
-    ctx.strokeStyle=
-        `hsl(
-            ${(p.c+time*100)%360},
-            100%,
-            70%
-        )`;
-
-    ctx.shadowBlur=35;
-
-    ctx.shadowColor=
-        ctx.strokeStyle;
-
-    ctx.lineWidth=5;
-
-    ctx.beginPath();
-
-    ctx.arc(
-        0,
-        0,
-        size*.45,
-        0,
-        Math.PI*2
-    );
-
-    ctx.stroke();
-
-    ctx.restore();
-}
-
-
-/* ============================================================
-   ACTUALIZAR OBJETOS
-   ============================================================ */
-
-function updateObjects(dt){
-
-    for(
-        let i=objects.length-1;
-        i>=0;
-        i--
-    ){
-
-        const o=objects[i];
-
-        o.rot+=dt;
-
-        o.z=
-            .6+
-            Math.sin(
-                time*3+
-                o.phase
-            )*.12;
-
-
-        /*
-           IMÁN
-        */
-
-        if(player.magnet){
-
-            const dx=
-                player.x-o.x;
-
-            const dy=
-                player.y-o.y;
-
-            const d=
-                Math.hypot(dx,dy);
-
-            if(
-                d<5
-            ){
-
-                const force=
-                    (
-                        1-
-                        d/5
-                    )*8;
-
-                o.vx+=
-                    dx/
-                    Math.max(d,.01)*
-                    force*
-                    dt;
-
-                o.vy+=
-                    dy/
-                    Math.max(d,.01)*
-                    force*
-                    dt;
-            }
-        }
-
-
-        /*
-           Física del pulso.
-        */
-
-        o.vx*=
-            Math.exp(-4*dt);
-
-        o.vy*=
-            Math.exp(-4*dt);
-
-
-        const nx=
-            o.x+
-            o.vx*dt;
-
-        const ny=
-            o.y+
-            o.vy*dt;
-
-        if(
-            canMove(nx,ny)
-        ){
-
-            o.x=nx;
-            o.y=ny;
-        }
-
-
-        /*
-           Recoger.
-        */
-
-        const distance=
-            Math.hypot(
-                o.x-player.x,
-                o.y-player.y
-            );
-
-        if(
-            distance<
-            CFG.PICKUP_DISTANCE
-        ){
-
-            collectObject(i);
-        }
-    }
-}
-
-
-/* ============================================================
-   RECOGER
-   ============================================================ */
-
-function collectObject(index){
-
-    const o=
-        objects[index];
-
-    save.xp+=o.value;
-
-    save.totalXP+=o.value;
-
-    save.totalObjects++;
-
-    currentLevelObjects++;
-
-    objects.splice(
-        index,
-        1
-    );
-
-
-    checkLevelUp();
-
-    saveGame();
-
-    flash(.12);
-}
-
-
-function xpNeeded(level){
-
-    return Math.floor(
-        CFG.XP_BASE*
-        Math.pow(
-            level,
-            1.25
-        )
-    );
-}
-
-
-function checkLevelUp(){
-
-    let leveled=false;
-
-    while(
-        save.xp>=
-        xpNeeded(save.level)
-    ){
-
-        save.xp-=
-            xpNeeded(save.level);
-
-        save.level++;
-
-        leveled=true;
-    }
-
-    if(leveled){
-
-        /*
-           La nueva paleta aparece inmediatamente.
-        */
-
-        showMessage(
-            "NIVEL "+save.level,
-            palette().name
-        );
-
-        flash(1);
-
-        /*
-           El nivel también regenera
-           un nuevo laberinto.
-        */
-
-        generateMaze(
-            save.level
-        );
-    }
-}
-
-
-/* ============================================================
-   SALIDA
-   ============================================================ */
-
-let transitionLock=false;
-
-function checkExit(){
-
-    if(transitionLock)
-        return;
-
-    const distance=
-        Math.hypot(
-            player.x-exit.x,
-            player.y-exit.y
-        );
-
-    if(
-        distance<
-        CFG.EXIT_DISTANCE
-    ){
-
-        completeMaze();
-    }
-}
-
-
-function completeMaze(){
-
-    transitionLock=true;
-
-    save.totalTime+=
-        levelTime;
-
-    save.completedMazes++;
-
-
-    /*
-       Bonus de finalización.
-    */
-
-    const bonus=
-        50+
-        save.level*15;
-
-    save.xp+=bonus;
-
-    save.totalXP+=bonus;
-
-
-    /*
-       La salida puede provocar subida de nivel.
-    */
-
-    let leveled=false;
-
-    while(
-        save.xp>=
-        xpNeeded(save.level)
-    ){
-
-        save.xp-=
-            xpNeeded(save.level);
-
-        save.level++;
-
-        leveled=true;
-    }
-
-
-    saveGame();
-
-    showMessage(
-        "SALIDA",
-        "NUEVO LABERINTO"
-    );
-
-    flash(1);
-
-
-    setTimeout(
-        ()=>{
-
-            generateMaze(
-                save.level
-            );
-
-            transitionLock=false;
-
-        },
-        1100
-    );
-}
-
-
-/* ============================================================
-   MINIMAPA
-   ============================================================ */
-
-function renderMap(){
-
-    const mw=mapCanvas.width;
-    const mh=mapCanvas.height;
-
-    mapCtx.clearRect(
-        0,
-        0,
-        mw,
-        mh
-    );
-
-
-    /*
-       Fondo.
-    */
-
-    mapCtx.fillStyle=
-        "rgba(0,0,15,.95)";
-
-    mapCtx.fillRect(
-        0,
-        0,
-        mw,
-        mh
-    );
-
-
-    const sx=
-        mw/mazeW;
-
-    const sy=
-        mh/mazeH;
-
-
-    /*
-       Primero dibujamos todos los corredores
-       para que el jugador vea CLARAMENTE
-       la estructura completa.
-    */
-
-    mapCtx.strokeStyle=
-        `hsla(
-            ${palette().b},
-            100%,
-            65%,
-            .75
-        )`;
-
-    mapCtx.lineWidth=
-        Math.max(
-            1,
-            sx*.18
-        );
-
-
-    for(
-        let y=0;
-        y<mazeH;
-        y++
-    ){
-
-        for(
-            let x=0;
-            x<mazeW;
-            x++
-        ){
-
-            if(
-                maze[y][x]===0
-            ){
-
-                mapCtx.strokeRect(
-                    x*sx+.5,
-                    y*sy+.5,
-                    sx-1,
-                    sy-1
-                );
-            }
-        }
-    }
-
-
-    /*
-       Paredes como líneas.
-    */
-
-    mapCtx.strokeStyle=
-        `hsla(
-            ${palette().a},
-            100%,
-            75%,
-            .7
-        )`;
-
-    mapCtx.lineWidth=1;
-
-    for(
-        let y=0;
-        y<mazeH;
-        y++
-    ){
-
-        for(
-            let x=0;
-            x<mazeW;
-            x++
-        ){
-
-            if(
-                maze[y][x]!==1
-            )
-                continue;
-
-            mapCtx.strokeRect(
-                x*sx,
-                y*sy,
-                sx,
-                sy
-            );
-        }
-    }
-
-
-    /*
-       OBJETOS.
-    */
-
-    for(
-        const o of objects
-    ){
-
-        mapCtx.fillStyle=
-            "#ff00ff";
-
-        mapCtx.shadowBlur=8;
-
-        mapCtx.shadowColor=
-            "#ff00ff";
-
-        mapCtx.beginPath();
-
-        mapCtx.arc(
-            o.x*sx,
-            o.y*sy,
-            Math.max(
-                2,
-                sx*.25
-            ),
-            0,
-            Math.PI*2
-        );
-
-        mapCtx.fill();
-    }
-
-    mapCtx.shadowBlur=0;
-
-
-    /*
-       SALIDA.
-    */
-
-    mapCtx.fillStyle=
-        "#ffff00";
-
-    mapCtx.shadowBlur=12;
-
-    mapCtx.shadowColor=
-        "#ffff00";
-
-    mapCtx.beginPath();
-
-    mapCtx.arc(
-        exit.x*sx,
-        exit.y*sy,
-        Math.max(
-            4,
-            sx*.42
-        ),
-        0,
-        Math.PI*2
-    );
-
-    mapCtx.fill();
-
-    mapCtx.shadowBlur=0;
-
-
-    /*
-       INICIO.
-    */
-
-    mapCtx.strokeStyle=
-        "#00ffff";
-
-    mapCtx.lineWidth=2;
-
-    mapCtx.beginPath();
-
-    mapCtx.arc(
-        spawn.x*sx,
-        spawn.y*sy,
-        Math.max(
-            4,
-            sx*.45
-        ),
-        0,
-        Math.PI*2
-    );
-
-    mapCtx.stroke();
-
-
-    /*
-       JUGADOR.
-    */
-
-    mapCtx.fillStyle=
-        "#ffffff";
-
-    mapCtx.shadowBlur=12;
-
-    mapCtx.shadowColor=
-        "#ffffff";
-
-    mapCtx.beginPath();
-
-    mapCtx.arc(
-        player.x*sx,
-        player.y*sy,
-        Math.max(
-            3,
-            sx*.35
-        ),
-        0,
-        Math.PI*2
-    );
-
-    mapCtx.fill();
-
-    mapCtx.shadowBlur=0;
-
-
-    /*
-       Dirección del jugador.
-    */
-
-    mapCtx.strokeStyle=
-        "#ffffff";
-
-    mapCtx.lineWidth=1.5;
-
-    mapCtx.beginPath();
-
-    mapCtx.moveTo(
-        player.x*sx,
-        player.y*sy
-    );
-
-    mapCtx.lineTo(
-        (
-            player.x+
-            Math.cos(player.angle)*
-            1.5
-        )*sx,
-        (
-            player.y+
-            Math.sin(player.angle)*
-            1.5
-        )*sy
-    );
-
-    mapCtx.stroke();
-}
-
-
-/* ============================================================
-   HUD
-   ============================================================ */
-
-function updateHUD(){
-
-    const need=
-        xpNeeded(save.level);
-
-    const percent=
-        Math.min(
-            100,
-            save.xp/
-            need*
-            100
-        );
-
-    document.getElementById(
-        "hpFill"
-    ).style.width=
-        player.health+"%";
-
-    document.getElementById(
-        "xpFill"
-    ).style.width=
-        percent+"%";
-
-    document.getElementById(
-        "levelText"
-    ).textContent=
-        "NIV "+save.level;
-
-    document.getElementById(
-        "xpText"
-    ).textContent=
-        save.xp+
-        " / "+
-        need;
-
-    document.getElementById(
-        "objectsText"
-    ).textContent=
-        currentLevelObjects;
-
-    document.getElementById(
-        "mazesText"
-    ).textContent=
-        save.completedMazes;
-
-    document.getElementById(
-        "timeText"
-    ).textContent=
-        formatTime(levelTime);
-}
-
-
-function formatTime(seconds){
-
-    seconds=Math.floor(seconds);
-
-    const m=
-        Math.floor(
-            seconds/60
-        );
-
-    const s=
-        seconds%60;
-
-    return (
-        String(m).padStart(2,"0")+
-        ":"+
-        String(s).padStart(2,"0")
-    );
-}
-
-
-/* ============================================================
-   MENSAJES
-   ============================================================ */
-
-let messageTimer=0;
-
-function showMessage(
-    title,
-    text
-){
-
-    document.getElementById(
-        "messageTitle"
-    ).textContent=
-        title;
-
-    document.getElementById(
-        "messageText"
-    ).textContent=
-        text;
-
-    document.getElementById(
-        "message"
-    ).classList.add(
-        "show"
-    );
-
-    messageTimer=2;
-}
-
-
-/* ============================================================
-   FLASH
-   ============================================================ */
-
-let flashPower=0;
-
-function flash(power){
-
-    flashPower=
-        Math.max(
-            flashPower,
-            power
-        );
-}
-
-
-/* ============================================================
-   POST PROCESADO
-   ============================================================ */
-
-function updatePostProcess(){
-
-    const speed=
-        Math.min(
-            1,
-            Math.hypot(
-                player.vx,
-                player.vy
-            )/
-            CFG.DASH_SPEED
-        );
-
-    const hueShift=
-        (
-            Math.sin(
-                time*1.6
-            )*
-            18+
-            speed*35+
-            save.level*11
-        );
-
-    const saturation=
-        1.35+
-        speed*.7;
-
-    const contrast=
-        1.05+
-        speed*.25;
-
-    canvas.style.filter=
-        `
-        hue-rotate(${hueShift}deg)
-        saturate(${saturation})
-        contrast(${contrast})
-        `;
-
-
-    /*
-       Aberración cromática durante el dash.
-    */
-
-    if(
-        player.dashTimer>0
-    ){
-
-        const offset=
-            Math.sin(
-                time*90
-            )*
-            2.5;
-
-        canvas.style.transform=
-            `
-            translateX(${offset}px)
-            scale(1.012)
-            `;
-
-    }else{
-
-        canvas.style.transform=
-            "translateX(0) scale(1)";
-    }
-}
-
-
-/* ============================================================
-   GAME LOOP
-   ============================================================ */
-
-let time=0;
-
-let lastTime=
-    performance.now();
-
-function loop(now){
-
-    let dt=
-        (
-            now-
-            lastTime
-        )/1000;
-
-    lastTime=now;
-
-    dt=
-        Math.min(
-            dt,
-            .033
-        );
-
-    time+=dt;
-
-    levelTime+=dt;
-
-    updateMovement(dt);
-
-    updateObjects(dt);
-
-    checkExit();
-
-
-    if(
-        player.pulse>0
-    ){
-
-        player.pulse=
-            Math.max(
-                0,
-                player.pulse-dt
-            );
-    }
-
-
-    if(
-        flashPower>0
-    ){
-
-        flashPower=
-            Math.max(
-                0,
-                flashPower-dt*3
-            );
-    }
-
-
-    if(
-        messageTimer>0
-    ){
-
-        messageTimer-=dt;
-
-        if(
-            messageTimer<=0
-        ){
-
-            document
-                .getElementById(
-                    "message"
+                -120,
+                Math.min(
+                    120,
+                    cameraPitch
                 )
-                .classList.remove(
-                    "show"
-                );
+            );
+    },
+    {passive:false}
+);
+
+worldCanvas.addEventListener(
+    "touchend",
+    ()=>{
+        touchLook=false;
+    }
+);
+
+
+/* ==========================================================
+   BOTONES
+========================================================== */
+
+document.getElementById("jump")
+.addEventListener(
+    "pointerdown",
+    e=>{
+        e.preventDefault();
+        jump();
+    }
+);
+
+document.getElementById("dash")
+.addEventListener(
+    "pointerdown",
+    e=>{
+        e.preventDefault();
+        dash();
+    }
+);
+
+document.getElementById("backGalaxy")
+.addEventListener(
+    "click",
+    returnToGalaxy
+);
+
+
+/* ==========================================================
+   MINIMAPA
+========================================================== */
+
+function updateMinimap(){
+
+    const size=145;
+
+    mctx.clearRect(
+        0,0,size,size
+    );
+
+    mctx.fillStyle="#030405";
+
+    mctx.fillRect(
+        0,0,size,size
+    );
+
+    const scale=
+        Math.min(
+            size/MAP_W,
+            size/MAP_H
+        );
+
+    for(let y=0;y<MAP_H;y++){
+
+        for(let x=0;x<MAP_W;x++){
+
+            mctx.fillStyle=
+                worldMap[y][x]
+                ? "#7d6244"
+                : "#15151b";
+
+            mctx.fillRect(
+                x*scale,
+                y*scale,
+                scale+.5,
+                scale+.5
+            );
         }
     }
 
+    mctx.fillStyle="#fff";
 
-    document.getElementById(
-        "flash"
-    ).style.opacity=
-        flashPower;
+    mctx.beginPath();
 
+    mctx.arc(
+        player.x*scale,
+        player.y*scale,
+        3,
+        0,
+        Math.PI*2
+    );
 
-    render();
+    mctx.fill();
 
-    renderMap();
+    mctx.strokeStyle="#fff";
 
-    updateHUD();
+    mctx.beginPath();
 
-    updatePostProcess();
+    mctx.moveTo(
+        player.x*scale,
+        player.y*scale
+    );
 
-    requestAnimationFrame(loop);
+    mctx.lineTo(
+        (player.x+
+        Math.cos(player.angle)*1.5)*scale,
+        (player.y+
+        Math.sin(player.angle)*1.5)*scale
+    );
+
+    mctx.stroke();
 }
 
 
-/* ============================================================
-   RECUPERACIÓN DE PESTAÑA
-   ============================================================ */
+/* ==========================================================
+   LOOP MUNDO
+========================================================== */
 
-document.addEventListener(
-    "visibilitychange",
+let lastWorld=performance.now();
+
+function worldLoop(now){
+
+    const dt=
+        Math.min(
+            .05,
+            (now-lastWorld)/1000
+        );
+
+    lastWorld=now;
+
+    if(mode==="world"){
+
+        updatePlayer(dt);
+        renderWorld();
+
+        /*
+           El minimapa no necesita actualizarse
+           cada frame.
+        */
+
+        if(
+            Math.floor(now/100)%2===0
+        )
+            updateMinimap();
+    }
+
+    requestAnimationFrame(worldLoop);
+}
+
+requestAnimationFrame(worldLoop);
+
+
+/* ==========================================================
+   VOLVER AL UNIVERSO
+========================================================== */
+
+function returnToGalaxy(){
+
+    const fade=
+        document.getElementById("fade");
+
+    fade.style.opacity=1;
+
+    setTimeout(()=>{
+
+        mode="galaxy";
+
+        galaxyCanvas.style.display="block";
+        worldCanvas.style.display="none";
+
+        document.getElementById("hud")
+            .style.display="block";
+
+        document.getElementById("worldHud")
+            .style.display="none";
+
+        document.getElementById("target")
+            .style.opacity=0;
+
+        setTimeout(()=>{
+            fade.style.opacity=0;
+        },300);
+
+    },500);
+}
+
+
+/* ==========================================================
+   CONTROLES UNIVERSO
+========================================================== */
+
+document.getElementById("pause")
+.addEventListener(
+    "click",
     ()=>{
-        lastTime=
-            performance.now();
+
+        paused=!paused;
+
+        document.getElementById("pause")
+            .textContent=
+            paused
+            ? "CONTINUAR"
+            : "PAUSAR";
     }
 );
 
 
-/* ============================================================
-   INICIO
-   ============================================================ */
+document.getElementById("newUniverse")
+.addEventListener(
+    "click",
+    ()=>{
 
-generateMaze(
-    save.level
+        seed=
+            Math.floor(
+                Math.random()*999999999
+            );
+
+        localStorage.setItem(
+            "UNIVERSE_SEED",
+            seed
+        );
+
+        shipDistance=0;
+        sectorActual=-999;
+        galaxyObjects=[];
+
+        selectedObject=null;
+        lastSelected=null;
+
+        systemMode=false;
+        mode="galaxy";
+
+        document.getElementById("fade")
+            .style.opacity=1;
+
+        setTimeout(()=>{
+            document.getElementById("fade")
+                .style.opacity=0;
+        },500);
+    }
 );
 
-showMessage(
-    "PSYCHEDELIC LABYRINTH",
-    "ENCUENTRA EL FINAL"
+
+/* ==========================================================
+   RUEDA / VELOCIDAD
+========================================================== */
+
+addEventListener(
+    "wheel",
+    e=>{
+
+        if(mode!=="galaxy")
+            return;
+
+        shipSpeed+=
+            e.deltaY<0
+            ? .2
+            : -.2;
+
+        shipSpeed=
+            Math.max(
+                .2,
+                Math.min(
+                    5,
+                    shipSpeed
+                )
+            );
+    },
+    {passive:true}
 );
 
-requestAnimationFrame(loop);
+
+/* ==========================================================
+   DOBLE CLICK = TURBO
+========================================================== */
+
+galaxyCanvas.addEventListener(
+    "dblclick",
+    ()=>{
+
+        if(mode!=="galaxy")
+            return;
+
+        shipSpeed=
+            Math.min(
+                5,
+                shipSpeed+1
+            );
+    }
+);
+
+
+/* ==========================================================
+   REEMPLAZAR PROYECCIÓN PARA SISTEMA
+========================================================== */
+
+/*
+   El renderizador principal usa projectGalaxy.
+   Cuando systemMode está activo queremos que los objetos
+   sean proyectados alrededor del Sol.
+*/
+
+const oldDrawGalaxyObject=
+    drawGalaxyObject;
+
+
+/*
+   No modificamos la función original:
+   utilizamos un pequeño adaptador en el loop principal.
+*/
+
+const originalGalaxyLoop=
+    galaxyLoop;
+
+
+/*
+   Mensaje inicial.
+*/
+
+console.log(
+    "UNIVERSO PROCEDURAL",
+    seed
+);
+
+console.log(
+    "Toca un objeto una vez para seleccionarlo.",
+    "Tócalo otra vez para viajar."
+);
 
 </script>
-
 </body>
 </html>
