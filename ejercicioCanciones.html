@@ -1,12 +1,14 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport"
       content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
 <title>PRĀṆA — El Templo de la Resonancia</title>
 
 <style>
+
 *{
   box-sizing:border-box;
   user-select:none;
@@ -20,8 +22,13 @@ html,body{
   height:100%;
   overflow:hidden;
   background:#05030a;
+  color:#ffe7a3;
   font-family:Georgia,"Times New Roman",serif;
-  color:#ffe8a8;
+}
+
+button{
+  font-family:inherit;
+  cursor:pointer;
 }
 
 #game{
@@ -32,6 +39,10 @@ html,body{
   background:#05030a;
 }
 
+/* =========================================================
+   HUD
+========================================================= */
+
 #hud{
   position:fixed;
   inset:0;
@@ -40,62 +51,71 @@ html,body{
 
 .top{
   position:absolute;
-  top:12px;
+  top:10px;
   left:50%;
   transform:translateX(-50%);
-  width:min(620px,90vw);
   text-align:center;
+  width:80%;
+  pointer-events:none;
 }
 
 .title{
-  font-size:14px;
+  font-size:13px;
   letter-spacing:5px;
-  color:#ffd76a;
+  color:#ffd66a;
   text-shadow:
-    0 0 8px #ffb300,
-    0 0 20px #ff5e00;
+    0 0 8px #ff9b20,
+    0 0 20px #ff5d00;
 }
 
 .subtitle{
   margin-top:3px;
-  font-size:9px;
+  font-size:8px;
   letter-spacing:3px;
-  color:#d7b985;
+  color:#c9b486;
 }
 
 .barBox{
   position:absolute;
-  width:190px;
+  top:18px;
+  width:180px;
   height:15px;
   border:1px solid rgba(255,220,130,.7);
-  background:rgba(0,0,0,.55);
-  box-shadow:0 0 12px rgba(255,170,40,.2);
-  border-radius:10px;
+  background:rgba(0,0,0,.65);
+  border-radius:9px;
   overflow:hidden;
-}
-
-.bar{
-  height:100%;
-  width:100%;
-  transition:width .12s linear;
 }
 
 #healthBox{
   left:16px;
-  top:18px;
 }
 
 #pranaBox{
   right:16px;
-  top:18px;
+}
+
+.bar{
+  width:100%;
+  height:100%;
+  transition:width .12s linear;
 }
 
 #healthBar{
-  background:linear-gradient(90deg,#7d0814,#ff3048,#ffb45c);
+  background:linear-gradient(
+    90deg,
+    #650711,
+    #ef243d,
+    #ffb25b
+  );
 }
 
 #pranaBar{
-  background:linear-gradient(90deg,#1268a8,#24d8e9,#fff1a2);
+  background:linear-gradient(
+    90deg,
+    #075687,
+    #23d9e8,
+    #fff1a0
+  );
 }
 
 .label{
@@ -103,7 +123,6 @@ html,body{
   top:-15px;
   font-size:9px;
   letter-spacing:2px;
-  color:#e8d19b;
 }
 
 #healthText{
@@ -118,35 +137,56 @@ html,body{
   right:16px;
   top:38px;
   font-size:10px;
-  text-align:right;
+}
+
+#levelText{
+  position:absolute;
+  left:50%;
+  top:45px;
+  transform:translateX(-50%);
+  font-size:11px;
+  letter-spacing:2px;
+  color:#f5d68a;
+}
+
+#xpText{
+  position:absolute;
+  left:50%;
+  top:61px;
+  transform:translateX(-50%);
+  font-size:9px;
+  color:#bca879;
+}
+
+#worldText{
+  position:absolute;
+  left:50%;
+  top:76px;
+  transform:translateX(-50%);
+  font-size:9px;
+  color:#a99672;
+  letter-spacing:2px;
+}
+
+#goldText{
+  position:absolute;
+  right:18px;
+  top:60px;
+  font-size:10px;
+  color:#e4bd57;
 }
 
 #combo{
   position:absolute;
   left:50%;
-  top:80px;
+  top:95px;
   transform:translateX(-50%);
-  color:#fff2ad;
-  font-size:18px;
+  font-size:17px;
   letter-spacing:3px;
-  text-shadow:0 0 12px #ff9e00;
+  color:#fff0a7;
+  text-shadow:0 0 15px #ff9700;
   opacity:0;
   transition:opacity .2s;
-}
-
-#message{
-  position:absolute;
-  left:50%;
-  bottom:17%;
-  transform:translateX(-50%);
-  width:90%;
-  text-align:center;
-  font-size:14px;
-  letter-spacing:2px;
-  color:#ffe5a0;
-  text-shadow:0 0 8px #000;
-  opacity:0;
-  transition:opacity .4s;
 }
 
 #crosshair{
@@ -164,7 +204,7 @@ html,body{
   content:"";
   position:absolute;
   background:#ffe7a0;
-  box-shadow:0 0 5px #ffb52b;
+  box-shadow:0 0 6px #ffae2d;
 }
 
 #crosshair:before{
@@ -175,10 +215,25 @@ html,body{
 }
 
 #crosshair:after{
-  top:11px;
   left:2px;
+  top:11px;
   width:20px;
   height:2px;
+}
+
+#message{
+  position:absolute;
+  left:50%;
+  bottom:18%;
+  transform:translateX(-50%);
+  width:90%;
+  text-align:center;
+  color:#ffe8a5;
+  font-size:13px;
+  letter-spacing:2px;
+  text-shadow:0 0 10px #000;
+  opacity:0;
+  transition:opacity .3s;
 }
 
 #minimap{
@@ -187,45 +242,21 @@ html,body{
   bottom:15px;
   width:145px;
   height:145px;
-  border:1px solid rgba(255,220,140,.55);
-  background:rgba(5,3,10,.68);
+  border:1px solid rgba(255,215,120,.55);
+  background:rgba(4,2,7,.72);
   box-shadow:
-    0 0 20px rgba(255,150,20,.16),
-    inset 0 0 20px rgba(255,160,20,.08);
+    0 0 25px rgba(255,150,30,.15),
+    inset 0 0 25px rgba(255,170,30,.08);
 }
+
+/* =========================================================
+   CONTROLES
+========================================================= */
 
 #controls{
   position:fixed;
   inset:0;
   pointer-events:none;
-}
-
-#joystick{
-  position:absolute;
-  left:25px;
-  bottom:25px;
-  width:125px;
-  height:125px;
-  border:1px solid rgba(255,215,130,.3);
-  border-radius:50%;
-  background:rgba(30,15,5,.25);
-  box-shadow:inset 0 0 30px rgba(255,180,60,.08);
-  pointer-events:auto;
-}
-
-#stick{
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:52px;
-  height:52px;
-  transform:translate(-50%,-50%);
-  border-radius:50%;
-  border:1px solid rgba(255,220,140,.6);
-  background:rgba(255,180,60,.12);
-  box-shadow:
-    0 0 15px rgba(255,170,30,.2),
-    inset 0 0 15px rgba(255,220,100,.1);
 }
 
 #lookArea{
@@ -237,6 +268,33 @@ html,body{
   pointer-events:auto;
 }
 
+#joystick{
+  position:absolute;
+  left:22px;
+  bottom:23px;
+  width:125px;
+  height:125px;
+  border-radius:50%;
+  border:1px solid rgba(255,215,130,.35);
+  background:rgba(40,18,5,.25);
+  box-shadow:
+    inset 0 0 30px rgba(255,180,60,.08);
+  pointer-events:auto;
+}
+
+#stick{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:52px;
+  height:52px;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  border:1px solid rgba(255,220,140,.65);
+  background:rgba(255,180,60,.12);
+  box-shadow:0 0 15px rgba(255,170,30,.2);
+}
+
 .action{
   position:absolute;
   pointer-events:auto;
@@ -244,10 +302,9 @@ html,body{
   height:65px;
   border-radius:50%;
   border:1px solid rgba(255,215,130,.65);
-  background:rgba(30,10,4,.42);
+  background:rgba(30,10,4,.45);
   color:#ffe6a0;
-  font-family:Georgia,serif;
-  font-size:12px;
+  font-size:10px;
   letter-spacing:1px;
   box-shadow:
     0 0 15px rgba(255,160,20,.12),
@@ -260,27 +317,36 @@ html,body{
 }
 
 #attackBtn{
-  right:27px;
-  bottom:32px;
+  right:25px;
+  bottom:28px;
   width:82px;
   height:82px;
-  font-size:13px;
 }
 
 #pranaBtn{
-  right:112px;
-  bottom:55px;
+  right:110px;
+  bottom:52px;
 }
 
 #dashBtn{
-  right:27px;
-  bottom:125px;
+  right:25px;
+  bottom:123px;
 }
 
 #guardBtn{
-  right:112px;
-  bottom:135px;
+  right:110px;
+  bottom:132px;
 }
+
+#shopBtn{
+  right:110px;
+  bottom:210px;
+  display:none;
+}
+
+/* =========================================================
+   INICIO
+========================================================= */
 
 #start{
   position:fixed;
@@ -290,25 +356,27 @@ html,body{
   justify-content:center;
   align-items:center;
   background:
-    radial-gradient(circle at center,
+    radial-gradient(
+      circle at center,
       rgba(111,50,10,.28),
-      rgba(5,2,9,.96) 70%);
+      rgba(5,2,9,.97) 72%
+    );
 }
 
 .panel{
-  width:min(600px,92vw);
-  padding:35px 25px;
+  width:min(620px,92vw);
+  padding:32px 24px;
   text-align:center;
   border:1px solid rgba(255,210,110,.55);
-  background:rgba(12,5,8,.88);
+  background:rgba(12,5,8,.9);
   box-shadow:
     0 0 45px rgba(255,130,10,.12),
     inset 0 0 35px rgba(255,180,60,.05);
 }
 
 .mandala{
-  width:110px;
-  height:110px;
+  width:105px;
+  height:105px;
   margin:0 auto 15px;
   border:1px solid #c99b42;
   border-radius:50%;
@@ -326,7 +394,7 @@ html,body{
 }
 
 .mandala:after{
-  inset:31px;
+  inset:30px;
   transform:rotate(45deg);
   border-radius:0;
 }
@@ -337,15 +405,15 @@ html,body{
 
 h1{
   margin:0;
-  font-size:31px;
+  font-size:30px;
   letter-spacing:7px;
   color:#ffd873;
   text-shadow:0 0 20px #ff7b00;
 }
 
 h2{
-  margin:7px 0 20px;
-  font-size:12px;
+  margin:8px 0 20px;
+  font-size:11px;
   font-weight:normal;
   letter-spacing:4px;
   color:#cdb684;
@@ -353,12 +421,13 @@ h2{
 
 .story{
   line-height:1.7;
-  font-size:13px;
+  font-size:12px;
   color:#d8c49b;
-  margin-bottom:25px;
+  margin-bottom:23px;
 }
 
-#startBtn{
+#startBtn,
+#resetBtn{
   border:1px solid #e0ae4d;
   background:linear-gradient(
     180deg,
@@ -366,28 +435,160 @@ h2{
     rgba(80,25,5,.35)
   );
   color:#ffe7a5;
-  padding:13px 32px;
-  letter-spacing:4px;
-  font-family:Georgia,serif;
-  cursor:pointer;
+  padding:12px 25px;
+  letter-spacing:3px;
+}
+
+#resetBtn{
+  margin-left:8px;
+  border-color:#704d30;
+  color:#bda887;
 }
 
 .tip{
-  margin-top:20px;
-  font-size:9px;
+  margin-top:18px;
+  font-size:8px;
   color:#907c62;
-  letter-spacing:1px;
-  line-height:1.6;
+  line-height:1.7;
 }
 
-.hidden{
-  display:none!important;
+/* =========================================================
+   TRANSICIÓN
+========================================================= */
+
+#levelScreen{
+  position:fixed;
+  inset:0;
+  z-index:35;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(4,2,7,.92);
 }
+
+#levelScreen.show{
+  display:flex;
+}
+
+.levelPanel{
+  text-align:center;
+  padding:38px;
+  border:1px solid #d4a850;
+  background:rgba(18,8,8,.95);
+  box-shadow:0 0 55px rgba(255,170,40,.18);
+}
+
+.levelPanel h1{
+  font-size:24px;
+}
+
+.levelPanel p{
+  color:#cdb78a;
+}
+
+/* =========================================================
+   TIENDA
+========================================================= */
+
+#shopScreen{
+  position:fixed;
+  inset:0;
+  z-index:50;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:
+    radial-gradient(
+      circle,
+      rgba(90,45,10,.38),
+      rgba(3,2,7,.96)
+    );
+}
+
+#shopScreen.hidden{
+  display:none;
+}
+
+#shopPanel{
+  width:min(720px,94vw);
+  max-height:90vh;
+  overflow:auto;
+  padding:24px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(35,16,8,.98),
+      rgba(8,4,9,.98)
+    );
+  border:1px solid #d8ad59;
+  box-shadow:0 0 50px rgba(255,160,30,.2);
+}
+
+.shopTitle{
+  text-align:center;
+  color:#ffd875;
+  font-size:20px;
+  letter-spacing:4px;
+  margin-bottom:8px;
+}
+
+#shopGold{
+  text-align:center;
+  color:#d9b85c;
+  margin-bottom:18px;
+}
+
+#shopItems{
+  display:grid;
+  grid-template-columns:
+    repeat(auto-fit,minmax(180px,1fr));
+  gap:12px;
+}
+
+.shopItem{
+  padding:15px;
+  border:1px solid rgba(220,180,90,.4);
+  background:rgba(0,0,0,.4);
+  color:#e9d7a4;
+}
+
+.shopItem h3{
+  margin:0 0 10px;
+  color:#ffd36a;
+  font-size:13px;
+}
+
+.shopItem div{
+  font-size:10px;
+  line-height:1.7;
+}
+
+.shopBuy{
+  margin-top:12px;
+  width:100%;
+  padding:8px;
+  border:1px solid #bd9143;
+  background:rgba(180,120,30,.15);
+  color:#ffe8a5;
+}
+
+#closeShop{
+  display:block;
+  margin:20px auto 0;
+  padding:10px 25px;
+  background:transparent;
+  border:1px solid #9e783d;
+  color:#e8cd91;
+}
+
+/* =========================================================
+   VICTORIA / MUERTE
+========================================================= */
 
 #victory{
   position:fixed;
   inset:0;
-  z-index:30;
+  z-index:40;
   display:none;
   justify-content:center;
   align-items:center;
@@ -406,36 +607,61 @@ h2{
 }
 
 .victoryPanel h1{
-  font-size:25px;
+  font-size:23px;
+}
+
+.hidden{
+  display:none!important;
 }
 
 @media(max-width:600px){
+
   .barBox{
     width:130px;
   }
 
   #minimap{
-    width:110px;
-    height:110px;
-    bottom:12px;
-    right:12px;
+    width:105px;
+    height:105px;
   }
 
   .title{
-    font-size:11px;
+    font-size:9px;
+    letter-spacing:3px;
+  }
+
+  #levelText{
+    top:43px;
+  }
+
+  #xpText{
+    top:58px;
+  }
+
+  #worldText{
+    top:72px;
+  }
+
+  #goldText{
+    top:57px;
   }
 
   #message{
-    bottom:25%;
-    font-size:11px;
+    bottom:24%;
+    font-size:10px;
   }
 }
+
 </style>
 </head>
 
 <body>
 
 <canvas id="game"></canvas>
+
+<!-- =======================================================
+     HUD
+======================================================= -->
 
 <div id="hud">
 
@@ -452,12 +678,25 @@ h2{
   <div id="healthText">100 / 100</div>
   <div id="pranaText">100 / 100</div>
 
+  <div id="levelText">NIVEL 1</div>
+  <div id="xpText">0 / 100 XP</div>
+  <div id="worldText">TEMPLO 1</div>
+
+  <div id="goldText">☼ 0</div>
+
   <div class="top">
-    <div class="title">PRĀṆA · RESONANCE</div>
-    <div class="subtitle">TEMPLO DEL ALIENTO ETERNO</div>
+    <div class="title">
+      PRĀṆA · RESONANCE
+    </div>
+
+    <div class="subtitle">
+      TEMPLO DEL ALIENTO ETERNO
+    </div>
   </div>
 
-  <div id="combo">RESONANCIA × 0</div>
+  <div id="combo">
+    RESONANCIA × 0
+  </div>
 
   <div id="crosshair"></div>
 
@@ -467,6 +706,10 @@ h2{
 
 </div>
 
+<!-- =======================================================
+     CONTROLES
+======================================================= -->
+
 <div id="controls">
 
   <div id="lookArea"></div>
@@ -475,176 +718,796 @@ h2{
     <div id="stick"></div>
   </div>
 
-  <button id="attackBtn" class="action">ESPADA</button>
-  <button id="pranaBtn" class="action">PRĀṆA</button>
-  <button id="dashBtn" class="action">ĀKĀŚA</button>
-  <button id="guardBtn" class="action">GUARDIA</button>
+  <button id="attackBtn" class="action">
+    ESPADA
+  </button>
+
+  <button id="pranaBtn" class="action">
+    PRĀṆA
+  </button>
+
+  <button id="dashBtn" class="action">
+    ĀKĀŚA
+  </button>
+
+  <button id="guardBtn" class="action">
+    GUARDIA
+  </button>
+
+  <button id="shopBtn" class="action">
+    TIENDA
+  </button>
 
 </div>
 
+<!-- =======================================================
+     PANTALLA INICIO
+======================================================= -->
+
 <div id="start">
+
   <div class="panel">
 
     <div class="mandala"></div>
 
     <h1>PRĀṆA</h1>
-    <h2>EL TEMPLO DE LA RESONANCIA</h2>
+
+    <h2>
+      EL TEMPLO DE LA RESONANCIA
+    </h2>
 
     <div class="story">
-      Has entrado en un templo perdido entre los mundos.<br>
-      Los demonios se alimentan del miedo y del prāṇa
-      disperso de los viajeros.<br><br>
 
-      Tu espada corta la forma.<br>
-      <b>Tu prāṇa corta aquello que existe detrás de la forma.</b><br><br>
+      Cada templo nace de una forma diferente.<br>
+      Cada demonio consume el prāṇa de los viajeros.<br><br>
 
-      Respira. Observa. Ataca. Resuena.
+      Tu espada destruye la forma.<br>
+
+      <b>
+        Tu prāṇa destruye aquello que existe detrás de la forma.
+      </b>
+
+      <br><br>
+
+      Derrota a todos los demonios.<br>
+      Evoluciona. Encuentra oro.<br>
+      Busca al mercader de los templos profundos.
+
     </div>
 
-    <button id="startBtn">ENTRAR AL TEMPLO</button>
+    <button id="startBtn">
+      ENTRAR AL TEMPLO
+    </button>
+
+    <button id="resetBtn">
+      BORRAR
+    </button>
 
     <div class="tip">
-      PC: WASD · MOUSE · CLICK · ESPACIO · SHIFT · Q<br>
-      MÓVIL: JOYSTICK · DESLIZA EL LADO DERECHO · BOTONES
+      PC: WASD · MOUSE · SPACE · Q · SHIFT · F · E<br>
+      MÓVIL: JOYSTICK · DESLIZA DERECHA · BOTONES
     </div>
 
   </div>
+
 </div>
 
-<div id="victory">
-  <div class="victoryPanel">
+<!-- =======================================================
+     CAMBIO DE NIVEL
+======================================================= -->
+
+<div id="levelScreen">
+
+  <div class="levelPanel">
+
     <div class="mandala"></div>
-    <h1>EL TEMPLO HA RESPIRADO CONTIGO</h1>
-    <p>La resonancia ha regresado al centro.</p>
-    <button id="restartBtn" class="action"
-            style="position:static;width:120px;height:45px;border-radius:5px">
-      RENACER
-    </button>
+
+    <h1 id="levelTitle">
+      TEMPLO PURIFICADO
+    </h1>
+
+    <p id="levelReward">
+      La resonancia ha regresado.
+    </p>
+
   </div>
+
+</div>
+
+<!-- =======================================================
+     TIENDA
+======================================================= -->
+
+<div id="shopScreen" class="hidden">
+
+  <div id="shopPanel">
+
+    <div class="shopTitle">
+      ☉ MERCADER DEL PRĀṆA ☉
+    </div>
+
+    <div id="shopGold">
+      ☼ 0
+    </div>
+
+    <div id="shopItems"></div>
+
+    <button id="closeShop">
+      CERRAR
+    </button>
+
+  </div>
+
+</div>
+
+<!-- =======================================================
+     VICTORIA
+======================================================= -->
+
+<div id="victory">
+
+  <div class="victoryPanel">
+
+    <div class="mandala"></div>
+
+    <h1>
+      EL TEMPLO HA RESPIRADO CONTIGO
+    </h1>
+
+    <p>
+      La resonancia ha regresado al centro.
+    </p>
+
+    <button
+      id="continueBtn"
+      class="action"
+      style="
+        position:static;
+        width:130px;
+        height:45px;
+        border-radius:5px;
+      ">
+      SIGUIENTE
+    </button>
+
+  </div>
+
 </div>
 
 <script>
+
 "use strict";
 
 /* =========================================================
-   PRĀṆA — EL TEMPLO DE LA RESONANCIA
-   Raycaster 2.5D puro Canvas + JavaScript
-   Sin librerías externas
+   CANVAS
 ========================================================= */
 
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+const canvas=
+  document.getElementById("game");
 
-const mini = document.getElementById("minimap");
-const mctx = mini.getContext("2d");
+const ctx=
+  canvas.getContext("2d");
 
-let W = 0;
-let H = 0;
+const mini=
+  document.getElementById("minimap");
+
+const mctx=
+  mini.getContext("2d");
+
+let W=0;
+let H=0;
 
 function resize(){
-  W = canvas.width = innerWidth;
-  H = canvas.height = innerHeight;
 
-  const size = Math.min(150, Math.max(105, innerWidth * .25));
-  mini.width = size;
-  mini.height = size;
+  W=canvas.width=innerWidth;
+  H=canvas.height=innerHeight;
+
+  const size=
+    Math.min(
+      150,
+      Math.max(105,innerWidth*.25)
+    );
+
+  mini.width=size;
+  mini.height=size;
 }
 
 addEventListener("resize",resize);
+
 resize();
 
 /* =========================================================
-   CONFIGURACIÓN
+   CONFIG
 ========================================================= */
 
-const CFG = {
-  FOV: Math.PI / 3,
-  MAX_DEPTH: 22,
-  RAYS: 260,
+const CFG={
 
-  MOVE: 2.7,
-  TURN: 2.3,
+  FOV:Math.PI/3,
+
+  MAX_DEPTH:25,
+
+  RAYS:280,
+
+  MOVE:3.0,
+
+  TURN:2.3,
 
   PLAYER_RADIUS:.20,
 
-  MAX_HEALTH:100,
   MAX_PRANA:100,
 
   PRANA_REGEN:5.5,
 
   ATTACK_COST:4,
+
   RESONANCE_COST:35,
 
-  ATTACK_RANGE:2.7
+  ATTACK_RANGE:2.8
 };
 
 /* =========================================================
-   MAPA
+   GUARDADO
 ========================================================= */
 
-const MAP_W = 24;
-const MAP_H = 24;
+const SAVE_KEY=
+  "PRANA_RESONANCE_RPG_V2";
 
-const map = [
-"########################",
-"#..........#...........#",
-"#..........#...........#",
-"#..####....#....####...#",
-"#..#.......#.......#...#",
-"#..#.......#####...#...#",
-"#..........#...........#",
-"######.....#.....#######",
-"#......................#",
-"#....###.........###...#",
-"#....#.............#...#",
-"#....#.....###.....#...#",
-"#..........#...........#",
-"#..........#...........#",
-"#...####........####...#",
-"#......................#",
-"#....###........###....#",
-"#......................#",
-"#.......########.......#",
-"#......................#",
-"#......................#",
-"#......................#",
-"#......................#",
-"########################"
-];
+const DEFAULT_SAVE={
+
+  level:1,
+
+  xp:0,
+
+  totalXp:0,
+
+  health:100,
+
+  attack:25,
+
+  defense:0,
+
+  evasion:0,
+
+  gold:80,
+
+  worldLevel:1,
+
+  kills:0,
+
+  weapon:{
+    name:"Espada del Peregrino",
+    attack:0,
+    critical:0
+  },
+
+  shield:{
+    name:"Escudo de Loto",
+    defense:0,
+    evasion:0
+  }
+};
+
+let save;
+
+function cloneDefault(){
+
+  return JSON.parse(
+    JSON.stringify(DEFAULT_SAVE)
+  );
+}
+
+function loadSave(){
+
+  try{
+
+    const raw=
+      localStorage.getItem(SAVE_KEY);
+
+    if(raw){
+
+      save={
+        ...cloneDefault(),
+        ...JSON.parse(raw)
+      };
+
+    }else{
+
+      save=cloneDefault();
+    }
+
+  }catch(e){
+
+    save=cloneDefault();
+  }
+
+  save.weapon ??=
+    cloneDefault().weapon;
+
+  save.shield ??=
+    cloneDefault().shield;
+}
+
+function saveGame(){
+
+  localStorage.setItem(
+    SAVE_KEY,
+    JSON.stringify(save)
+  );
+}
 
 /* =========================================================
    PLAYER
 ========================================================= */
 
-const player = {
-  x:3.5,
+const player={
+
+  x:2.5,
   y:2.5,
+
   a:0,
+
   pitch:0,
 
   health:100,
+
+  maxHealth:100,
+
+  attack:25,
+
+  defense:0,
+
+  evasion:0,
+
   prana:100,
 
-  stamina:100,
+  maxPrana:100,
 
   attacking:false,
+
   attackTimer:0,
 
   guard:false,
 
-  dashTimer:0,
-
   combo:0,
+
   comboTimer:0,
 
   resonance:0
 };
 
+loadSave();
+
+function updatePlayerStats(){
+
+  player.maxHealth=
+    save.health;
+
+  player.attack=
+    save.attack+
+    (save.weapon?.attack||0);
+
+  player.defense=
+    save.defense+
+    (save.shield?.defense||0);
+
+  player.evasion=
+    Math.min(
+      75,
+      save.evasion+
+      (save.shield?.evasion||0)
+    );
+
+  player.maxPrana=
+    CFG.MAX_PRANA+
+    (save.level-1)*3;
+}
+
+updatePlayerStats();
+
+player.health=player.maxHealth;
+player.prana=player.maxPrana;
+
+/* =========================================================
+   XP
+========================================================= */
+
+function xpRequired(level){
+
+  return Math.floor(
+    100*Math.pow(level,1.35)
+  );
+}
+
+function gainXP(amount){
+
+  save.xp+=amount;
+  save.totalXp+=amount;
+
+  let levels=0;
+
+  while(
+    save.xp>=xpRequired(save.level)
+  ){
+
+    save.xp-=xpRequired(save.level);
+
+    save.level++;
+
+    save.health+=12;
+    save.attack+=3;
+    save.defense+=1;
+    save.evasion+=.8;
+
+    levels++;
+  }
+
+  updatePlayerStats();
+
+  if(levels>0){
+
+    player.health=
+      player.maxHealth;
+
+    player.prana=
+      player.maxPrana;
+
+    showMessage(
+      `✦ NIVEL ${save.level} · TUS ESTADÍSTICAS HAN AUMENTADO`
+    );
+  }
+
+  saveGame();
+}
+
+/* =========================================================
+   MAPA PROCEDURAL
+========================================================= */
+
+let MAP_W=31;
+let MAP_H=31;
+
+let map=[];
+
+function generateMap(){
+
+  map=[];
+
+  for(let y=0;y<MAP_H;y++){
+
+    const row=[];
+
+    for(let x=0;x<MAP_W;x++){
+
+      row.push("#");
+    }
+
+    map.push(row);
+  }
+
+  /* algoritmo de laberinto */
+
+  const stack=[];
+
+  const startX=1;
+  const startY=1;
+
+  map[startY][startX]=".";
+
+  stack.push([
+    startX,
+    startY
+  ]);
+
+  const dirs=[
+    [2,0],
+    [-2,0],
+    [0,2],
+    [0,-2]
+  ];
+
+  while(stack.length){
+
+    const index=
+      Math.floor(
+        Math.random()*stack.length
+      );
+
+    const current=
+      stack.splice(index,1)[0];
+
+    const shuffled=
+      [...dirs].sort(
+        ()=>Math.random()-.5
+      );
+
+    for(const [dx,dy] of shuffled){
+
+      const nx=
+        current[0]+dx;
+
+      const ny=
+        current[1]+dy;
+
+      if(
+        nx>0 &&
+        ny>0 &&
+        nx<MAP_W-1 &&
+        ny<MAP_H-1 &&
+        map[ny][nx]==="#"
+      ){
+
+        map[
+          current[1]+dy/2
+        ][
+          current[0]+dx/2
+        ]=".";
+
+        map[ny][nx]=".";
+
+        stack.push([nx,ny]);
+      }
+    }
+  }
+
+  /* salas */
+
+  for(let i=0;i<14;i++){
+
+    const rw=
+      3+
+      Math.floor(Math.random()*7);
+
+    const rh=
+      3+
+      Math.floor(Math.random()*7);
+
+    const rx=
+      2+
+      Math.floor(
+        Math.random()*
+        (MAP_W-rw-4)
+      );
+
+    const ry=
+      2+
+      Math.floor(
+        Math.random()*
+        (MAP_H-rh-4)
+      );
+
+    for(let y=ry;y<ry+rh;y++){
+
+      for(let x=rx;x<rx+rw;x++){
+
+        if(
+          x>0 &&
+          y>0 &&
+          x<MAP_W-1 &&
+          y<MAP_H-1
+        ){
+
+          map[y][x]=".";
+        }
+      }
+    }
+  }
+
+  const shape=
+    Math.floor(
+      Math.random()*5
+    );
+
+  if(shape===0)
+    createCrossRoom();
+
+  if(shape===1)
+    createTempleCorridor();
+
+  if(shape===2)
+    createMandalaRoom();
+
+  if(shape===3)
+    createFourShrines();
+
+  if(shape===4)
+    createSpiral();
+
+  return map;
+}
+
+function carve(x,y){
+
+  if(
+    x>0 &&
+    y>0 &&
+    x<MAP_W-1 &&
+    y<MAP_H-1
+  ){
+
+    map[y][x]=".";
+  }
+}
+
+function createCrossRoom(){
+
+  const cx=
+    Math.floor(MAP_W/2);
+
+  const cy=
+    Math.floor(MAP_H/2);
+
+  for(let i=2;i<MAP_W-2;i++){
+
+    carve(i,cy);
+    carve(i,cy+1);
+  }
+
+  for(let i=2;i<MAP_H-2;i++){
+
+    carve(cx,i);
+    carve(cx+1,i);
+  }
+}
+
+function createTempleCorridor(){
+
+  const cy=
+    Math.floor(MAP_H/2);
+
+  for(let x=2;x<MAP_W-2;x++){
+
+    for(let y=cy-2;y<=cy+2;y++){
+
+      carve(x,y);
+    }
+  }
+
+  for(let i=0;i<6;i++){
+
+    const x=
+      4+
+      Math.floor(
+        Math.random()*(MAP_W-8)
+      );
+
+    for(let y=3;y<MAP_H-3;y++){
+
+      if(Math.random()<.35)
+        carve(x,y);
+    }
+  }
+}
+
+function createMandalaRoom(){
+
+  const cx=
+    Math.floor(MAP_W/2);
+
+  const cy=
+    Math.floor(MAP_H/2);
+
+  for(let y=cy-6;y<=cy+6;y++){
+
+    for(let x=cx-6;x<=cx+6;x++){
+
+      const d=
+        Math.hypot(
+          x-cx,
+          y-cy
+        );
+
+      if(d<6)
+        carve(x,y);
+    }
+  }
+
+  for(let i=0;i<7;i++){
+
+    carve(cx+i,cy);
+    carve(cx-i,cy);
+    carve(cx,cy+i);
+    carve(cx,cy-i);
+  }
+}
+
+function createFourShrines(){
+
+  const positions=[
+
+    [6,6],
+
+    [MAP_W-7,6],
+
+    [6,MAP_H-7],
+
+    [MAP_W-7,MAP_H-7]
+  ];
+
+  for(
+    const [cx,cy]
+    of positions
+  ){
+
+    for(
+      let y=cy-2;
+      y<=cy+2;
+      y++
+    ){
+
+      for(
+        let x=cx-2;
+        x<=cx+2;
+        x++
+      ){
+
+        carve(x,y);
+      }
+    }
+  }
+}
+
+function createSpiral(){
+
+  const cx=
+    Math.floor(MAP_W/2);
+
+  const cy=
+    Math.floor(MAP_H/2);
+
+  let x=2;
+  let y=2;
+
+  let dx=1;
+  let dy=0;
+
+  let segment=0;
+  let steps=MAP_W-4;
+
+  for(let i=0;i<250;i++){
+
+    carve(x,y);
+
+    x+=dx;
+    y+=dy;
+
+    if(
+      x>=MAP_W-3 ||
+      x<=2 ||
+      y>=MAP_H-3 ||
+      y<=2
+    ){
+
+      const temp=dx;
+
+      dx=-dy;
+      dy=temp;
+
+      segment++;
+
+      if(segment%2===0)
+        steps-=2;
+
+      if(steps<2)
+        break;
+    }
+  }
+
+  /* centro */
+
+  for(let yy=cy-3;yy<=cy+3;yy++){
+
+    for(let xx=cx-3;xx<=cx+3;xx++){
+
+      carve(xx,yy);
+    }
+  }
+}
+
 /* =========================================================
    ENEMIGOS
 ========================================================= */
 
-const enemyTypes = {
+const enemyTypes={
 
   rakshasa:{
     name:"RAKṢASA",
@@ -673,7 +1536,7 @@ const enemyTypes = {
     hp:90,
     speed:.42,
     damage:19,
-    size:1.0,
+    size:1,
     color:"#6f250c",
     glow:"#ff9a35",
     pranaWeak:false
@@ -691,263 +1554,277 @@ const enemyTypes = {
   }
 };
 
-let enemies = [];
+let enemies=[];
 
 function spawnEnemy(type,x,y){
-  const t = enemyTypes[type];
+
+  const t=
+    enemyTypes[type];
+
+  const scale=
+    1+
+    (save.worldLevel-1)*.13;
 
   enemies.push({
+
     type,
+
     x,
+
     y,
-    hp:t.hp,
-    maxHp:t.hp,
-    speed:t.speed,
-    damage:t.damage,
+
+    hp:t.hp*scale,
+
+    maxHp:t.hp*scale,
+
+    speed:
+      t.speed*
+      (
+        1+
+        (save.worldLevel-1)*.025
+      ),
+
+    damage:
+      t.damage*scale,
+
     size:t.size,
 
-    phase:Math.random()*Math.PI*2,
+    phase:
+      Math.random()*Math.PI*2,
+
     hitFlash:0,
-    attackCooldown:Math.random(),
+
+    attackCooldown:
+      Math.random(),
+
     dead:false,
 
-    pranaReaction:0
+    pranaReaction:0,
+
+    xpReward:
+      Math.floor(
+        20+
+        save.worldLevel*7+
+        Math.random()*25
+      ),
+
+    goldReward:
+      Math.floor(
+        8+
+        save.worldLevel*3+
+        Math.random()*12
+      )
   });
 }
 
 /* =========================================================
-   OBJETOS DEL TEMPLO
+   OBJETOS
 ========================================================= */
 
-let objects = [];
+let objects=[];
 
-function addObject(type,x,y,scale=1){
+let vendor=null;
+
+function addObject(
+  type,
+  x,
+  y,
+  scale=1
+){
+
   objects.push({
+
     type,
+
     x,
+
     y,
+
     scale,
-    phase:Math.random()*Math.PI*2
+
+    phase:
+      Math.random()*Math.PI*2
   });
 }
+
+/* =========================================================
+   POSICIÓN LIBRE
+========================================================= */
+
+function findFreePosition(){
+
+  for(let i=0;i<1000;i++){
+
+    const x=
+      1.5+
+      Math.random()*
+      (MAP_W-3);
+
+    const y=
+      1.5+
+      Math.random()*
+      (MAP_H-3);
+
+    if(
+      !isWall(x,y) &&
+      Math.hypot(
+        x-player.x,
+        y-player.y
+      )>4
+    ){
+
+      return {x,y};
+    }
+  }
+
+  return {
+    x:2.5,
+    y:2.5
+  };
+}
+
+/* =========================================================
+   CREAR TEMPLO
+========================================================= */
 
 function buildTemple(){
 
+  generateMap();
+
   enemies=[];
   objects=[];
+  vendor=null;
 
-  /* Demonios */
-  spawnEnemy("rakshasa",18.5,3.5);
-  spawnEnemy("pisacha",20.5,6.5);
-  spawnEnemy("naga",15.5,9.5);
-  spawnEnemy("rakshasa",5.5,15.5);
-  spawnEnemy("asura",18.5,16.5);
-  spawnEnemy("pisacha",7.5,19.5);
-  spawnEnemy("naga",14.5,20.5);
-  spawnEnemy("asura",20.5,20.5);
+  const start=
+    findSafeStart();
 
-  /* Lotos */
-  addObject("lotus",8.5,3.5);
-  addObject("lotus",15.5,4.5);
-  addObject("lotus",11.5,16.5);
-  addObject("lotus",19.5,12.5);
+  player.x=start.x;
+  player.y=start.y;
 
-  /* Cristales de prāṇa */
-  addObject("crystal",5.5,8.5);
-  addObject("crystal",21.5,8.5);
-  addObject("crystal",4.5,20.5);
-  addObject("crystal",12.5,6.5);
+  player.a=
+    Math.random()*
+    Math.PI*2;
 
-  /* Columnas */
-  addObject("pillar",6.5,6.5);
-  addObject("pillar",17.5,6.5);
-  addObject("pillar",6.5,13.5);
-  addObject("pillar",17.5,13.5);
+  const count=
+    Math.min(
+      5+
+      save.worldLevel*2,
+      32
+    );
 
-  /* Centro sagrado */
-  addObject("mandala",12.5,11.5);
+  const types=
+    Object.keys(enemyTypes);
+
+  for(let i=0;i<count;i++){
+
+    const p=
+      findFreePosition();
+
+    const type=
+      types[
+        Math.floor(
+          Math.random()*types.length
+        )
+      ];
+
+    spawnEnemy(
+      type,
+      p.x,
+      p.y
+    );
+  }
+
+  /* objetos */
+
+  for(let i=0;i<8;i++){
+
+    const p=
+      findFreePosition();
+
+    addObject(
+      Math.random()<.55
+      ?"lotus"
+      :"crystal",
+      p.x,
+      p.y
+    );
+  }
+
+  for(let i=0;i<6;i++){
+
+    const p=
+      findFreePosition();
+
+    addObject(
+      "pillar",
+      p.x,
+      p.y
+    );
+  }
+
+  const m=
+    findFreePosition();
+
+  addObject(
+    "mandala",
+    m.x,
+    m.y
+  );
+
+  /* vendedor cada 3 niveles */
+
+  if(save.worldLevel%3===0){
+
+    const p=
+      findFreePosition();
+
+    vendor={
+      x:p.x,
+      y:p.y
+    };
+
+    addObject(
+      "vendor",
+      p.x,
+      p.y
+    );
+  }
+
+  player.health=
+    player.maxHealth;
+
+  player.prana=
+    player.maxPrana;
+
+  showMessage(
+    `TEMPLO ${save.worldLevel} · NUEVA FORMA · ${count} DEMONIOS`
+  );
 }
 
-buildTemple();
+function findSafeStart(){
 
-/* =========================================================
-   INPUT PC
-========================================================= */
+  for(let y=1;y<MAP_H-1;y++){
 
-const keys = {};
+    for(let x=1;x<MAP_W-1;x++){
 
-addEventListener("keydown",e=>{
-  keys[e.code]=true;
+      if(
+        map[y][x]==="." &&
+        !isWall(x+.5,y+.5)
+      ){
 
-  if(e.code==="Space"){
-    attack();
-    e.preventDefault();
+        return {
+          x:x+.5,
+          y:y+.5
+        };
+      }
+    }
   }
 
-  if(e.code==="KeyQ"){
-    resonance();
-  }
-
-  if(e.code==="ShiftLeft" || e.code==="ShiftRight"){
-    dash();
-  }
-
-  if(e.code==="KeyF"){
-    player.guard=true;
-  }
-});
-
-addEventListener("keyup",e=>{
-  keys[e.code]=false;
-
-  if(e.code==="ShiftLeft" || e.code==="ShiftRight"){
-    player.dashTimer=0;
-  }
-
-  if(e.code==="KeyF"){
-    player.guard=false;
-  }
-});
-
-/* =========================================================
-   MOUSE
-========================================================= */
-
-let mouseLocked=false;
-
-canvas.addEventListener("click",()=>{
-  if(!gameStarted)return;
-
-  if(document.pointerLockElement!==canvas){
-    canvas.requestPointerLock?.();
-  }else{
-    attack();
-  }
-});
-
-document.addEventListener("mousemove",e=>{
-  if(!gameStarted)return;
-  if(document.pointerLockElement===canvas){
-    player.a += e.movementX * .0025;
-    player.pitch -= e.movementY * .0018;
-
-    player.pitch=Math.max(-.35,Math.min(.35,player.pitch));
-  }
-});
-
-/* =========================================================
-   TOUCH LOOK
-========================================================= */
-
-const lookArea=document.getElementById("lookArea");
-
-let lookId=null;
-let lastLookX=0;
-let lastLookY=0;
-
-lookArea.addEventListener("pointerdown",e=>{
-  lookId=e.pointerId;
-  lastLookX=e.clientX;
-  lastLookY=e.clientY;
-  lookArea.setPointerCapture(e.pointerId);
-});
-
-lookArea.addEventListener("pointermove",e=>{
-  if(e.pointerId!==lookId)return;
-
-  const dx=e.clientX-lastLookX;
-  const dy=e.clientY-lastLookY;
-
-  player.a += dx*.007;
-  player.pitch -= dy*.004;
-
-  player.pitch=Math.max(-.35,Math.min(.35,player.pitch));
-
-  lastLookX=e.clientX;
-  lastLookY=e.clientY;
-});
-
-lookArea.addEventListener("pointerup",e=>{
-  if(e.pointerId===lookId)lookId=null;
-});
-
-/* =========================================================
-   JOYSTICK
-========================================================= */
-
-const joystick=document.getElementById("joystick");
-const stick=document.getElementById("stick");
-
-let joyId=null;
-let joyX=0;
-let joyY=0;
-
-joystick.addEventListener("pointerdown",e=>{
-  joyId=e.pointerId;
-  joystick.setPointerCapture(e.pointerId);
-  updateJoystick(e);
-});
-
-joystick.addEventListener("pointermove",e=>{
-  if(e.pointerId===joyId){
-    updateJoystick(e);
-  }
-});
-
-joystick.addEventListener("pointerup",()=>{
-  joyId=null;
-  joyX=0;
-  joyY=0;
-
-  stick.style.left="50%";
-  stick.style.top="50%";
-});
-
-function updateJoystick(e){
-
-  const r=joystick.getBoundingClientRect();
-
-  let dx=e.clientX-(r.left+r.width/2);
-  let dy=e.clientY-(r.top+r.height/2);
-
-  const max=r.width*.38;
-
-  const len=Math.hypot(dx,dy);
-
-  if(len>max){
-    dx=dx/len*max;
-    dy=dy/len*max;
-  }
-
-  joyX=dx/max;
-  joyY=dy/max;
-
-  stick.style.left=`calc(50% + ${dx}px)`;
-  stick.style.top=`calc(50% + ${dy}px)`;
+  return {
+    x:1.5,
+    y:1.5
+  };
 }
-
-/* =========================================================
-   BOTONES
-========================================================= */
-
-document.getElementById("attackBtn")
-.addEventListener("pointerdown",attack);
-
-document.getElementById("pranaBtn")
-.addEventListener("pointerdown",resonance);
-
-document.getElementById("dashBtn")
-.addEventListener("pointerdown",dash);
-
-document.getElementById("guardBtn")
-.addEventListener("pointerdown",()=>{
-  player.guard=true;
-});
-
-document.getElementById("guardBtn")
-.addEventListener("pointerup",()=>{
-  player.guard=false;
-});
 
 /* =========================================================
    COLISIONES
@@ -958,17 +1835,25 @@ function isWall(x,y){
   const mx=Math.floor(x);
   const my=Math.floor(y);
 
-  if(mx<0 || my<0 || mx>=MAP_W || my>=MAP_H)
+  if(
+    mx<0 ||
+    my<0 ||
+    mx>=MAP_W ||
+    my>=MAP_H
+  ){
+
     return true;
+  }
 
   return map[my][mx]==="#";
 }
 
 function blocked(x,y){
 
-  const r=CFG.PLAYER_RADIUS;
+  const r=
+    CFG.PLAYER_RADIUS;
 
-  return (
+  return(
     isWall(x-r,y-r) ||
     isWall(x+r,y-r) ||
     isWall(x-r,y+r) ||
@@ -978,17 +1863,324 @@ function blocked(x,y){
 
 function movePlayer(dx,dy){
 
-  const nx=player.x+dx;
-  const ny=player.y+dy;
+  const nx=
+    player.x+dx;
 
-  if(!blocked(nx,player.y)){
+  const ny=
+    player.y+dy;
+
+  if(!blocked(nx,player.y))
     player.x=nx;
+
+  if(!blocked(player.x,ny))
+    player.y=ny;
+}
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+const keys={};
+
+addEventListener(
+  "keydown",
+  e=>{
+
+    keys[e.code]=true;
+
+    if(e.code==="Space"){
+
+      attack();
+
+      e.preventDefault();
+    }
+
+    if(e.code==="KeyQ")
+      resonance();
+
+    if(
+      e.code==="ShiftLeft" ||
+      e.code==="ShiftRight"
+    ){
+
+      dash();
+    }
+
+    if(e.code==="KeyF")
+      player.guard=true;
+
+    if(e.code==="KeyE")
+      openShop();
+  }
+);
+
+addEventListener(
+  "keyup",
+  e=>{
+
+    keys[e.code]=false;
+
+    if(e.code==="KeyF")
+      player.guard=false;
+  }
+);
+
+/* =========================================================
+   MOUSE
+========================================================= */
+
+canvas.addEventListener(
+  "click",
+  ()=>{
+
+    if(!gameStarted)
+      return;
+
+    if(
+      document.pointerLockElement!==canvas
+    ){
+
+      canvas.requestPointerLock?.();
+
+    }else{
+
+      attack();
+    }
+  }
+);
+
+document.addEventListener(
+  "mousemove",
+  e=>{
+
+    if(!gameStarted)
+      return;
+
+    if(
+      document.pointerLockElement===canvas
+    ){
+
+      player.a+=
+        e.movementX*.0025;
+
+      player.pitch-=
+        e.movementY*.0018;
+
+      player.pitch=
+        Math.max(
+          -.35,
+          Math.min(.35,player.pitch)
+        );
+    }
+  }
+);
+
+/* =========================================================
+   TOUCH LOOK
+========================================================= */
+
+const lookArea=
+  document.getElementById(
+    "lookArea"
+  );
+
+let lookId=null;
+
+let lastLookX=0;
+let lastLookY=0;
+
+lookArea.addEventListener(
+  "pointerdown",
+  e=>{
+
+    lookId=e.pointerId;
+
+    lastLookX=e.clientX;
+    lastLookY=e.clientY;
+
+    lookArea.setPointerCapture(
+      e.pointerId
+    );
+  }
+);
+
+lookArea.addEventListener(
+  "pointermove",
+  e=>{
+
+    if(e.pointerId!==lookId)
+      return;
+
+    const dx=
+      e.clientX-lastLookX;
+
+    const dy=
+      e.clientY-lastLookY;
+
+    player.a+=dx*.007;
+
+    player.pitch-=dy*.004;
+
+    player.pitch=
+      Math.max(
+        -.35,
+        Math.min(.35,player.pitch)
+      );
+
+    lastLookX=e.clientX;
+    lastLookY=e.clientY;
+  }
+);
+
+lookArea.addEventListener(
+  "pointerup",
+  e=>{
+
+    if(e.pointerId===lookId)
+      lookId=null;
+  }
+);
+
+/* =========================================================
+   JOYSTICK
+========================================================= */
+
+const joystick=
+  document.getElementById(
+    "joystick"
+  );
+
+const stick=
+  document.getElementById(
+    "stick"
+  );
+
+let joyId=null;
+
+let joyX=0;
+let joyY=0;
+
+joystick.addEventListener(
+  "pointerdown",
+  e=>{
+
+    joyId=e.pointerId;
+
+    joystick.setPointerCapture(
+      e.pointerId
+    );
+
+    updateJoystick(e);
+  }
+);
+
+joystick.addEventListener(
+  "pointermove",
+  e=>{
+
+    if(e.pointerId===joyId)
+      updateJoystick(e);
+  }
+);
+
+joystick.addEventListener(
+  "pointerup",
+  ()=>{
+    joyId=null;
+
+    joyX=0;
+    joyY=0;
+
+    stick.style.left="50%";
+    stick.style.top="50%";
+  }
+);
+
+function updateJoystick(e){
+
+  const r=
+    joystick.getBoundingClientRect();
+
+  let dx=
+    e.clientX-
+    (r.left+r.width/2);
+
+  let dy=
+    e.clientY-
+    (r.top+r.height/2);
+
+  const max=
+    r.width*.38;
+
+  const len=
+    Math.hypot(dx,dy);
+
+  if(len>max){
+
+    dx=dx/len*max;
+    dy=dy/len*max;
   }
 
-  if(!blocked(player.x,ny)){
-    player.y=ny;
-  }
+  joyX=dx/max;
+  joyY=dy/max;
+
+  stick.style.left=
+    `calc(50% + ${dx}px)`;
+
+  stick.style.top=
+    `calc(50% + ${dy}px)`;
 }
+
+/* =========================================================
+   BOTONES
+========================================================= */
+
+document
+  .getElementById("attackBtn")
+  .addEventListener(
+    "pointerdown",
+    attack
+  );
+
+document
+  .getElementById("pranaBtn")
+  .addEventListener(
+    "pointerdown",
+    resonance
+  );
+
+document
+  .getElementById("dashBtn")
+  .addEventListener(
+    "pointerdown",
+    dash
+  );
+
+const guardBtn=
+  document.getElementById(
+    "guardBtn"
+  );
+
+guardBtn.addEventListener(
+  "pointerdown",
+  ()=>{
+    player.guard=true;
+  }
+);
+
+guardBtn.addEventListener(
+  "pointerup",
+  ()=>{
+    player.guard=false;
+  }
+);
+
+document
+  .getElementById("shopBtn")
+  .addEventListener(
+    "pointerdown",
+    openShop
+  );
 
 /* =========================================================
    MOVIMIENTO
@@ -999,258 +2191,429 @@ function updatePlayer(dt){
   let forward=0;
   let strafe=0;
 
-  if(keys["KeyW"])forward+=1;
-  if(keys["KeyS"])forward-=1;
+  if(keys["KeyW"])
+    forward+=1;
 
-  if(keys["KeyA"])strafe-=1;
-  if(keys["KeyD"])strafe+=1;
+  if(keys["KeyS"])
+    forward-=1;
 
-  /* Joystick */
-  forward += -joyY;
-  strafe += joyX;
+  if(keys["KeyA"])
+    strafe-=1;
 
-  const len=Math.hypot(forward,strafe);
+  if(keys["KeyD"])
+    strafe+=1;
+
+  forward+=-joyY;
+  strafe+=joyX;
+
+  const len=
+    Math.hypot(
+      forward,
+      strafe
+    );
 
   if(len>1){
+
     forward/=len;
     strafe/=len;
   }
 
-  const speed=CFG.MOVE*(keys["ShiftLeft"]||keys["ShiftRight"] ? 1.55 : 1);
+  const speed=
+    CFG.MOVE*
+    (
+      keys["ShiftLeft"] ||
+      keys["ShiftRight"]
+      ?1.5
+      :1
+    );
 
   const dx=
-    Math.cos(player.a)*forward*speed*dt +
-    Math.cos(player.a+Math.PI/2)*strafe*speed*dt;
+    Math.cos(player.a)*
+    forward*
+    speed*dt+
+
+    Math.cos(
+      player.a+Math.PI/2
+    )*
+    strafe*
+    speed*dt;
 
   const dy=
-    Math.sin(player.a)*forward*speed*dt +
-    Math.sin(player.a+Math.PI/2)*strafe*speed*dt;
+    Math.sin(player.a)*
+    forward*
+    speed*dt+
+
+    Math.sin(
+      player.a+Math.PI/2
+    )*
+    strafe*
+    speed*dt;
 
   movePlayer(dx,dy);
 
-  /* giro teclado */
   if(keys["ArrowLeft"])
     player.a-=CFG.TURN*dt;
 
   if(keys["ArrowRight"])
     player.a+=CFG.TURN*dt;
 
-  /* recuperación natural de prāṇa */
+  /* regeneración */
+
   if(
     !player.attacking &&
     !player.guard &&
-    Math.abs(forward)+Math.abs(strafe)<.2
+    Math.abs(forward)+
+    Math.abs(strafe)<.15
   ){
-    player.prana += CFG.PRANA_REGEN*dt;
+
+    player.prana+=
+      CFG.PRANA_REGEN*dt;
   }
 
-  player.prana=Math.min(CFG.MAX_PRANA,player.prana);
+  player.prana=
+    Math.min(
+      player.maxPrana,
+      player.prana
+    );
 
   if(player.attackTimer>0){
+
     player.attackTimer-=dt;
 
-    if(player.attackTimer<=0){
+    if(player.attackTimer<=0)
       player.attacking=false;
-    }
   }
 
   if(player.comboTimer>0){
+
     player.comboTimer-=dt;
 
-    if(player.comboTimer<=0){
+    if(player.comboTimer<=0)
       player.combo=0;
+  }
+
+  /* vendedor */
+
+  if(vendor){
+
+    const d=
+      Math.hypot(
+        player.x-vendor.x,
+        player.y-vendor.y
+      );
+
+    if(d<2){
+
+      document
+        .getElementById(
+          "shopBtn"
+        )
+        .style.display="block";
+
+    }else{
+
+      document
+        .getElementById(
+          "shopBtn"
+        )
+        .style.display="none";
     }
   }
 }
 
 /* =========================================================
-   DASH — ĀKĀŚA
+   DASH
 ========================================================= */
 
 function dash(){
 
-  if(player.prana<12)return;
+  if(!gameStarted)
+    return;
+
+  if(player.prana<12){
+
+    showMessage(
+      "PRĀṆA INSUFICIENTE"
+    );
+
+    return;
+  }
 
   player.prana-=12;
 
-  const dist=1.25;
-
   movePlayer(
-    Math.cos(player.a)*dist,
-    Math.sin(player.a)*dist
+    Math.cos(player.a)*1.25,
+    Math.sin(player.a)*1.25
   );
 
-  player.dashTimer=.25;
-
-  showMessage("ĀKĀŚA · EL CUERPO SE VUELVE AIRE");
+  showMessage(
+    "ĀKĀŚA · EL CUERPO SE VUELVE AIRE"
+  );
 }
 
 /* =========================================================
-   ESPADA
+   ATAQUE
 ========================================================= */
 
 function attack(){
 
-  if(!gameStarted)return;
+  if(!gameStarted)
+    return;
 
-  if(player.attacking)return;
+  if(player.attacking)
+    return;
 
-  if(player.prana<CFG.ATTACK_COST)return;
+  if(player.prana<CFG.ATTACK_COST)
+    return;
 
-  player.prana-=CFG.ATTACK_COST;
+  player.prana-=
+    CFG.ATTACK_COST;
 
   player.attacking=true;
+
   player.attackTimer=.34;
 
   let hit=false;
 
   for(const e of enemies){
 
-    if(e.dead)continue;
+    if(e.dead)
+      continue;
 
-    const dx=e.x-player.x;
-    const dy=e.y-player.y;
+    const dx=
+      e.x-player.x;
 
-    const dist=Math.hypot(dx,dy);
+    const dy=
+      e.y-player.y;
 
-    if(dist>CFG.ATTACK_RANGE)continue;
+    const dist=
+      Math.hypot(dx,dy);
 
-    let ang=Math.atan2(dy,dx)-player.a;
+    if(
+      dist>
+      CFG.ATTACK_RANGE
+    )
+      continue;
 
-    while(ang>Math.PI)ang-=Math.PI*2;
-    while(ang<-Math.PI)ang+=Math.PI*2;
+    let angle=
+      Math.atan2(dy,dx)-
+      player.a;
 
-    if(Math.abs(ang)<.48){
+    while(angle>Math.PI)
+      angle-=Math.PI*2;
 
-      const damage=25+player.combo*5;
+    while(angle<-Math.PI)
+      angle+=Math.PI*2;
+
+    if(Math.abs(angle)<.5){
+
+      let damage=
+        player.attack+
+        player.combo*5;
+
+      const critical=
+        save.weapon?.critical||0;
+
+      if(
+        Math.random()<
+        critical/100
+      ){
+
+        damage*=2;
+
+        showMessage(
+          "✦ GOLPE CRÍTICO"
+        );
+      }
 
       e.hp-=damage;
+
       e.hitFlash=.18;
 
       hit=true;
 
       player.combo++;
+
       player.comboTimer=1.3;
 
       player.resonance+=10;
 
       if(e.hp<=0){
 
-        e.dead=true;
-
-        player.prana+=8;
-
-        showMessage(
-          e.type==="asura"
-          ? "ASURA DISUELTO · EL PRĀṆA REGRESA"
-          : "FORMA ROTA · PRĀṆA ABSORBIDO"
-        );
+        killEnemy(e);
       }
     }
   }
 
   if(hit){
-    document.getElementById("combo").style.opacity="1";
+
+    document
+      .getElementById(
+        "combo"
+      )
+      .style.opacity="1";
   }
 }
 
 /* =========================================================
-   RESONANCIA — MECÁNICA ESPECIAL
+   MUERTE ENEMIGO
 ========================================================= */
+
+function killEnemy(e){
+
+  e.dead=true;
+
+  player.prana=
+    Math.min(
+      player.maxPrana,
+      player.prana+8
+    );
+
+  gainXP(e.xpReward);
+
+  save.gold+=
+    e.goldReward;
+
+  save.kills++;
+
+  saveGame();
+
+  showMessage(
+    `+${e.xpReward} XP   +${e.goldReward} ☼`
+  );
+}
+
+/* =========================================================
+   RESONANCIA
+========================================================= */
+
+let pulseEffect=0;
 
 function resonance(){
 
-  if(!gameStarted)return;
+  if(!gameStarted)
+    return;
 
-  if(player.prana<CFG.RESONANCE_COST){
-    showMessage("PRĀṆA INSUFICIENTE");
+  if(
+    player.prana<
+    CFG.RESONANCE_COST
+  ){
+
+    showMessage(
+      "PRĀṆA INSUFICIENTE"
+    );
+
     return;
   }
 
-  player.prana-=CFG.RESONANCE_COST;
-
-  player.resonance=0;
-
-  const radius=5.5;
+  player.prana-=
+    CFG.RESONANCE_COST;
 
   let affected=0;
 
   for(const e of enemies){
 
-    if(e.dead)continue;
+    if(e.dead)
+      continue;
 
-    const d=Math.hypot(
-      e.x-player.x,
-      e.y-player.y
-    );
+    const d=
+      Math.hypot(
+        e.x-player.x,
+        e.y-player.y
+      );
 
-    if(d<=radius){
+    if(d<=5.5){
+
+      const t=
+        enemyTypes[e.type];
 
       let damage=35;
 
-      const t=enemyTypes[e.type];
-
-      if(t.pranaWeak){
+      if(t.pranaWeak)
         damage*=2;
-      }
 
       e.hp-=damage;
+
       e.pranaReaction=.8;
 
       affected++;
 
-      if(e.hp<=0){
-        e.dead=true;
-        player.prana+=12;
-      }
+      if(e.hp<=0)
+        killEnemy(e);
     }
   }
 
+  pulseEffect=1;
+
   showMessage(
     affected
-    ? "ANĀHATA · EL TEMPLO RESPIRA CONTIGO"
-    : "ANĀHATA · ESCUCHA EL SILENCIO"
+    ?"ANĀHATA · EL TEMPLO RESPIRA CONTIGO"
+    :"ANĀHATA · ESCUCHA EL SILENCIO"
   );
-
-  pulseEffect=1;
 }
 
 /* =========================================================
-   DAÑO AL JUGADOR
+   DAÑO
 ========================================================= */
 
 function hurt(amount){
+
+  if(
+    Math.random()<
+    player.evasion/100
+  ){
+
+    showMessage(
+      "EVASIÓN · EL GOLPE ATRAVIESA EL AIRE"
+    );
+
+    return;
+  }
 
   if(player.guard){
 
     player.prana-=8;
 
     if(player.prana<0){
+
       player.prana=0;
+
       player.guard=false;
     }
 
-    showMessage("GUARDIA · PRĀṆA ABSORBE EL IMPACTO");
+    showMessage(
+      "GUARDIA · PRĀṆA ABSORBE EL IMPACTO"
+    );
+
     return;
   }
 
-  player.health-=amount;
+  const reduced=
+    Math.max(
+      1,
+      amount-player.defense*.45
+    );
+
+  player.health-=reduced;
 
   if(player.health<=0){
+
     player.health=0;
+
     gameOver();
   }
 }
 
 /* =========================================================
-   IA DEMONIOS
+   IA
 ========================================================= */
 
 function updateEnemies(dt){
 
   for(const e of enemies){
 
-    if(e.dead)continue;
+    if(e.dead)
+      continue;
 
     e.phase+=dt*2;
 
@@ -1260,10 +2623,14 @@ function updateEnemies(dt){
     if(e.pranaReaction>0)
       e.pranaReaction-=dt;
 
-    const dx=player.x-e.x;
-    const dy=player.y-e.y;
+    const dx=
+      player.x-e.x;
 
-    const dist=Math.hypot(dx,dy);
+    const dy=
+      player.y-e.y;
+
+    const dist=
+      Math.hypot(dx,dy);
 
     if(dist<.75){
 
@@ -1273,59 +2640,50 @@ function updateEnemies(dt){
 
         hurt(e.damage);
 
-        e.attackCooldown=1.1+
+        e.attackCooldown=
+          1+
           Math.random()*.8;
       }
 
       continue;
     }
 
-    /* comportamiento distinto por demonio */
-
     let speed=e.speed;
 
     if(e.type==="pisacha"){
-      speed*=1+
+
+      speed*=
+        1+
         Math.sin(e.phase)*.35;
     }
 
-    if(e.type==="naga"){
+    if(e.type==="naga")
       speed*=.8;
-    }
 
     if(e.type==="asura"){
-      speed*=dist>5?.7:1.15;
+
+      speed*=
+        dist>5?.7:1.15;
     }
 
-    if(e.type==="rakshasa"){
-      speed*=1;
-    }
+    const angle=
+      Math.atan2(dy,dx);
 
-    let ang=Math.atan2(dy,dx);
+    const nx=
+      e.x+
+      Math.cos(angle)*
+      speed*dt;
 
-    const nx=e.x+
-      Math.cos(ang)*speed*dt;
-
-    const ny=e.y+
-      Math.sin(ang)*speed*dt;
+    const ny=
+      e.y+
+      Math.sin(angle)*
+      speed*dt;
 
     if(!isWall(nx,ny)){
+
       e.x=nx;
       e.y=ny;
     }
-  }
-}
-
-/* =========================================================
-   EFECTO RESONANCIA
-========================================================= */
-
-let pulseEffect=0;
-
-function updateEffects(dt){
-
-  if(pulseEffect>0){
-    pulseEffect-=dt;
   }
 }
 
@@ -1335,90 +2693,163 @@ function updateEffects(dt){
 
 function castRay(angle){
 
-  const sin=Math.sin(angle);
-  const cos=Math.cos(angle);
+  const sin=
+    Math.sin(angle);
+
+  const cos=
+    Math.cos(angle);
 
   let distance=0;
 
   const step=.025;
 
-  while(distance<CFG.MAX_DEPTH){
+  while(
+    distance<
+    CFG.MAX_DEPTH
+  ){
 
     distance+=step;
 
-    const x=player.x+cos*distance;
-    const y=player.y+sin*distance;
+    const x=
+      player.x+
+      cos*distance;
+
+    const y=
+      player.y+
+      sin*distance;
 
     if(isWall(x,y)){
 
-      const fx=x-Math.floor(x);
-      const fy=y-Math.floor(y);
+      const fx=
+        x-Math.floor(x);
 
-      let side;
+      const fy=
+        y-Math.floor(y);
 
-      if(fx<.08 || fx>.92)
-        side="x";
-      else
-        side="y";
+      return{
 
-      return {
         distance,
+
         x,
+
         y,
-        side
+
+        side:
+          (
+            fx<.08 ||
+            fx>.92
+          )
+          ?"x"
+          :"y"
       };
     }
   }
 
-  return {
+  return{
+
     distance:CFG.MAX_DEPTH,
-    x:player.x+cos*CFG.MAX_DEPTH,
-    y:player.y+sin*CFG.MAX_DEPTH,
+
+    x:
+      player.x+
+      cos*CFG.MAX_DEPTH,
+
+    y:
+      player.y+
+      sin*CFG.MAX_DEPTH,
+
     side:"x"
   };
 }
 
 /* =========================================================
-   RENDER MUROS
+   RENDER MUNDO
 ========================================================= */
 
 function renderWorld(){
 
-  /* cielo */
-  const sky=ctx.createLinearGradient(0,0,0,H*.58);
-  sky.addColorStop(0,"#070313");
-  sky.addColorStop(.5,"#261027");
-  sky.addColorStop(1,"#6c3215");
+  const sky=
+    ctx.createLinearGradient(
+      0,0,0,H*.58
+    );
+
+  sky.addColorStop(
+    0,
+    "#070313"
+  );
+
+  sky.addColorStop(
+    .5,
+    "#261027"
+  );
+
+  sky.addColorStop(
+    1,
+    "#6c3215"
+  );
 
   ctx.fillStyle=sky;
-  ctx.fillRect(0,0,W,H/2);
 
-  /* suelo */
-  const floor=ctx.createLinearGradient(0,H/2,0,H);
-  floor.addColorStop(0,"#2b160f");
-  floor.addColorStop(1,"#050305");
+  ctx.fillRect(
+    0,0,W,H/2
+  );
+
+  const floor=
+    ctx.createLinearGradient(
+      0,H/2,0,H
+    );
+
+  floor.addColorStop(
+    0,
+    "#2b160f"
+  );
+
+  floor.addColorStop(
+    1,
+    "#050305"
+  );
 
   ctx.fillStyle=floor;
-  ctx.fillRect(0,H/2,W,H/2);
 
-  const rays=Math.min(CFG.RAYS,W);
-  const zBuffer=new Float32Array(rays);
+  ctx.fillRect(
+    0,H/2,W,H/2
+  );
 
-  for(let i=0;i<rays;i++){
+  const rays=
+    Math.min(
+      CFG.RAYS,
+      W
+    );
 
-    const cameraX=i/rays-.5;
+  const zBuffer=
+    new Float32Array(rays);
 
-    const rayAngle=
+  for(
+    let i=0;
+    i<rays;
+    i++
+  ){
+
+    const cameraX=
+      i/rays-.5;
+
+    const angle=
       player.a+
       cameraX*CFG.FOV;
 
-    const ray=castRay(rayAngle);
+    const ray=
+      castRay(angle);
 
     let dist=
       ray.distance*
-      Math.cos(rayAngle-player.a);
+      Math.cos(
+        angle-player.a
+      );
 
-    dist=Math.max(.001,dist);
+    dist=
+      Math.max(
+        .001,
+        dist
+      );
 
     zBuffer[i]=dist;
 
@@ -1429,28 +2860,41 @@ function renderWorld(){
       H/2-
       player.pitch*H;
 
-    const top=horizon-wallHeight/2;
+    const top=
+      horizon-
+      wallHeight/2;
 
-    const bottom=horizon+wallHeight/2;
+    const bottom=
+      horizon+
+      wallHeight/2;
 
-    /* profundidad */
-    const light=Math.max(
-      0,
-      1-dist/CFG.MAX_DEPTH
-    );
+    const light=
+      Math.max(
+        0,
+        1-dist/CFG.MAX_DEPTH
+      );
 
-    let baseR=110+90*light;
-    let baseG=45+65*light;
-    let baseB=24+30*light;
+    let r=
+      110+
+      90*light;
+
+    let g=
+      45+
+      65*light;
+
+    let b=
+      24+
+      30*light;
 
     if(ray.side==="x"){
-      baseR*=.78;
-      baseG*=.78;
-      baseB*=.78;
+
+      r*=.78;
+      g*=.78;
+      b*=.78;
     }
 
     ctx.fillStyle=
-      `rgb(${baseR|0},${baseG|0},${baseB|0})`;
+      `rgb(${r|0},${g|0},${b|0})`;
 
     ctx.fillRect(
       i*(W/rays),
@@ -1458,44 +2902,30 @@ function renderWorld(){
       W/rays+1,
       bottom-top
     );
-
-    /* bloques de piedra */
-    if(wallHeight>30){
-
-      const fx=ray.x-Math.floor(ray.x);
-      const brick=Math.floor(fx*4);
-
-      if(brick%2===0){
-
-        ctx.fillStyle=
-          `rgba(255,190,90,${.035*light})`;
-
-        ctx.fillRect(
-          i*(W/rays),
-          top,
-          1,
-          wallHeight
-        );
-      }
-    }
   }
 
   renderFloorSymbols();
-  renderSprites(zBuffer,rays);
+
+  renderSprites(
+    zBuffer,
+    rays
+  );
+
   renderSword();
 
-  if(pulseEffect>0){
+  if(pulseEffect>0)
     renderPulse();
-  }
 }
 
 /* =========================================================
-   SUELO CON MANDALAS
+   SÍMBOLOS DEL SUELO
 ========================================================= */
 
 function renderFloorSymbols(){
 
-  const horizon=H/2-player.pitch*H;
+  const horizon=
+    H/2-
+    player.pitch*H;
 
   ctx.save();
 
@@ -1503,24 +2933,33 @@ function renderFloorSymbols(){
 
   for(let r=1;r<9;r++){
 
-    const y=horizon+H*.055*r*r;
+    const y=
+      horizon+
+      H*.055*r*r;
 
-    if(y>H)break;
+    if(y>H)
+      break;
 
     ctx.strokeStyle="#d38d38";
+
     ctx.lineWidth=1;
 
     ctx.beginPath();
 
     const width=
-      Math.min(W*.9,90*r);
+      Math.min(
+        W*.9,
+        90*r
+      );
 
     ctx.ellipse(
       W/2,
       y,
       width,
       width*.18,
-      0,0,Math.PI*2
+      0,
+      0,
+      Math.PI*2
     );
 
     ctx.stroke();
@@ -1533,69 +2972,90 @@ function renderFloorSymbols(){
    SPRITES
 ========================================================= */
 
-function renderSprites(zBuffer,rays){
+function renderSprites(
+  zBuffer,
+  rays
+){
 
   const sprites=[];
 
   for(const e of enemies){
 
-    if(e.dead)continue;
+    if(!e.dead){
 
-    sprites.push({
-      kind:"enemy",
-      obj:e
-    });
+      sprites.push({
+        kind:"enemy",
+        obj:e
+      });
+    }
   }
 
   for(const o of objects){
 
     sprites.push({
-      kind:"object",
+      kind:o.type==="vendor"
+      ?"vendor"
+      :"object",
+
       obj:o
     });
   }
 
-  sprites.sort((a,b)=>{
+  sprites.sort(
+    (a,b)=>{
 
-    const da=
-      Math.hypot(
-        a.obj.x-player.x,
-        a.obj.y-player.y
-      );
+      const da=
+        Math.hypot(
+          a.obj.x-player.x,
+          a.obj.y-player.y
+        );
 
-    const db=
-      Math.hypot(
-        b.obj.x-player.x,
-        b.obj.y-player.y
-      );
+      const db=
+        Math.hypot(
+          b.obj.x-player.x,
+          b.obj.y-player.y
+        );
 
-    return db-da;
-  });
+      return db-da;
+    }
+  );
 
   for(const s of sprites){
 
-    const dx=s.obj.x-player.x;
-    const dy=s.obj.y-player.y;
+    const dx=
+      s.obj.x-player.x;
 
-    const dist=Math.hypot(dx,dy);
+    const dy=
+      s.obj.y-player.y;
 
-    let ang=
-      Math.atan2(dy,dx)-player.a;
+    const dist=
+      Math.hypot(dx,dy);
 
-    while(ang>Math.PI)ang-=Math.PI*2;
-    while(ang<-Math.PI)ang+=Math.PI*2;
+    let angle=
+      Math.atan2(dy,dx)-
+      player.a;
 
-    if(Math.abs(ang)>CFG.FOV*.65)
+    while(angle>Math.PI)
+      angle-=Math.PI*2;
+
+    while(angle<-Math.PI)
+      angle+=Math.PI*2;
+
+    if(
+      Math.abs(angle)>
+      CFG.FOV*.65
+    )
       continue;
 
     const corrected=
-      dist*Math.cos(ang);
+      dist*Math.cos(angle);
 
-    if(corrected<=.1)continue;
+    if(corrected<=.1)
+      continue;
 
     const screenX=
       W/2+
-      Math.tan(ang)/
+      Math.tan(angle)/
       Math.tan(CFG.FOV/2)*
       W/2;
 
@@ -1603,25 +3063,55 @@ function renderSprites(zBuffer,rays){
       H/corrected;
 
     if(s.kind==="enemy"){
-      drawEnemy(s.obj,screenX,scale,corrected);
+
+      drawEnemy(
+        s.obj,
+        screenX,
+        scale,
+        corrected
+      );
+
+    }else if(
+      s.kind==="vendor"
+    ){
+
+      drawVendor(
+        s.obj,
+        screenX,
+        scale
+      );
+
     }else{
-      drawObject(s.obj,screenX,scale,corrected);
+
+      drawObject(
+        s.obj,
+        screenX,
+        scale
+      );
     }
   }
 }
 
 /* =========================================================
-   DEMONIOS
+   ENEMIGO
 ========================================================= */
 
-function drawEnemy(e,x,scale,dist){
+function drawEnemy(
+  e,
+  x,
+  scale,
+  dist
+){
 
-  const t=enemyTypes[e.type];
+  const t=
+    enemyTypes[e.type];
 
-  const size=scale*t.size;
+  const size=
+    scale*t.size;
 
   const bob=
-    Math.sin(e.phase)*size*.025;
+    Math.sin(e.phase)*
+    size*.025;
 
   const bottom=
     H/2+
@@ -1632,15 +3122,9 @@ function drawEnemy(e,x,scale,dist){
   const top=
     bottom-size;
 
-  const width=size*.55;
+  const width=
+    size*.55;
 
-  /* comprobar z buffer aproximado */
-  const rayIndex=
-    Math.floor(
-      (x/W)*Math.min(CFG.RAYS,W)
-    );
-
-  /* sombra */
   ctx.save();
 
   ctx.globalAlpha=.35;
@@ -1654,23 +3138,29 @@ function drawEnemy(e,x,scale,dist){
     bottom+size*.04,
     width*.65,
     size*.10,
-    0,0,Math.PI*2
+    0,
+    0,
+    Math.PI*2
   );
 
   ctx.fill();
 
   ctx.restore();
 
-  /* aura */
   ctx.save();
 
   ctx.globalAlpha=
-    e.pranaReaction>0?.8:.28;
+    e.pranaReaction>0
+    ?.8
+    :.28;
 
   ctx.shadowBlur=25;
-  ctx.shadowColor=t.glow;
 
-  ctx.fillStyle=t.glow;
+  ctx.shadowColor=
+    t.glow;
+
+  ctx.fillStyle=
+    t.glow;
 
   ctx.beginPath();
 
@@ -1679,24 +3169,28 @@ function drawEnemy(e,x,scale,dist){
     top+size*.52,
     width*.48,
     size*.55,
-    0,0,Math.PI*2
+    0,
+    0,
+    Math.PI*2
   );
 
   ctx.fill();
 
   ctx.restore();
 
-  /* cuerpo */
   ctx.save();
 
-  if(e.hitFlash>0){
-    ctx.fillStyle="#fff4c2";
-  }else{
-    ctx.fillStyle=t.color;
-  }
+  ctx.fillStyle=
+    e.hitFlash>0
+    ?"white"
+    :t.color;
 
   ctx.shadowBlur=10;
-  ctx.shadowColor=t.glow;
+
+  ctx.shadowColor=
+    t.glow;
+
+  /* cuerpo */
 
   ctx.beginPath();
 
@@ -1705,12 +3199,15 @@ function drawEnemy(e,x,scale,dist){
     top+size*.57,
     width*.36,
     size*.40,
-    0,0,Math.PI*2
+    0,
+    0,
+    Math.PI*2
   );
 
   ctx.fill();
 
   /* cabeza */
+
   ctx.beginPath();
 
   ctx.arc(
@@ -1724,13 +3221,15 @@ function drawEnemy(e,x,scale,dist){
   ctx.fill();
 
   /* ojos */
+
   ctx.shadowBlur=15;
+
   ctx.shadowColor="#fff";
 
   ctx.fillStyle=
     e.type==="naga"
-    ? "#66ffe0"
-    : "#ffdf72";
+    ?" #66ffe0"
+    :"#ffdf72";
 
   ctx.beginPath();
 
@@ -1753,65 +3252,121 @@ function drawEnemy(e,x,scale,dist){
   ctx.fill();
 
   /* brazos */
-  ctx.strokeStyle=t.color;
-  ctx.lineWidth=Math.max(2,size*.045);
+
+  ctx.strokeStyle=
+    t.color;
+
+  ctx.lineWidth=
+    Math.max(
+      2,
+      size*.045
+    );
 
   ctx.beginPath();
 
-  ctx.moveTo(x-width*.25,top+size*.52);
-  ctx.lineTo(x-width*.55,top+size*.72);
+  ctx.moveTo(
+    x-width*.25,
+    top+size*.52
+  );
 
-  ctx.moveTo(x+width*.25,top+size*.52);
-  ctx.lineTo(x+width*.55,top+size*.72);
+  ctx.lineTo(
+    x-width*.55,
+    top+size*.72
+  );
+
+  ctx.moveTo(
+    x+width*.25,
+    top+size*.52
+  );
+
+  ctx.lineTo(
+    x+width*.55,
+    top+size*.72
+  );
 
   ctx.stroke();
 
-  /* Naga serpiente */
+  /* naga */
+
   if(e.type==="naga"){
 
     ctx.beginPath();
 
-    ctx.moveTo(x,top+size*.55);
+    ctx.moveTo(
+      x,
+      top+size*.55
+    );
 
     for(let i=0;i<5;i++){
 
       const xx=
         x+
-        Math.sin(i+e.phase)*size*.12;
+        Math.sin(
+          i+e.phase
+        )*
+        size*.12;
 
       const yy=
         top+
-        size*(.62+i*.075);
+        size*
+        (.62+i*.075);
 
-      ctx.lineTo(xx,yy);
+      ctx.lineTo(
+        xx,
+        yy
+      );
     }
 
     ctx.stroke();
   }
 
-  /* cuernos Asura */
+  /* asura */
+
   if(e.type==="asura"){
 
     ctx.strokeStyle="#e0a05a";
-    ctx.lineWidth=Math.max(2,size*.035);
+
+    ctx.lineWidth=
+      Math.max(
+        2,
+        size*.035
+      );
 
     ctx.beginPath();
 
-    ctx.moveTo(x-size*.12,top+size*.15);
-    ctx.lineTo(x-size*.22,top-size*.02);
+    ctx.moveTo(
+      x-size*.12,
+      top+size*.15
+    );
 
-    ctx.moveTo(x+size*.12,top+size*.15);
-    ctx.lineTo(x+size*.22,top-size*.02);
+    ctx.lineTo(
+      x-size*.22,
+      top-size*.02
+    );
+
+    ctx.moveTo(
+      x+size*.12,
+      top+size*.15
+    );
+
+    ctx.lineTo(
+      x+size*.22,
+      top-size*.02
+    );
 
     ctx.stroke();
   }
 
   ctx.restore();
 
-  /* barra de vida */
-  const hp=e.hp/e.maxHp;
+  /* vida */
 
-  ctx.fillStyle="rgba(0,0,0,.7)";
+  const hp=
+    e.hp/e.maxHp;
+
+  ctx.fillStyle=
+    "rgba(0,0,0,.7)";
+
   ctx.fillRect(
     x-width*.55,
     top-size*.08,
@@ -1819,7 +3374,8 @@ function drawEnemy(e,x,scale,dist){
     4
   );
 
-  ctx.fillStyle=t.glow;
+  ctx.fillStyle=
+    t.glow;
 
   ctx.fillRect(
     x-width*.55,
@@ -1828,12 +3384,16 @@ function drawEnemy(e,x,scale,dist){
     4
   );
 
-  /* nombre */
   if(dist<5){
 
-    ctx.font="9px Georgia";
-    ctx.textAlign="center";
-    ctx.fillStyle="#f5d99b";
+    ctx.font=
+      "9px Georgia";
+
+    ctx.textAlign=
+      "center";
+
+    ctx.fillStyle=
+      "#f5d99b";
 
     ctx.fillText(
       t.name,
@@ -1847,7 +3407,11 @@ function drawEnemy(e,x,scale,dist){
    OBJETOS
 ========================================================= */
 
-function drawObject(o,x,scale,dist){
+function drawObject(
+  o,
+  x,
+  scale
+){
 
   const bob=
     Math.sin(
@@ -1857,31 +3421,41 @@ function drawObject(o,x,scale,dist){
 
   if(o.type==="lotus"){
 
-    const s=scale*.32;
+    const s=
+      scale*.32;
 
     ctx.save();
 
     ctx.translate(
       x,
-      H/2+scale*.35+bob-player.pitch*H
+      H/2+
+      scale*.35+
+      bob-
+      player.pitch*H
     );
 
     ctx.shadowBlur=18;
+
     ctx.shadowColor="#ff6caa";
 
     ctx.fillStyle="#dc5b9d";
 
     for(let i=0;i<8;i++){
 
-      ctx.rotate(Math.PI/4);
+      ctx.rotate(
+        Math.PI/4
+      );
 
       ctx.beginPath();
 
       ctx.ellipse(
-        0,-s*.25,
+        0,
+        -s*.25,
         s*.13,
         s*.35,
-        0,0,Math.PI*2
+        0,
+        0,
+        Math.PI*2
       );
 
       ctx.fill();
@@ -1891,7 +3465,13 @@ function drawObject(o,x,scale,dist){
 
     ctx.beginPath();
 
-    ctx.arc(0,0,s*.13,0,Math.PI*2);
+    ctx.arc(
+      0,
+      0,
+      s*.13,
+      0,
+      Math.PI*2
+    );
 
     ctx.fill();
 
@@ -1900,27 +3480,52 @@ function drawObject(o,x,scale,dist){
 
   if(o.type==="crystal"){
 
-    const s=scale*.3;
+    const s=
+      scale*.3;
 
     ctx.save();
 
     ctx.translate(
       x,
-      H/2+scale*.35+bob-player.pitch*H
+      H/2+
+      scale*.35+
+      bob-
+      player.pitch*H
     );
 
     ctx.shadowBlur=25;
+
     ctx.shadowColor="#35eaff";
 
     ctx.fillStyle="#4edfff";
 
     ctx.beginPath();
 
-    ctx.moveTo(0,-s);
-    ctx.lineTo(s*.35,-s*.25);
-    ctx.lineTo(s*.22,s*.65);
-    ctx.lineTo(-s*.22,s*.65);
-    ctx.lineTo(-s*.35,-s*.25);
+    ctx.moveTo(
+      0,
+      -s
+    );
+
+    ctx.lineTo(
+      s*.35,
+      -s*.25
+    );
+
+    ctx.lineTo(
+      s*.22,
+      s*.65
+    );
+
+    ctx.lineTo(
+      -s*.22,
+      s*.65
+    );
+
+    ctx.lineTo(
+      -s*.35,
+      -s*.25
+    );
+
     ctx.closePath();
 
     ctx.fill();
@@ -1930,9 +3535,13 @@ function drawObject(o,x,scale,dist){
 
   if(o.type==="pillar"){
 
-    const s=scale*.65;
+    const s=
+      scale*.65;
 
-    const y=H/2+scale*.48-player.pitch*H;
+    const y=
+      H/2+
+      scale*.48-
+      player.pitch*H;
 
     ctx.fillStyle="#75452b";
 
@@ -1959,8 +3568,8 @@ function drawObject(o,x,scale,dist){
       s*.10
     );
 
-    /* loto grabado */
     ctx.strokeStyle="#e3b75b";
+
     ctx.lineWidth=2;
 
     ctx.beginPath();
@@ -1969,7 +3578,8 @@ function drawObject(o,x,scale,dist){
       x,
       y-s*.5,
       s*.13,
-      0,Math.PI*2
+      0,
+      Math.PI*2
     );
 
     ctx.stroke();
@@ -1977,23 +3587,31 @@ function drawObject(o,x,scale,dist){
 
   if(o.type==="mandala"){
 
-    const s=scale*.55;
+    const s=
+      scale*.55;
 
     ctx.save();
 
     ctx.translate(
       x,
-      H/2+scale*.45-player.pitch*H
+      H/2+
+      scale*.45-
+      player.pitch*H
     );
 
-    ctx.rotate(performance.now()*.0002);
+    ctx.rotate(
+      performance.now()*.0002
+    );
 
     ctx.strokeStyle="#e0ae51";
+
     ctx.lineWidth=2;
 
     for(let i=0;i<8;i++){
 
-      ctx.rotate(Math.PI/4);
+      ctx.rotate(
+        Math.PI/4
+      );
 
       ctx.strokeRect(
         -s*.12,
@@ -2004,7 +3622,15 @@ function drawObject(o,x,scale,dist){
     }
 
     ctx.beginPath();
-    ctx.arc(0,0,s*.22,0,Math.PI*2);
+
+    ctx.arc(
+      0,
+      0,
+      s*.22,
+      0,
+      Math.PI*2
+    );
+
     ctx.stroke();
 
     ctx.restore();
@@ -2012,7 +3638,160 @@ function drawObject(o,x,scale,dist){
 }
 
 /* =========================================================
-   ESPADA DEL JUGADOR
+   VENDEDOR
+========================================================= */
+
+function drawVendor(
+  o,
+  x,
+  scale
+){
+
+  const s=
+    scale*.85;
+
+  const y=
+    H/2+
+    scale*.42-
+    player.pitch*H;
+
+  ctx.save();
+
+  ctx.shadowBlur=30;
+
+  ctx.shadowColor="#ffc85a";
+
+  /* cuerpo */
+
+  ctx.fillStyle="#743f1c";
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    x-s*.25,
+    y
+  );
+
+  ctx.lineTo(
+    x-s*.18,
+    y-s*.65
+  );
+
+  ctx.lineTo(
+    x+s*.18,
+    y-s*.65
+  );
+
+  ctx.lineTo(
+    x+s*.25,
+    y
+  );
+
+  ctx.closePath();
+
+  ctx.fill();
+
+  /* cabeza */
+
+  ctx.fillStyle="#b87942";
+
+  ctx.beginPath();
+
+  ctx.arc(
+    x,
+    y-s*.82,
+    s*.15,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+  /* turbante */
+
+  ctx.strokeStyle="#e5b95b";
+
+  ctx.lineWidth=
+    s*.08;
+
+  ctx.beginPath();
+
+  ctx.arc(
+    x,
+    y-s*.87,
+    s*.18,
+    Math.PI,
+    Math.PI*2
+  );
+
+  ctx.stroke();
+
+  /* báculo */
+
+  ctx.strokeStyle="#c89445";
+
+  ctx.lineWidth=
+    Math.max(2,s*.04);
+
+  ctx.beginPath();
+
+  ctx.moveTo(
+    x+s*.18,
+    y
+  );
+
+  ctx.lineTo(
+    x+s*.32,
+    y-s*.95
+  );
+
+  ctx.stroke();
+
+  /* gema */
+
+  ctx.fillStyle="#54eaff";
+
+  ctx.shadowBlur=18;
+
+  ctx.beginPath();
+
+  ctx.arc(
+    x+s*.32,
+    y-s,
+    s*.07,
+    0,
+    Math.PI*2
+  );
+
+  ctx.fill();
+
+  ctx.restore();
+
+  if(
+    Math.hypot(
+      player.x-o.x,
+      player.y-o.y
+    )<2.5
+  ){
+
+    ctx.textAlign="center";
+
+    ctx.font=
+      "10px Georgia";
+
+    ctx.fillStyle=
+      "#ffe3a0";
+
+    ctx.fillText(
+      "E · MERCADER",
+      x,
+      y-s*1.15
+    );
+  }
+}
+
+/* =========================================================
+   ESPADA
 ========================================================= */
 
 function renderSword(){
@@ -2022,22 +3801,29 @@ function renderSword(){
   if(player.attacking){
 
     const p=
-      1-player.attackTimer/.34;
+      1-
+      player.attackTimer/.34;
 
     swing=
       Math.sin(p*Math.PI)*1.4;
   }
 
-  const cx=W*.72;
-  const baseY=H*1.04;
+  const cx=
+    W*.72;
 
-  const length=Math.min(W,H)*.55;
+  const baseY=
+    H*1.04;
+
+  const length=
+    Math.min(W,H)*.55;
 
   ctx.save();
 
   ctx.translate(
-    cx+swing*W*.12,
-    baseY-swing*H*.18
+    cx+
+    swing*W*.12,
+    baseY-
+    swing*H*.18
   );
 
   ctx.rotate(
@@ -2046,6 +3832,7 @@ function renderSword(){
   );
 
   /* brazo */
+
   ctx.fillStyle="#7b4b35";
 
   ctx.fillRect(
@@ -2056,6 +3843,7 @@ function renderSword(){
   );
 
   /* empuñadura */
+
   ctx.fillStyle="#4d2818";
 
   ctx.fillRect(
@@ -2064,6 +3852,8 @@ function renderSword(){
     30,
     105
   );
+
+  /* guardia */
 
   ctx.fillStyle="#d6a94d";
 
@@ -2075,43 +3865,92 @@ function renderSword(){
   );
 
   /* hoja */
-  const grad=ctx.createLinearGradient(
-    -10,0,
-    10,0
+
+  const grad=
+    ctx.createLinearGradient(
+      -10,0,
+      10,0
+    );
+
+  grad.addColorStop(
+    0,
+    "#8f806f"
   );
 
-  grad.addColorStop(0,"#8f806f");
-  grad.addColorStop(.45,"#f5e8c8");
-  grad.addColorStop(.55,"#fff9df");
-  grad.addColorStop(1,"#6f665c");
+  grad.addColorStop(
+    .45,
+    "#f5e8c8"
+  );
+
+  grad.addColorStop(
+    .55,
+    "#fff9df"
+  );
+
+  grad.addColorStop(
+    1,
+    "#6f665c"
+  );
 
   ctx.fillStyle=grad;
 
   ctx.beginPath();
 
-  ctx.moveTo(-13,-35);
-  ctx.lineTo(13,-35);
-  ctx.lineTo(8,-length);
-  ctx.lineTo(0,-length-45);
-  ctx.lineTo(-8,-length);
+  ctx.moveTo(
+    -13,
+    -35
+  );
+
+  ctx.lineTo(
+    13,
+    -35
+  );
+
+  ctx.lineTo(
+    8,
+    -length
+  );
+
+  ctx.lineTo(
+    0,
+    -length-45
+  );
+
+  ctx.lineTo(
+    -8,
+    -length
+  );
+
   ctx.closePath();
 
   ctx.fill();
 
-  /* filo luminoso */
+  /* filo */
+
   ctx.strokeStyle="#fff4b8";
+
   ctx.lineWidth=2;
 
   ctx.beginPath();
 
-  ctx.moveTo(4,-42);
-  ctx.lineTo(0,-length-40);
+  ctx.moveTo(
+    4,
+    -42
+  );
+
+  ctx.lineTo(
+    0,
+    -length-40
+  );
 
   ctx.stroke();
 
-  /* runa de prāṇa */
+  /* runa */
+
   ctx.strokeStyle="#55eaff";
+
   ctx.shadowBlur=12;
+
   ctx.shadowColor="#38eaff";
 
   ctx.beginPath();
@@ -2130,7 +3969,7 @@ function renderSword(){
 }
 
 /* =========================================================
-   ONDA ANĀHATA
+   PULSO
 ========================================================= */
 
 function renderPulse(){
@@ -2139,7 +3978,9 @@ function renderPulse(){
     1-pulseEffect;
 
   const radius=
-    Math.min(W,H)*.65*progress;
+    Math.min(W,H)*
+    .65*
+    progress;
 
   ctx.save();
 
@@ -2149,10 +3990,12 @@ function renderPulse(){
   ctx.strokeStyle="#6eeaff";
 
   ctx.shadowBlur=30;
+
   ctx.shadowColor="#55ddff";
 
   ctx.lineWidth=
-    4+20*pulseEffect;
+    4+
+    20*pulseEffect;
 
   ctx.beginPath();
 
@@ -2166,23 +4009,33 @@ function renderPulse(){
 
   ctx.stroke();
 
-  /* pétalos */
   ctx.lineWidth=2;
 
   for(let i=0;i<12;i++){
 
-    const a=i*Math.PI/6;
+    const a=
+      i*Math.PI/6;
 
     ctx.beginPath();
 
     ctx.moveTo(
-      W/2+Math.cos(a)*radius*.55,
-      H/2+Math.sin(a)*radius*.55
+      W/2+
+      Math.cos(a)*
+      radius*.55,
+
+      H/2+
+      Math.sin(a)*
+      radius*.55
     );
 
     ctx.lineTo(
-      W/2+Math.cos(a)*radius,
-      H/2+Math.sin(a)*radius
+      W/2+
+      Math.cos(a)*
+      radius,
+
+      H/2+
+      Math.sin(a)*
+      radius
     );
 
     ctx.stroke();
@@ -2200,7 +4053,12 @@ function renderMinimap(){
   const mw=mini.width;
   const mh=mini.height;
 
-  mctx.clearRect(0,0,mw,mh);
+  mctx.clearRect(
+    0,
+    0,
+    mw,
+    mh
+  );
 
   const scale=
     Math.min(
@@ -2215,57 +4073,51 @@ function renderMinimap(){
     (mh-MAP_H*scale)/2
   );
 
-  /* mapa */
-  for(let y=0;y<MAP_H;y++){
+  for(
+    let y=0;
+    y<MAP_H;
+    y++
+  ){
 
-    for(let x=0;x<MAP_W;x++){
+    for(
+      let x=0;
+      x<MAP_W;
+      x++
+    ){
 
-      if(map[y][x]==="#"){
+      if(
+        map[y][x]==="#"
+      ){
 
-        mctx.fillStyle="#6d4226";
+        mctx.fillStyle=
+          "#6d4226";
 
-        mctx.fillRect(
-          x*scale,
-          y*scale,
-          scale+.5,
-          scale+.5
-        );
       }else{
 
-        mctx.fillStyle="#160d0c";
-
-        mctx.fillRect(
-          x*scale,
-          y*scale,
-          scale,
-          scale
-        );
+        mctx.fillStyle=
+          "#160d0c";
       }
+
+      mctx.fillRect(
+        x*scale,
+        y*scale,
+        scale+.5,
+        scale+.5
+      );
     }
   }
 
-  /* objetos */
-  for(const o of objects){
+  /* enemigos */
+
+  for(
+    const e of enemies
+  ){
+
+    if(e.dead)
+      continue;
 
     mctx.fillStyle=
-      o.type==="crystal"
-      ? "#49dfee"
-      : "#c68a42";
-
-    mctx.fillRect(
-      o.x*scale-1.5,
-      o.y*scale-1.5,
-      3,
-      3
-    );
-  }
-
-  /* demonios */
-  for(const e of enemies){
-
-    if(e.dead)continue;
-
-    mctx.fillStyle="#e43838";
+      "#e43838";
 
     mctx.beginPath();
 
@@ -2280,8 +4132,30 @@ function renderMinimap(){
     mctx.fill();
   }
 
+  /* vendedor */
+
+  if(vendor){
+
+    mctx.fillStyle=
+      "#ffd24d";
+
+    mctx.beginPath();
+
+    mctx.arc(
+      vendor.x*scale,
+      vendor.y*scale,
+      4,
+      0,
+      Math.PI*2
+    );
+
+    mctx.fill();
+  }
+
   /* jugador */
-  mctx.fillStyle="#fff0a0";
+
+  mctx.fillStyle=
+    "#fff0a0";
 
   mctx.beginPath();
 
@@ -2295,8 +4169,9 @@ function renderMinimap(){
 
   mctx.fill();
 
-  /* dirección */
-  mctx.strokeStyle="#fff0a0";
+  mctx.strokeStyle=
+    "#fff0a0";
+
   mctx.lineWidth=1;
 
   mctx.beginPath();
@@ -2307,10 +4182,15 @@ function renderMinimap(){
   );
 
   mctx.lineTo(
-    (player.x+
-      Math.cos(player.a)*1.2)*scale,
-    (player.y+
-      Math.sin(player.a)*1.2)*scale
+    (
+      player.x+
+      Math.cos(player.a)*1.2
+    )*scale,
+
+    (
+      player.y+
+      Math.sin(player.a)*1.2
+    )*scale
   );
 
   mctx.stroke();
@@ -2325,32 +4205,67 @@ function renderMinimap(){
 function updateHUD(){
 
   const hp=
-    Math.max(0,player.health/CFG.MAX_HEALTH)*100;
+    Math.max(
+      0,
+      player.health/player.maxHealth
+    )*100;
 
   const pr=
-    Math.max(0,player.prana/CFG.MAX_PRANA)*100;
+    Math.max(
+      0,
+      player.prana/player.maxPrana
+    )*100;
 
-  document.getElementById("healthBar")
-    .style.width=hp+"%";
+  document
+    .getElementById("healthBar")
+    .style.width=
+      hp+"%";
 
-  document.getElementById("pranaBar")
-    .style.width=pr+"%";
+  document
+    .getElementById("pranaBar")
+    .style.width=
+      pr+"%";
 
-  document.getElementById("healthText")
+  document
+    .getElementById("healthText")
     .textContent=
-    `${Math.ceil(player.health)} / ${CFG.MAX_HEALTH}`;
+      `${Math.ceil(player.health)} / ${player.maxHealth}`;
 
-  document.getElementById("pranaText")
+  document
+    .getElementById("pranaText")
     .textContent=
-    `${Math.ceil(player.prana)} / ${CFG.MAX_PRANA}`;
+      `${Math.ceil(player.prana)} / ${player.maxPrana}`;
+
+  document
+    .getElementById("levelText")
+    .textContent=
+      `NIVEL ${save.level}`;
+
+  document
+    .getElementById("xpText")
+    .textContent=
+      `${Math.floor(save.xp)} / ${xpRequired(save.level)} XP`;
+
+  document
+    .getElementById("worldText")
+    .textContent=
+      `TEMPLO ${save.worldLevel}`;
+
+  document
+    .getElementById("goldText")
+    .textContent=
+      `☼ ${save.gold}`;
 
   const combo=
-    document.getElementById("combo");
+    document.getElementById(
+      "combo"
+    );
 
   combo.textContent=
     `RESONANCIA × ${player.combo}`;
 
   if(player.combo<=0){
+
     combo.style.opacity="0";
   }
 }
@@ -2364,41 +4279,458 @@ let messageTimer=0;
 function showMessage(text){
 
   const el=
-    document.getElementById("message");
+    document.getElementById(
+      "message"
+    );
 
   el.textContent=text;
+
   el.style.opacity="1";
 
   messageTimer=2.2;
 }
 
 /* =========================================================
-   VICTORIA
+   TIENDA
 ========================================================= */
 
-function checkVictory(){
+let shopOpen=false;
 
-  const alive=
-    enemies.filter(e=>!e.dead).length;
+let shopItems=[];
 
-  if(alive===0 && gameStarted){
+function generateShop(){
 
-    document.getElementById("victory")
-      .classList.add("show");
+  shopItems=[];
 
-    gameStarted=false;
+  const weapons=[
+
+    "Talwar del Sol",
+
+    "Khanda de Agni",
+
+    "Espada de Vayu",
+
+    "Hoja de Nārāyaṇa",
+
+    "Talwar del Loto",
+
+    "Espada de Rudra",
+
+    "Cimitarra de Surya",
+
+    "Hoja del Himalaya"
+  ];
+
+  const shields=[
+
+    "Escudo de Loto",
+
+    "Escudo de Garuda",
+
+    "Escudo de Agni",
+
+    "Escudo del Mandala",
+
+    "Escudo de Shiva",
+
+    "Escudo del Himalaya",
+
+    "Escudo de Vajra",
+
+    "Escudo de Naga"
+  ];
+
+  for(let i=0;i<3;i++){
+
+    const attack=
+      4+
+      save.worldLevel*2+
+      Math.floor(
+        Math.random()*9
+      );
+
+    const critical=
+      Math.floor(
+        Math.random()*13
+      );
+
+    shopItems.push({
+
+      type:"weapon",
+
+      name:
+        weapons[
+          Math.floor(
+            Math.random()*weapons.length
+          )
+        ],
+
+      attack,
+
+      critical,
+
+      price:
+        40+
+        attack*6+
+        critical*4
+    });
+  }
+
+  for(let i=0;i<3;i++){
+
+    const defense=
+      3+
+      save.worldLevel+
+      Math.floor(
+        Math.random()*8
+      );
+
+    const evasion=
+      Math.floor(
+        Math.random()*11
+      );
+
+    shopItems.push({
+
+      type:"shield",
+
+      name:
+        shields[
+          Math.floor(
+            Math.random()*shields.length
+          )
+        ],
+
+      defense,
+
+      evasion,
+
+      price:
+        45+
+        defense*7+
+        evasion*4
+    });
   }
 }
 
+function openShop(){
+
+  if(!gameStarted)
+    return;
+
+  if(!vendor)
+    return;
+
+  const d=
+    Math.hypot(
+      player.x-vendor.x,
+      player.y-vendor.y
+    );
+
+  if(d>2.5){
+
+    showMessage(
+      "ACÉRCATE AL MERCADER"
+    );
+
+    return;
+  }
+
+  if(shopOpen)
+    return;
+
+  shopOpen=true;
+
+  generateShop();
+
+  renderShop();
+}
+
+function renderShop(){
+
+  const screen=
+    document.getElementById(
+      "shopScreen"
+    );
+
+  const gold=
+    document.getElementById(
+      "shopGold"
+    );
+
+  const items=
+    document.getElementById(
+      "shopItems"
+    );
+
+  gold.textContent=
+    `☼ ${save.gold} monedas de templo`;
+
+  items.innerHTML="";
+
+  shopItems.forEach(
+    (item,index)=>{
+
+      const div=
+        document.createElement(
+          "div"
+        );
+
+      div.className=
+        "shopItem";
+
+      if(
+        item.type==="weapon"
+      ){
+
+        div.innerHTML=`
+
+          <h3>
+            ⚔ ${item.name}
+          </h3>
+
+          <div>
+            ATAQUE +${item.attack}<br>
+            CRÍTICO +${item.critical}%
+          </div>
+
+          <button
+            class="shopBuy"
+            data-index="${index}">
+            COMPRAR · ☼ ${item.price}
+          </button>
+        `;
+
+      }else{
+
+        div.innerHTML=`
+
+          <h3>
+            🛡 ${item.name}
+          </h3>
+
+          <div>
+            DEFENSA +${item.defense}<br>
+            EVASIÓN +${item.evasion}%
+          </div>
+
+          <button
+            class="shopBuy"
+            data-index="${index}">
+            COMPRAR · ☼ ${item.price}
+          </button>
+        `;
+      }
+
+      items.appendChild(div);
+    }
+  );
+
+  items
+    .querySelectorAll(
+      ".shopBuy"
+    )
+    .forEach(
+      btn=>{
+
+        btn.addEventListener(
+          "click",
+          ()=>{
+            buyItem(
+              Number(
+                btn.dataset.index
+              )
+            );
+          }
+        );
+      }
+    );
+
+  screen.classList.remove(
+    "hidden"
+  );
+}
+
+function buyItem(index){
+
+  const item=
+    shopItems[index];
+
+  if(!item)
+    return;
+
+  if(
+    save.gold<
+    item.price
+  ){
+
+    showMessage(
+      "NO TIENES SUFICIENTE ORO"
+    );
+
+    return;
+  }
+
+  save.gold-=
+    item.price;
+
+  if(
+    item.type==="weapon"
+  ){
+
+    save.weapon={
+
+      name:item.name,
+
+      attack:item.attack,
+
+      critical:item.critical
+    };
+
+    showMessage(
+      `${item.name} EQUIPADA`
+    );
+
+  }else{
+
+    save.shield={
+
+      name:item.name,
+
+      defense:item.defense,
+
+      evasion:item.evasion
+    };
+
+    showMessage(
+      `${item.name} EQUIPADO`
+    );
+  }
+
+  updatePlayerStats();
+
+  saveGame();
+
+  renderShop();
+}
+
+document
+  .getElementById(
+    "closeShop"
+  )
+  .addEventListener(
+    "click",
+    ()=>{
+      shopOpen=false;
+
+      document
+        .getElementById(
+          "shopScreen"
+        )
+        .classList.add(
+          "hidden"
+        );
+    }
+  );
+
+/* =========================================================
+   CAMBIO DE TEMPLO
+========================================================= */
+
+let levelTransition=false;
+
+function checkTempleComplete(){
+
+  const alive=
+    enemies.filter(
+      e=>!e.dead
+    ).length;
+
+  if(
+    alive===0 &&
+    !levelTransition
+  ){
+
+    levelTransition=true;
+
+    save.worldLevel++;
+
+    saveGame();
+
+    setTimeout(
+      nextTemple,
+      900
+    );
+  }
+}
+
+function nextTemple(){
+
+  const screen=
+    document.getElementById(
+      "levelScreen"
+    );
+
+  document
+    .getElementById(
+      "levelTitle"
+    )
+    .textContent=
+      `TEMPLO ${save.worldLevel}`;
+
+  document
+    .getElementById(
+      "levelReward"
+    )
+    .textContent=
+      `La forma del mundo ha cambiado · Nivel ${save.level}`;
+
+  screen.classList.add(
+    "show"
+  );
+
+  setTimeout(
+    ()=>{
+      buildTemple();
+
+      screen.classList.remove(
+        "show"
+      );
+
+      levelTransition=false;
+    },
+    1700
+  );
+}
+
+/* =========================================================
+   MUERTE
+========================================================= */
+
 function gameOver(){
+
+  gameStarted=false;
 
   showMessage(
     "EL PRĀṆA SE HA EXTINGUIDO..."
   );
 
-  setTimeout(()=>{
-    location.reload();
-  },1800);
+  setTimeout(
+    ()=>{
+      location.reload();
+    },
+    1800
+  );
+}
+
+/* =========================================================
+   EFECTOS
+========================================================= */
+
+function updateEffects(dt){
+
+  if(pulseEffect>0)
+    pulseEffect-=dt;
 }
 
 /* =========================================================
@@ -2406,19 +4738,30 @@ function gameOver(){
 ========================================================= */
 
 let gameStarted=false;
-let lastTime=performance.now();
+
+let lastTime=
+  performance.now();
 
 function loop(now){
 
   const dt=
-    Math.min(.033,(now-lastTime)/1000);
+    Math.min(
+      .033,
+      (now-lastTime)/1000
+    );
 
   lastTime=now;
 
-  if(gameStarted){
+  if(
+    gameStarted &&
+    !shopOpen &&
+    !levelTransition
+  ){
 
     updatePlayer(dt);
+
     updateEnemies(dt);
+
     updateEffects(dt);
 
     if(messageTimer>0){
@@ -2427,16 +4770,21 @@ function loop(now){
 
       if(messageTimer<=0){
 
-        document.getElementById("message")
+        document
+          .getElementById(
+            "message"
+          )
           .style.opacity="0";
       }
     }
 
     renderWorld();
+
     renderMinimap();
+
     updateHUD();
 
-    checkVictory();
+    checkTempleComplete();
   }
 
   requestAnimationFrame(loop);
@@ -2448,100 +4796,141 @@ requestAnimationFrame(loop);
    INICIO
 ========================================================= */
 
-document.getElementById("startBtn")
-.addEventListener("click",()=>{
+document
+  .getElementById(
+    "startBtn"
+  )
+  .addEventListener(
+    "click",
+    ()=>{
 
-  document.getElementById("start")
-    .classList.add("hidden");
+      loadSave();
 
-  gameStarted=true;
+      updatePlayerStats();
 
-  player.health=CFG.MAX_HEALTH;
-  player.prana=CFG.MAX_PRANA;
+      player.health=
+        player.maxHealth;
 
-  showMessage(
-    "PRĀṆA · RESPIRA ANTES DE AVANZAR"
+      player.prana=
+        player.maxPrana;
+
+      buildTemple();
+
+      document
+        .getElementById(
+          "start"
+        )
+        .classList.add(
+          "hidden"
+        );
+
+      gameStarted=true;
+
+      showMessage(
+        "PRĀṆA · RESPIRA ANTES DE AVANZAR"
+      );
+    }
   );
-});
 
 /* =========================================================
-   REINICIO
+   BORRAR PROGRESO
 ========================================================= */
 
-document.getElementById("restartBtn")
-.addEventListener("click",()=>{
+document
+  .getElementById(
+    "resetBtn"
+  )
+  .addEventListener(
+    "click",
+    ()=>{
+      localStorage.removeItem(
+        SAVE_KEY
+      );
 
-  player.x=3.5;
-  player.y=2.5;
-  player.a=0;
-  player.pitch=0;
-  player.health=100;
-  player.prana=100;
-  player.combo=0;
-
-  buildTemple();
-
-  document.getElementById("victory")
-    .classList.remove("show");
-
-  gameStarted=true;
-
-  showMessage(
-    "EL TEMPLO HA RENACIDO"
+      location.reload();
+    }
   );
-});
 
 /* =========================================================
-   TECLA E — MEDITACIÓN
-   Mecánica adicional:
-   permanecer quieto aumenta el prāṇa.
+   CONTINUAR
+========================================================= */
+
+document
+  .getElementById(
+    "continueBtn"
+  )
+  .addEventListener(
+    "click",
+    ()=>{
+      document
+        .getElementById(
+          "victory"
+        )
+        .classList.remove(
+          "show"
+        );
+
+      gameStarted=true;
+    }
+  );
+
+/* =========================================================
+   DHYĀNA
+   Estar quieto genera prāṇa adicional.
 ========================================================= */
 
 let stillTime=0;
 
-setInterval(()=>{
+setInterval(
+  ()=>{
 
-  if(!gameStarted)return;
+    if(!gameStarted)
+      return;
 
-  if(
-    Math.abs(joyX)<.05 &&
-    Math.abs(joyY)<.05 &&
-    !keys["KeyW"] &&
-    !keys["KeyA"] &&
-    !keys["KeyS"] &&
-    !keys["KeyD"]
-  ){
+    if(shopOpen)
+      return;
 
-    stillTime++;
+    const moving=
+      keys["KeyW"] ||
+      keys["KeyA"] ||
+      keys["KeyS"] ||
+      keys["KeyD"] ||
+      Math.abs(joyX)>.05 ||
+      Math.abs(joyY)>.05;
 
-    if(stillTime===4){
+    if(
+      !moving &&
+      !player.attacking &&
+      !player.guard
+    ){
 
-      player.prana=
-        Math.min(
-          CFG.MAX_PRANA,
-          player.prana+15
+      stillTime++;
+
+      if(stillTime>=4){
+
+        player.prana=
+          Math.min(
+            player.maxPrana,
+            player.prana+15
+          );
+
+        showMessage(
+          "DHYĀNA · EL SILENCIO GENERA PRĀṆA"
         );
 
-      showMessage(
-        "DHYĀNA · EL SILENCIO GENERA PRĀṆA"
-      );
+        stillTime=0;
+      }
+
+    }else{
 
       stillTime=0;
     }
-  }else{
-    stillTime=0;
-  }
 
-},1000);
-
-/* =========================================================
-   DEBUG OPCIONAL
-   F = GUARDIA
-   Q = RESONANCIA
-   SPACE = ESPADA
-   SHIFT = ĀKĀŚA
-========================================================= */
+  },
+  1000
+);
 
 </script>
+
 </body>
 </html>
