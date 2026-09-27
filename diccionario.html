@@ -1,0 +1,2223 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diccionario de las Cuatro Lenguas</title>
+
+    <style>
+        /* =========================================================
+   DICCIONARIO — ESTILOS
+   ========================================================= */
+
+        :root {
+            --bg: #0b0d0c;
+            --panel: #141816;
+            --panel2: #1b211e;
+            --line: #303a34;
+            --text: #f1f4ef;
+            --muted: #9ca89f;
+            --gold: #d6b56d;
+            --green: #79a978;
+            --blue: #759bbd;
+            --purple: #a58bc5;
+            --red: #c98787;
+            --shadow: 0 12px 35px rgba(0, 0, 0, .35);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background:
+                radial-gradient(circle at 20% 0%, rgba(121, 169, 120, .08), transparent 30%),
+                radial-gradient(circle at 90% 10%, rgba(214, 181, 109, .07), transparent 30%),
+                var(--bg);
+            color: var(--text);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            min-height: 100vh;
+        }
+
+        header {
+            padding: 35px 20px 25px;
+            text-align: center;
+            border-bottom: 1px solid var(--line);
+            background: rgba(10, 12, 11, .75);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .logo {
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            margin-top: 7px;
+        }
+
+        .container {
+            width: min(1250px, 94%);
+            margin: 25px auto 70px;
+        }
+
+        /* ---------------------------------------------------------
+   IDIOMAS
+   --------------------------------------------------------- */
+
+        .languages {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .lang {
+            border: 1px solid var(--line);
+            background: var(--panel);
+            color: var(--text);
+            padding: 16px 10px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: .2s;
+            font-size: 15px;
+        }
+
+        .lang:hover {
+            transform: translateY(-2px);
+            border-color: var(--gold);
+        }
+
+        .lang.active {
+            border-color: var(--gold);
+            background: linear-gradient(145deg, #24261f, #171a17);
+            box-shadow: 0 0 0 1px rgba(214, 181, 109, .12);
+        }
+
+        .langSymbol {
+            display: block;
+            font-size: 25px;
+            margin-bottom: 5px;
+        }
+
+        /* ---------------------------------------------------------
+   BUSCADOR
+   --------------------------------------------------------- */
+
+        .searchBox {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .searchBox input {
+            width: 100%;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            color: white;
+            border-radius: 14px;
+            padding: 17px 20px 17px 50px;
+            outline: none;
+            font-size: 17px;
+        }
+
+        .searchBox input:focus {
+            border-color: var(--gold);
+        }
+
+        .searchIcon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+        }
+
+        /* ---------------------------------------------------------
+   LETRAS
+   --------------------------------------------------------- */
+
+        .alphabet {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-bottom: 14px;
+        }
+
+        .letter {
+            min-width: 38px;
+            height: 38px;
+            border: 1px solid var(--line);
+            background: var(--panel);
+            color: var(--text);
+            border-radius: 9px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .letter:hover,
+        .letter.active {
+            background: var(--gold);
+            color: #17140d;
+            border-color: var(--gold);
+        }
+
+        /* ---------------------------------------------------------
+   CATEGORÍAS
+   --------------------------------------------------------- */
+
+        .categories {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+
+        .category {
+            white-space: nowrap;
+            border: 1px solid var(--line);
+            background: transparent;
+            color: var(--muted);
+            border-radius: 30px;
+            padding: 9px 15px;
+            cursor: pointer;
+        }
+
+        .category.active {
+            background: var(--panel2);
+            color: var(--gold);
+            border-color: var(--gold);
+        }
+
+        /* ---------------------------------------------------------
+   CABECERA DE RESULTADOS
+   --------------------------------------------------------- */
+
+        .resultHeader {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin: 25px 0 12px;
+        }
+
+        .resultHeader h2 {
+            margin: 0;
+        }
+
+        .count {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* ---------------------------------------------------------
+   TARJETAS
+   --------------------------------------------------------- */
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 13px;
+        }
+
+        .card {
+            background:
+                linear-gradient(145deg, rgba(255, 255, 255, .025), transparent),
+                var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            padding: 19px;
+            cursor: pointer;
+            transition: .2s;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, .15);
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: #59655d;
+        }
+
+        .word {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .translit {
+            color: var(--gold);
+            font-size: 15px;
+            margin-bottom: 9px;
+        }
+
+        .meaning {
+            font-size: 17px;
+        }
+
+        .type {
+            display: inline-block;
+            margin-top: 13px;
+            font-size: 12px;
+            color: var(--muted);
+            border: 1px solid var(--line);
+            padding: 4px 8px;
+            border-radius: 20px;
+        }
+
+        .empty {
+            padding: 40px;
+            text-align: center;
+            color: var(--muted);
+            border: 1px dashed var(--line);
+            border-radius: 15px;
+        }
+
+        /* ---------------------------------------------------------
+   NÚMEROS
+   --------------------------------------------------------- */
+
+        .numbers {
+            display: none;
+        }
+
+        .numberGrid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 10px;
+        }
+
+        .number {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            padding: 14px;
+            border-radius: 12px;
+        }
+
+        .numberValue {
+            color: var(--gold);
+            font-size: 13px;
+        }
+
+        .numberWord {
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        /* ---------------------------------------------------------
+   MODAL
+   --------------------------------------------------------- */
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .7);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modalBox {
+            width: min(600px, 100%);
+            background: #151a17;
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 17px;
+            top: 14px;
+            border: 0;
+            background: none;
+            color: var(--muted);
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .modalWord {
+            font-size: 42px;
+            font-weight: 800;
+        }
+
+        .modalTranslit {
+            color: var(--gold);
+            font-size: 18px;
+            margin: 4px 0 20px;
+        }
+
+        .modalMeaning {
+            font-size: 23px;
+            margin-bottom: 15px;
+        }
+
+        .modalInfo {
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        /* ---------------------------------------------------------
+   COMPARADOR
+   --------------------------------------------------------- */
+
+        .compare {
+            margin-top: 35px;
+        }
+
+        .compareBox {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .compareItem {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 13px;
+            padding: 15px;
+        }
+
+        .compareLang {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .compareWord {
+            font-size: 21px;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        @media(max-width:800px) {
+            .languages {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .compareBox {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            header {
+                position: relative;
+            }
+        }
+
+        @media(max-width:500px) {
+            .container {
+                width: 92%;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .numberGrid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .compareBox {
+                grid-template-columns: 1fr;
+            }
+
+            .logo {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">EL DICCIONARIO</div>
+        <div class="subtitle">
+            Español · Mapudungun · Sánscrito · Arameo / Siríaco
+        </div>
+    </header>
+
+    <main class="container">
+
+        <!-- IDIOMAS -->
+        <section class="languages">
+
+            <button class="lang active" data-lang="es">
+                <span class="langSymbol">🇪🇸</span>
+                Español
+            </button>
+
+            <button class="lang" data-lang="map">
+                <span class="langSymbol">🌿</span>
+                Mapudungun
+            </button>
+
+            <button class="lang" data-lang="sa">
+                <span class="langSymbol">ॐ</span>
+                Sánscrito
+            </button>
+
+            <button class="lang" data-lang="syr">
+                <span class="langSymbol">ܐ</span>
+                Arameo / Siríaco
+            </button>
+
+        </section>
+
+        <!-- BUSCADOR -->
+        <div class="searchBox">
+            <span class="searchIcon">⌕</span>
+            <input id="search" type="text" placeholder="Buscar palabra, significado..." autocomplete="off">
+        </div>
+
+        <!-- LETRAS -->
+        <div id="alphabet" class="alphabet"></div>
+
+        <!-- CATEGORÍAS -->
+        <div id="categories" class="categories"></div>
+
+        <!-- RESULTADOS -->
+        <section>
+            <div class="resultHeader">
+                <h2 id="sectionTitle">Palabras</h2>
+                <span id="count" class="count"></span>
+            </div>
+
+            <div id="results" class="grid"></div>
+        </section>
+
+        <!-- NÚMEROS -->
+        <section id="numbersSection" class="numbers">
+            <div class="resultHeader">
+                <h2>Números</h2>
+                <span class="count">0–20</span>
+            </div>
+
+            <div id="numbers" class="numberGrid"></div>
+        </section>
+
+        <!-- COMPARACIÓN -->
+        <section class="compare">
+
+            <div class="resultHeader">
+                <h2>Comparar una palabra</h2>
+                <span class="count">Busca un significado</span>
+            </div>
+
+            <div id="compareBox" class="compareBox"></div>
+
+        </section>
+
+    </main>
+
+
+    <!-- MODAL -->
+    <div id="modal" class="modal">
+        <div class="modalBox">
+
+            <button class="close" id="closeModal">×</button>
+
+            <div id="modalWord" class="modalWord"></div>
+            <div id="modalTranslit" class="modalTranslit"></div>
+            <div id="modalMeaning" class="modalMeaning"></div>
+            <div id="modalInfo" class="modalInfo"></div>
+
+        </div>
+    </div>
+
+
+    <script>
+
+        /* =========================================================
+           CONFIGURACIÓN
+           ========================================================= */
+
+        const LANGS = {
+
+            es: {
+                name: "Español",
+                symbol: "🇪🇸",
+                alphabet: "ABCDEFGHIJKLMNÑOPQRSTUVWXYZ".split("")
+            },
+
+            map: {
+                name: "Mapudungun",
+                symbol: "🌿",
+
+                /*
+                  Grafemario práctico.
+                  El mapudungun presenta distintas propuestas de escritura.
+                  No se fuerzan letras para las que no tenemos entradas.
+                */
+                alphabet: [
+                    "A", "Ch", "D", "E", "F", "G", "I", "K", "L",
+                    "M", "N", "Ñ", "Ng", "O", "P", "R", "S", "T",
+                    "Tr", "U", "Ü", "W", "Y"
+                ]
+            },
+
+            sa: {
+                name: "Sánscrito",
+                symbol: "ॐ",
+
+                alphabet: [
+                    "अ", "आ", "इ", "ई", "उ", "ऊ", "ऋ", "ए", "ऐ", "ओ", "औ",
+                    "क", "ख", "ग", "घ", "ङ",
+                    "च", "छ", "ज", "झ", "ञ",
+                    "ट", "ठ", "ड", "ढ", "ण",
+                    "त", "थ", "द", "ध", "न",
+                    "प", "फ", "ब", "भ", "म",
+                    "य", "र", "ल", "व",
+                    "श", "ष", "स", "ह"
+                ]
+            },
+
+            syr: {
+                name: "Arameo / Siríaco",
+
+                alphabet: [
+                    "ܐ", "ܒ", "ܓ", "ܕ", "ܗ", "ܘ", "ܙ", "ܚ", "ܛ",
+                    "ܝ", "ܟ", "ܠ", "ܡ", "ܢ", "ܣ", "ܥ", "ܦ", "ܨ",
+                    "ܩ", "ܪ", "ܫ", "ܬ"
+                ]
+            }
+
+        };
+
+
+        /* =========================================================
+           DATOS DEL DICCIONARIO
+           ========================================================= */
+
+        const DATA = {
+
+            es: [
+
+                { word: "agua", meaning: "agua", type: "sustantivo", cat: "naturaleza" },
+                { word: "aire", meaning: "aire", type: "sustantivo", cat: "naturaleza" },
+                { word: "amor", meaning: "amor", type: "sustantivo", cat: "emociones" },
+                { word: "árbol", meaning: "árbol", type: "sustantivo", cat: "naturaleza" },
+                { word: "alma", meaning: "alma", type: "sustantivo", cat: "espiritualidad" },
+                { word: "amanecer", meaning: "amanecer", type: "verbo/sustantivo", cat: "naturaleza" },
+
+                { word: "bosque", meaning: "bosque", type: "sustantivo", cat: "naturaleza" },
+                { word: "boca", meaning: "boca", type: "sustantivo", cat: "cuerpo" },
+                { word: "bueno", meaning: "bueno", type: "adjetivo", cat: "adjetivos" },
+                { word: "camino", meaning: "camino", type: "sustantivo", cat: "lugares" },
+                { word: "casa", meaning: "casa", type: "sustantivo", cat: "vida" },
+                { word: "corazón", meaning: "corazón", type: "sustantivo", cat: "cuerpo" },
+
+                { word: "día", meaning: "día", type: "sustantivo", cat: "naturaleza" },
+                { word: "dios", meaning: "dios", type: "sustantivo", cat: "espiritualidad" },
+                { word: "dolor", meaning: "dolor", type: "sustantivo", cat: "emociones" },
+                { word: "estrella", meaning: "estrella", type: "sustantivo", cat: "naturaleza" },
+                { word: "espíritu", meaning: "espíritu", type: "sustantivo", cat: "espiritualidad" },
+
+                { word: "familia", meaning: "familia", type: "sustantivo", cat: "personas" },
+                { word: "fuego", meaning: "fuego", type: "sustantivo", cat: "naturaleza" },
+                { word: "flor", meaning: "flor", type: "sustantivo", cat: "naturaleza" },
+                { word: "feliz", meaning: "feliz", type: "adjetivo", cat: "emociones" },
+
+                { word: "gato", meaning: "gato", type: "sustantivo", cat: "animales" },
+                { word: "gran", meaning: "grande", type: "adjetivo", cat: "adjetivos" },
+                { word: "hermano", meaning: "hermano", type: "sustantivo", cat: "familia" },
+                { word: "hombre", meaning: "hombre", type: "sustantivo", cat: "personas" },
+                { word: "hogar", meaning: "hogar", type: "sustantivo", cat: "vida" },
+
+                { word: "iglesia", meaning: "iglesia", type: "sustantivo", cat: "espiritualidad" },
+                { word: "isla", meaning: "isla", type: "sustantivo", cat: "lugares" },
+                { word: "jardín", meaning: "jardín", type: "sustantivo", cat: "naturaleza" },
+                { word: "luz", meaning: "luz", type: "sustantivo", cat: "naturaleza" },
+                { word: "luna", meaning: "luna", type: "sustantivo", cat: "naturaleza" },
+                { word: "lluvia", meaning: "lluvia", type: "sustantivo", cat: "naturaleza" },
+
+                { word: "madre", meaning: "madre", type: "sustantivo", cat: "familia" },
+                { word: "mar", meaning: "mar", type: "sustantivo", cat: "naturaleza" },
+                { word: "mapa", meaning: "mapa", type: "sustantivo", cat: "lugares" },
+                { word: "montaña", meaning: "montaña", type: "sustantivo", cat: "naturaleza" },
+                { word: "noche", meaning: "noche", type: "sustantivo", cat: "naturaleza" },
+                { word: "niño", meaning: "niño", type: "sustantivo", cat: "personas" },
+
+                { word: "océano", meaning: "océano", type: "sustantivo", cat: "naturaleza" },
+                { word: "padre", meaning: "padre", type: "sustantivo", cat: "familia" },
+                { word: "paz", meaning: "paz", type: "sustantivo", cat: "emociones" },
+                { word: "perro", meaning: "perro", type: "sustantivo", cat: "animales" },
+                { word: "río", meaning: "río", type: "sustantivo", cat: "naturaleza" },
+                { word: "sol", meaning: "sol", type: "sustantivo", cat: "naturaleza" },
+                { word: "tierra", meaning: "tierra", type: "sustantivo", cat: "naturaleza" },
+                { word: "vida", meaning: "vida", type: "sustantivo", cat: "vida" },
+                { word: "viento", meaning: "viento", type: "sustantivo", cat: "naturaleza" },
+                { word: "voz", meaning: "voz", type: "sustantivo", cat: "cuerpo" },
+
+                { word: "yo", meaning: "primera persona singular", type: "pronombre", cat: "gramática" },
+                { word: "tú", meaning: "segunda persona singular", type: "pronombre", cat: "gramática" },
+                { word: "nosotros", meaning: "primera persona plural", type: "pronombre", cat: "gramática" },
+
+                { word: "caminar", meaning: "caminar", type: "verbo", cat: "verbos" },
+                { word: "amar", meaning: "amar", type: "verbo", cat: "verbos" },
+                { word: "vivir", meaning: "vivir", type: "verbo", cat: "verbos" },
+                { word: "ver", meaning: "ver", type: "verbo", cat: "verbos" },
+                { word: "hablar", meaning: "hablar", type: "verbo", cat: "verbos" }
+
+            ],
+
+
+            /* =========================================================
+               MAPUDUNGUN
+               ========================================================= */
+            map: [
+
+                /* A */
+                { word: "ad", meaning: "manera, forma, costumbre", type: "sustantivo", cat: "vida" },
+                { word: "af", meaning: "fin, término; acabar", type: "sustantivo/verbo", cat: "vida" },
+                { word: "afün", meaning: "terminar, acabar", type: "verbo", cat: "verbos" },
+                { word: "aku", meaning: "llegar", type: "verbo", cat: "verbos" },
+                { word: "akutun", meaning: "volver, regresar", type: "verbo", cat: "movimiento" },
+                { word: "allkütun", meaning: "escuchar", type: "verbo", cat: "verbos" },
+                { word: "am", meaning: "alma, espíritu", type: "sustantivo", cat: "espiritualidad" },
+                { word: "amun", meaning: "ir, caminar", type: "verbo", cat: "movimiento" },
+                { word: "antü", meaning: "sol; día", type: "sustantivo", cat: "naturaleza" },
+                { word: "antü", meaning: "día", type: "sustantivo", cat: "tiempo" },
+                { word: "ayün", meaning: "amar, querer", type: "verbo", cat: "emociones" },
+
+                /* CH */
+                { word: "che", meaning: "persona, gente", type: "sustantivo", cat: "personas" },
+                { word: "chaw", meaning: "padre", type: "sustantivo", cat: "familia" },
+                { word: "chew", meaning: "dónde", type: "adverbio", cat: "gramática" },
+                { word: "chum", meaning: "cómo", type: "adverbio", cat: "gramática" },
+                { word: "chumgechi", meaning: "cómo, de qué manera", type: "adverbio", cat: "gramática" },
+                { word: "chumngechi", meaning: "cómo, de qué manera", type: "adverbio", cat: "gramática" },
+
+                /* E */
+                { word: "eluwün", meaning: "dar, entregar", type: "verbo", cat: "verbos" },
+                { word: "eymi", meaning: "tú, usted", type: "pronombre", cat: "gramática" },
+
+                /* F */
+                { word: "fücha", meaning: "anciano, antiguo; grande en edad", type: "adjetivo", cat: "personas" },
+                { word: "füta", meaning: "grande", type: "adjetivo", cat: "adjetivos" },
+                { word: "fütra", meaning: "grande, mucho", type: "adjetivo", cat: "cantidad" },
+                { word: "fey", meaning: "él, ella; ese, esa", type: "pronombre/demostrativo", cat: "gramática" },
+                { word: "feychi", meaning: "ese, esa; aquel, aquella", type: "demostrativo", cat: "gramática" },
+
+                /* I / Ñ */
+                { word: "iñche", meaning: "yo", type: "pronombre", cat: "gramática" },
+                { word: "iñchiñ", meaning: "nosotros", type: "pronombre", cat: "gramática" },
+                { word: "iñchiw", meaning: "nosotros dos", type: "pronombre", cat: "gramática" },
+                { word: "iñchiñ", meaning: "nosotros, nosotras", type: "pronombre", cat: "personas" },
+
+                /* K */
+                { word: "kim", meaning: "saber, conocer", type: "verbo", cat: "verbos" },
+                { word: "kimün", meaning: "conocimiento, saber", type: "sustantivo", cat: "conocimiento" },
+                { word: "ko", meaning: "agua", type: "sustantivo", cat: "naturaleza" },
+                { word: "kümelkaley", meaning: "está bien, se encuentra bien", type: "expresión", cat: "emociones" },
+                { word: "küme", meaning: "bueno, bien", type: "adjetivo", cat: "adjetivos" },
+                { word: "küpan", meaning: "venir", type: "verbo", cat: "verbos" },
+                { word: "küpal", meaning: "familia, linaje; procedencia", type: "sustantivo", cat: "familia" },
+
+                /* L */
+                { word: "lafken", meaning: "mar, lago grande", type: "sustantivo", cat: "naturaleza" },
+                { word: "lafkenmapu", meaning: "territorio de la costa", type: "sustantivo", cat: "lugares" },
+                { word: "lelfün", meaning: "campo, llanura", type: "sustantivo", cat: "naturaleza" },
+                { word: "lelfün", meaning: "campo", type: "sustantivo", cat: "lugares" },
+                { word: "leufu", meaning: "río", type: "sustantivo", cat: "naturaleza" },
+                { word: "lemu", meaning: "bosque", type: "sustantivo", cat: "naturaleza" },
+                { word: "lof", meaning: "comunidad, unidad territorial", type: "sustantivo", cat: "sociedad" },
+                { word: "longko", meaning: "cabeza; autoridad tradicional", type: "sustantivo", cat: "personas" },
+
+                /* M */
+                { word: "machi", meaning: "persona especialista en medicina y espiritualidad mapuche", type: "sustantivo", cat: "personas" },
+                { word: "mapu", meaning: "tierra, territorio", type: "sustantivo", cat: "naturaleza" },
+                { word: "mapuche", meaning: "persona del pueblo mapuche", type: "sustantivo", cat: "personas" },
+                { word: "mañum", meaning: "gracias", type: "expresión", cat: "comunicación" },
+                { word: "müley", meaning: "hay, está, se encuentra", type: "verbo", cat: "verbos" },
+                { word: "mülen", meaning: "estar, existir, haber", type: "verbo", cat: "verbos" },
+                { word: "müna", meaning: "muy", type: "adverbio", cat: "gramática" },
+                { word: "müchay", meaning: "pronto, rápidamente", type: "adverbio", cat: "tiempo" },
+
+                /* N / NG */
+                { word: "ngürü", meaning: "zorro", type: "sustantivo", cat: "animales" },
+                { word: "ngen", meaning: "dueño, poseedor; entidad asociada al cuidado de un lugar o elemento", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ngillatun", meaning: "ceremonia tradicional de rogativa", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ngillan", meaning: "comprar", type: "verbo", cat: "verbos" },
+                { word: "nütram", meaning: "conversación, relato", type: "sustantivo", cat: "vida" },
+                { word: "nütramkan", meaning: "conversar, dialogar", type: "verbo", cat: "comunicación" },
+                { word: "newen", meaning: "fuerza, energía, poder", type: "sustantivo", cat: "espiritualidad" },
+                { word: "newe", meaning: "no muy, apenas", type: "adverbio", cat: "gramática" },
+
+                /* P */
+                { word: "pichi", meaning: "pequeño", type: "adjetivo", cat: "adjetivos" },
+                { word: "pichi", meaning: "niño, niña; pequeño", type: "sustantivo/adjetivo", cat: "personas" },
+                { word: "pu", meaning: "marcador de plural", type: "partícula", cat: "gramática" },
+                { word: "pewma", meaning: "sueño", type: "sustantivo", cat: "espiritualidad" },
+                { word: "pewman", meaning: "soñar", type: "verbo", cat: "verbos" },
+
+                /* R */
+                { word: "ruka", meaning: "casa", type: "sustantivo", cat: "vida" },
+                { word: "rayün", meaning: "florecer", type: "verbo", cat: "naturaleza" },
+                { word: "rayün", meaning: "floración, florecimiento", type: "sustantivo", cat: "naturaleza" },
+
+                /* T / TR */
+                { word: "tüfachi", meaning: "este, esta", type: "demostrativo", cat: "gramática" },
+                { word: "tüfachi", meaning: "esto, este, esta", type: "demostrativo", cat: "gramática" },
+                { word: "trawün", meaning: "reunión, encuentro", type: "sustantivo", cat: "vida" },
+                { word: "trawün", meaning: "reunirse, encontrarse", type: "verbo/sustantivo", cat: "vida" },
+                { word: "trekan", meaning: "caminar", type: "verbo", cat: "movimiento" },
+                { word: "tukun", meaning: "poner, colocar", type: "verbo", cat: "verbos" },
+                { word: "tüfa", meaning: "esto, esta cosa", type: "demostrativo", cat: "gramática" },
+
+                /* Ü */
+                { word: "üñüm", meaning: "ave, pájaro", type: "sustantivo", cat: "animales" },
+                { word: "üñümche", meaning: "persona relacionada con aves", type: "sustantivo", cat: "personas" },
+
+                /* W */
+                { word: "wenu", meaning: "arriba, cielo", type: "sustantivo/adverbio", cat: "naturaleza" },
+                { word: "wenüy", meaning: "amigo, amiga", type: "sustantivo", cat: "personas" },
+                { word: "we", meaning: "nuevo", type: "adjetivo", cat: "adjetivos" },
+                { word: "wüñol", meaning: "volver, regreso", type: "sustantivo/verbo", cat: "movimiento" },
+                { word: "wüñoy", meaning: "volvió, regresó", type: "verbo", cat: "movimiento" },
+                { word: "winka", meaning: "persona no mapuche; extranjero, según contexto", type: "sustantivo", cat: "personas" },
+
+                /* Y */
+                { word: "yafü", meaning: "fuerte", type: "adjetivo", cat: "adjetivos" },
+                { word: "yafütun", meaning: "fortalecer", type: "verbo", cat: "verbos" },
+                { word: "yafün", meaning: "ser fuerte, fortalecerse", type: "verbo", cat: "verbos" },
+
+                /* NATURALEZA */
+                { word: "aliwen", meaning: "árbol grande, árbol", type: "sustantivo", cat: "naturaleza" },
+                { word: "kulliñ", meaning: "animal", type: "sustantivo", cat: "animales" },
+                { word: "kürüf", meaning: "viento", type: "sustantivo", cat: "naturaleza" },
+                { word: "mawün", meaning: "lluvia", type: "sustantivo", cat: "naturaleza" },
+                { word: "pire", meaning: "nieve", type: "sustantivo", cat: "naturaleza" },
+                { word: "küyen", meaning: "luna, mes lunar", type: "sustantivo", cat: "naturaleza" },
+                { word: "wangülen", meaning: "estrella", type: "sustantivo", cat: "naturaleza" },
+                { word: "karü", meaning: "verde", type: "adjetivo", cat: "naturaleza" },
+                { word: "kurü", meaning: "negro, oscuro", type: "adjetivo", cat: "colores" },
+                { word: "lig", meaning: "blanco, claro", type: "adjetivo", cat: "colores" },
+                { word: "choz", meaning: "amarillo", type: "adjetivo", cat: "colores" },
+                { word: "kelü", meaning: "rojo", type: "adjetivo", cat: "colores" },
+
+                /* ANIMALES */
+                { word: "kullin", meaning: "animal", type: "sustantivo", cat: "animales" },
+                { word: "koyam", meaning: "roble", type: "sustantivo", cat: "naturaleza" },
+                { word: "pangi", meaning: "puma", type: "sustantivo", cat: "animales" },
+                { word: "ñarki", meaning: "gato", type: "sustantivo", cat: "animales" },
+                { word: "challwa", meaning: "pez, pescado", type: "sustantivo", cat: "animales" },
+                { word: "kürü", meaning: "gusano", type: "sustantivo", cat: "animales" },
+
+                /* FAMILIA Y PERSONAS */
+                { word: "ñuke", meaning: "madre", type: "sustantivo", cat: "familia" },
+                { word: "chaw", meaning: "padre", type: "sustantivo", cat: "familia" },
+                { word: "püñeñ", meaning: "hijo, hija; descendiente", type: "sustantivo", cat: "familia" },
+                { word: "lamngen", meaning: "hermano, hermana; término de parentesco según relación", type: "sustantivo", cat: "familia" },
+                { word: "puñma", meaning: "hermano de hermana / relación de parentesco", type: "sustantivo", cat: "familia" },
+
+                /* CUERPO */
+                { word: "lonko", meaning: "cabeza", type: "sustantivo", cat: "cuerpo" },
+                { word: "püñe", meaning: "vientre, abdomen", type: "sustantivo", cat: "cuerpo" },
+                { word: "kuwü", meaning: "mano", type: "sustantivo", cat: "cuerpo" },
+                { word: "namün", meaning: "pie, pierna", type: "sustantivo", cat: "cuerpo" },
+                { word: "ñaña", meaning: "hermana; mujer cercana, según contexto", type: "sustantivo", cat: "familia" },
+
+                /* EMOCIONES Y VIDA */
+                { word: "ayün", meaning: "amor, cariño; amar", type: "sustantivo/verbo", cat: "emociones" },
+                { word: "ayiwün", meaning: "alegrarse", type: "verbo", cat: "emociones" },
+                { word: "lladkü", meaning: "tristeza, pena", type: "sustantivo", cat: "emociones" },
+                { word: "newen", meaning: "fuerza, energía", type: "sustantivo", cat: "emociones" },
+                { word: "küme", meaning: "bueno, bienestar, bien", type: "adjetivo", cat: "emociones" },
+                { word: "mañum", meaning: "gracias, agradecimiento", type: "expresión", cat: "emociones" },
+
+                /* COMUNICACIÓN */
+                { word: "dungu", meaning: "palabra, asunto, asunto de conversación", type: "sustantivo", cat: "comunicación" },
+                { word: "dugun", meaning: "hablar, decir", type: "verbo", cat: "comunicación" },
+                { word: "nütram", meaning: "conversación, relato", type: "sustantivo", cat: "comunicación" },
+                { word: "nütramkan", meaning: "conversar", type: "verbo", cat: "comunicación" },
+                { word: "allkütun", meaning: "escuchar", type: "verbo", cat: "comunicación" },
+
+                /* NÚMEROS */
+                { word: "kiñe", meaning: "uno", type: "numeral", cat: "números" },
+                { word: "epu", meaning: "dos", type: "numeral", cat: "números" },
+                { word: "küla", meaning: "tres", type: "numeral", cat: "números" },
+                { word: "meli", meaning: "cuatro", type: "numeral", cat: "números" },
+                { word: "kechu", meaning: "cinco", type: "numeral", cat: "números" },
+                { word: "kayú", meaning: "seis", type: "numeral", cat: "números" },
+                { word: "reqle", meaning: "siete", type: "numeral", cat: "números" },
+                { word: "purra", meaning: "ocho", type: "numeral", cat: "números" },
+                { word: "aylla", meaning: "nueve", type: "numeral", cat: "números" },
+                { word: "mari", meaning: "diez", type: "numeral", cat: "números" },
+                { word: "mari kiñe", meaning: "once", type: "numeral", cat: "números" },
+                { word: "epu mari", meaning: "veinte", type: "numeral", cat: "números" },
+
+                /* TIEMPO */
+                { word: "antü", meaning: "día, sol", type: "sustantivo", cat: "tiempo" },
+                { word: "pun", meaning: "noche", type: "sustantivo", cat: "tiempo" },
+                { word: "puliwen", meaning: "mañana, tiempo de la mañana", type: "sustantivo", cat: "tiempo" },
+                { word: "wüle", meaning: "mañana, día siguiente", type: "adverbio", cat: "tiempo" },
+                { word: "fachantü", meaning: "hoy, este día", type: "adverbio", cat: "tiempo" },
+
+                /* ESPACIO Y DIRECCIÓN */
+                { word: "wenu", meaning: "arriba, cielo", type: "adverbio/sustantivo", cat: "lugares" },
+                { word: "nag", meaning: "abajo", type: "adverbio", cat: "dirección" },
+                { word: "püle", meaning: "hacia, por el lado de", type: "partícula", cat: "gramática" },
+                { word: "mew", meaning: "en, por, desde; marcador de relación", type: "partícula", cat: "gramática" },
+
+                /* GRAMÁTICA */
+                { word: "iñche", meaning: "yo", type: "pronombre", cat: "gramática" },
+                { word: "eymi", meaning: "tú, usted", type: "pronombre", cat: "gramática" },
+                { word: "fey", meaning: "él, ella; ese, esa", type: "pronombre", cat: "gramática" },
+                { word: "iñchiñ", meaning: "nosotros", type: "pronombre", cat: "gramática" },
+                { word: "tüfa", meaning: "esto, esta cosa", type: "demostrativo", cat: "gramática" },
+                { word: "tüfachi", meaning: "este, esta", type: "demostrativo", cat: "gramática" },
+                { word: "feychi", meaning: "ese, esa; aquel, aquella", type: "demostrativo", cat: "gramática" },
+                { word: "chew", meaning: "dónde", type: "adverbio", cat: "gramática" },
+                { word: "chum", meaning: "cómo", type: "adverbio", cat: "gramática" },
+                { word: "chem", meaning: "qué", type: "pronombre interrogativo", cat: "gramática" },
+                { word: "iney", meaning: "quién", type: "pronombre interrogativo", cat: "gramática" },
+                { word: "pu", meaning: "marcador de plural", type: "partícula", cat: "gramática" },
+                { word: "mew", meaning: "en, con, por, desde; partícula relacional", type: "partícula", cat: "gramática" }
+
+            ],
+            /* =========================================================
+               SÁNSCRITO
+               ========================================================= */
+
+            /* =========================================================
+               SÁNSCRITO — VOCABULARIO AMPLIADO
+               ========================================================= */
+
+            sa: [
+
+                /* ---------------------------------------------------------
+                   A
+                   --------------------------------------------------------- */
+
+                { word: "अग्नि", latin: "agni", meaning: "fuego", type: "sustantivo", cat: "naturaleza" },
+                { word: "अङ्ग", latin: "aṅga", meaning: "miembro, parte del cuerpo", type: "sustantivo", cat: "cuerpo" },
+                { word: "अङ्गुलि", latin: "aṅguli", meaning: "dedo", type: "sustantivo", cat: "cuerpo" },
+                { word: "अन्न", latin: "anna", meaning: "comida, alimento", type: "sustantivo", cat: "vida" },
+                { word: "अनल", latin: "anala", meaning: "fuego", type: "sustantivo", cat: "naturaleza" },
+                { word: "अनिल", latin: "anila", meaning: "viento, aire", type: "sustantivo", cat: "naturaleza" },
+                { word: "अनन्त", latin: "ananta", meaning: "infinito, interminable", type: "adjetivo", cat: "espiritualidad" },
+                { word: "अन्तर", latin: "antara", meaning: "interior, espacio entre", type: "sustantivo", cat: "lugares" },
+                { word: "अन्तरात्मन्", latin: "antarātman", meaning: "alma interior, sí mismo interior", type: "sustantivo", cat: "espiritualidad" },
+                { word: "अप्", latin: "ap", meaning: "agua", type: "sustantivo", cat: "naturaleza" },
+                { word: "अम्बर", latin: "ambara", meaning: "cielo, espacio", type: "sustantivo", cat: "naturaleza" },
+                { word: "अमृत", latin: "amṛta", meaning: "inmortalidad, néctar; inmortal", type: "sustantivo/adjetivo", cat: "espiritualidad" },
+                { word: "अश्व", latin: "aśva", meaning: "caballo", type: "sustantivo", cat: "animales" },
+                { word: "अहिंसा", latin: "ahiṃsā", meaning: "no violencia", type: "sustantivo", cat: "espiritualidad" },
+                { word: "आकाश", latin: "ākāśa", meaning: "cielo, espacio, éter", type: "sustantivo", cat: "naturaleza" },
+                { word: "आत्मन्", latin: "ātman", meaning: "sí mismo, alma", type: "sustantivo", cat: "espiritualidad" },
+                { word: "आनन्द", latin: "ānanda", meaning: "alegría, dicha, felicidad", type: "sustantivo", cat: "emociones" },
+                { word: "आशा", latin: "āśā", meaning: "esperanza, deseo", type: "sustantivo", cat: "emociones" },
+                { word: "आयुः", latin: "āyuḥ", meaning: "vida, duración de la vida", type: "sustantivo", cat: "vida" },
+                { word: "आरोग्य", latin: "ārogya", meaning: "salud, bienestar", type: "sustantivo", cat: "vida" },
+
+                /* ---------------------------------------------------------
+                   I / U / Ṛ
+                   --------------------------------------------------------- */
+
+                { word: "इच्छा", latin: "icchā", meaning: "deseo, voluntad", type: "sustantivo", cat: "emociones" },
+                { word: "इन्द्र", latin: "indra", meaning: "Indra", type: "nombre", cat: "espiritualidad" },
+                { word: "इन्द्रिय", latin: "indriya", meaning: "sentido, facultad sensorial", type: "sustantivo", cat: "cuerpo" },
+                { word: "ईश्वर", latin: "īśvara", meaning: "señor, soberano", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ईश", latin: "īśa", meaning: "señor, gobernante", type: "sustantivo", cat: "espiritualidad" },
+                { word: "उषस्", latin: "uṣas", meaning: "aurora", type: "sustantivo", cat: "naturaleza" },
+                { word: "उदक", latin: "udaka", meaning: "agua", type: "sustantivo", cat: "naturaleza" },
+                { word: "उदय", latin: "udaya", meaning: "ascenso, salida; amanecer", type: "sustantivo", cat: "naturaleza" },
+                { word: "उद्यान", latin: "udyāna", meaning: "jardín, parque", type: "sustantivo", cat: "naturaleza" },
+                { word: "ऊर्जा", latin: "ūrjā", meaning: "energía, fuerza", type: "sustantivo", cat: "vida" },
+                { word: "ऋतु", latin: "ṛtu", meaning: "estación del año", type: "sustantivo", cat: "naturaleza" },
+                { word: "ऋषि", latin: "ṛṣi", meaning: "sabio, vidente", type: "sustantivo", cat: "espiritualidad" },
+
+                /* ---------------------------------------------------------
+                   E / O
+                   --------------------------------------------------------- */
+
+                { word: "एक", latin: "eka", meaning: "uno, único", type: "numeral/adjetivo", cat: "números" },
+                { word: "एकता", latin: "ekatā", meaning: "unidad", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ओजस्", latin: "ojas", meaning: "vigor, energía, fuerza vital", type: "sustantivo", cat: "vida" },
+                { word: "ओम्", latin: "oṃ", meaning: "Om, sílaba sagrada", type: "sílaba", cat: "espiritualidad" },
+                { word: "औषधि", latin: "auṣadhi", meaning: "planta medicinal, remedio", type: "sustantivo", cat: "naturaleza" },
+
+                /* ---------------------------------------------------------
+                   K
+                   --------------------------------------------------------- */
+
+                { word: "कमल", latin: "kamala", meaning: "loto", type: "sustantivo", cat: "naturaleza" },
+                { word: "कर्म", latin: "karma", meaning: "acción, acto", type: "sustantivo", cat: "espiritualidad" },
+                { word: "करुणा", latin: "karuṇā", meaning: "compasión", type: "sustantivo", cat: "emociones" },
+                { word: "काल", latin: "kāla", meaning: "tiempo; época", type: "sustantivo", cat: "tiempo" },
+                { word: "काली", latin: "kālī", meaning: "Kālī", type: "nombre", cat: "espiritualidad" },
+                { word: "किरण", latin: "kiraṇa", meaning: "rayo de luz", type: "sustantivo", cat: "naturaleza" },
+                { word: "कृष्ण", latin: "kṛṣṇa", meaning: "Kṛṣṇa; oscuro, negro", type: "nombre/adjetivo", cat: "espiritualidad" },
+                { word: "कूप", latin: "kūpa", meaning: "pozo", type: "sustantivo", cat: "naturaleza" },
+                { word: "कुसुम", latin: "kusuma", meaning: "flor", type: "sustantivo", cat: "naturaleza" },
+
+                /* ---------------------------------------------------------
+                   G
+                   --------------------------------------------------------- */
+
+                { word: "गङ्गा", latin: "gaṅgā", meaning: "Ganges", type: "nombre", cat: "naturaleza" },
+                { word: "गगन", latin: "gagana", meaning: "cielo", type: "sustantivo", cat: "naturaleza" },
+                { word: "गति", latin: "gati", meaning: "movimiento, camino, marcha", type: "sustantivo", cat: "vida" },
+                { word: "गन्ध", latin: "gandha", meaning: "olor, fragancia", type: "sustantivo", cat: "naturaleza" },
+                { word: "गिरि", latin: "giri", meaning: "montaña", type: "sustantivo", cat: "naturaleza" },
+                { word: "गीत", latin: "gīta", meaning: "canto, canción", type: "sustantivo", cat: "arte" },
+                { word: "गुरु", latin: "guru", meaning: "maestro, pesado, importante", type: "sustantivo/adjetivo", cat: "personas" },
+                { word: "गृह", latin: "gṛha", meaning: "casa, hogar", type: "sustantivo", cat: "vida" },
+
+                /* ---------------------------------------------------------
+                   GH / J
+                   --------------------------------------------------------- */
+
+                { word: "घट", latin: "ghaṭa", meaning: "vasija, recipiente", type: "sustantivo", cat: "objetos" },
+                { word: "जन", latin: "jana", meaning: "persona, gente", type: "sustantivo", cat: "personas" },
+                { word: "जननी", latin: "jananī", meaning: "madre", type: "sustantivo", cat: "familia" },
+                { word: "जगत्", latin: "jagat", meaning: "mundo, universo viviente", type: "sustantivo", cat: "naturaleza" },
+                { word: "जल", latin: "jala", meaning: "agua", type: "sustantivo", cat: "naturaleza" },
+                { word: "ज्वाला", latin: "jvālā", meaning: "llama", type: "sustantivo", cat: "naturaleza" },
+                { word: "जीव", latin: "jīva", meaning: "ser vivo, criatura, alma individual", type: "sustantivo", cat: "vida" },
+                { word: "जीवन", latin: "jīvana", meaning: "vida", type: "sustantivo", cat: "vida" },
+
+                /* ---------------------------------------------------------
+                   C / CH
+                   --------------------------------------------------------- */
+
+                { word: "चन्द्र", latin: "candra", meaning: "luna", type: "sustantivo", cat: "naturaleza" },
+                { word: "चरण", latin: "caraṇa", meaning: "pie; paso", type: "sustantivo", cat: "cuerpo" },
+                { word: "चक्षुस्", latin: "cakṣus", meaning: "ojo", type: "sustantivo", cat: "cuerpo" },
+                { word: "चित्त", latin: "citta", meaning: "mente, conciencia", type: "sustantivo", cat: "mente" },
+                { word: "चिन्तन", latin: "cintana", meaning: "pensamiento, reflexión", type: "sustantivo", cat: "mente" },
+                { word: "चिन्ता", latin: "cintā", meaning: "preocupación, pensamiento", type: "sustantivo", cat: "emociones" },
+                { word: "चैतन्य", latin: "caitanya", meaning: "conciencia, inteligencia", type: "sustantivo", cat: "espiritualidad" },
+
+                /* ---------------------------------------------------------
+                   T / TR / D
+                   --------------------------------------------------------- */
+
+                { word: "तपस्", latin: "tapas", meaning: "disciplina, ascetismo, calor espiritual", type: "sustantivo", cat: "espiritualidad" },
+                { word: "तरु", latin: "taru", meaning: "árbol", type: "sustantivo", cat: "naturaleza" },
+                { word: "तरङ्ग", latin: "taraṅga", meaning: "ola, onda", type: "sustantivo", cat: "naturaleza" },
+                { word: "तारा", latin: "tārā", meaning: "estrella; Tārā", type: "sustantivo/nombre", cat: "naturaleza" },
+                { word: "तीर्थ", latin: "tīrtha", meaning: "lugar sagrado, vado", type: "sustantivo", cat: "espiritualidad" },
+                { word: "तृप्ति", latin: "tṛpti", meaning: "satisfacción, saciedad", type: "sustantivo", cat: "emociones" },
+                { word: "त्रि", latin: "tri", meaning: "tres", type: "numeral", cat: "números" },
+                { word: "त्रिकाल", latin: "trikāla", meaning: "tres tiempos", type: "sustantivo", cat: "tiempo" },
+
+                { word: "दया", latin: "dayā", meaning: "compasión", type: "sustantivo", cat: "emociones" },
+                { word: "दर्शन", latin: "darśana", meaning: "visión, contemplación, enseñanza filosófica", type: "sustantivo", cat: "espiritualidad" },
+                { word: "दुःख", latin: "duḥkha", meaning: "sufrimiento, dolor", type: "sustantivo", cat: "emociones" },
+                { word: "दिन", latin: "dina", meaning: "día", type: "sustantivo", cat: "tiempo" },
+                { word: "दीप", latin: "dīpa", meaning: "lámpara, luz", type: "sustantivo", cat: "naturaleza" },
+                { word: "दीप्ति", latin: "dīpti", meaning: "brillo, resplandor", type: "sustantivo", cat: "naturaleza" },
+                { word: "देव", latin: "deva", meaning: "dios, ser divino", type: "sustantivo", cat: "espiritualidad" },
+                { word: "देवी", latin: "devī", meaning: "diosa", type: "sustantivo", cat: "espiritualidad" },
+                { word: "धर्म", latin: "dharma", meaning: "ley, deber, orden, enseñanza", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ध्यान", latin: "dhyāna", meaning: "meditación, contemplación", type: "sustantivo", cat: "espiritualidad" },
+
+                /* ---------------------------------------------------------
+                   N
+                   --------------------------------------------------------- */
+
+                { word: "नमः", latin: "namaḥ", meaning: "reverencia, saludo reverente", type: "expresión", cat: "espiritualidad" },
+                { word: "नमस्", latin: "namas", meaning: "reverencia, homenaje", type: "sustantivo", cat: "espiritualidad" },
+                { word: "नदी", latin: "nadī", meaning: "río", type: "sustantivo", cat: "naturaleza" },
+                { word: "नक्षत्र", latin: "nakṣatra", meaning: "estrella, constelación", type: "sustantivo", cat: "naturaleza" },
+                { word: "नारायण", latin: "nārāyaṇa", meaning: "Nārāyaṇa", type: "nombre", cat: "espiritualidad" },
+                { word: "निद्रा", latin: "nidrā", meaning: "sueño", type: "sustantivo", cat: "vida" },
+                { word: "निर्वाण", latin: "nirvāṇa", meaning: "extinción, liberación", type: "sustantivo", cat: "espiritualidad" },
+                { word: "नित्य", latin: "nitya", meaning: "eterno, constante, permanente", type: "adjetivo", cat: "espiritualidad" },
+                { word: "नील", latin: "nīla", meaning: "azul, oscuro", type: "adjetivo", cat: "adjetivos" },
+
+                /* ---------------------------------------------------------
+                   P
+                   --------------------------------------------------------- */
+
+                { word: "पक्षिन्", latin: "pakṣin", meaning: "ave, pájaro", type: "sustantivo", cat: "animales" },
+                { word: "पशु", latin: "paśu", meaning: "animal", type: "sustantivo", cat: "animales" },
+                { word: "पर्वत", latin: "parvata", meaning: "montaña", type: "sustantivo", cat: "naturaleza" },
+                { word: "पथ", latin: "patha", meaning: "camino, sendero", type: "sustantivo", cat: "lugares" },
+                { word: "पद्म", latin: "padma", meaning: "loto", type: "sustantivo", cat: "naturaleza" },
+                { word: "पिता", latin: "pitā", meaning: "padre", type: "sustantivo", cat: "familia" },
+                { word: "पृथ्वी", latin: "pṛthvī", meaning: "tierra", type: "sustantivo", cat: "naturaleza" },
+                { word: "प्रकाश", latin: "prakāśa", meaning: "luz, brillo, manifestación", type: "sustantivo", cat: "naturaleza" },
+                { word: "प्रकृति", latin: "prakṛti", meaning: "naturaleza, constitución, naturaleza primordial", type: "sustantivo", cat: "naturaleza" },
+                { word: "प्रज्ञा", latin: "prajñā", meaning: "sabiduría, conocimiento", type: "sustantivo", cat: "mente" },
+                { word: "प्रेम", latin: "prema", meaning: "amor, afecto", type: "sustantivo", cat: "emociones" },
+                { word: "प्राण", latin: "prāṇa", meaning: "aliento vital, fuerza vital", type: "sustantivo", cat: "vida" },
+                { word: "प्रार्थना", latin: "prārthanā", meaning: "oración, plegaria, petición", type: "sustantivo", cat: "espiritualidad" },
+
+                /* ---------------------------------------------------------
+                   B / BH / M
+                   --------------------------------------------------------- */
+
+                { word: "बल", latin: "bala", meaning: "fuerza, poder", type: "sustantivo", cat: "vida" },
+                { word: "बुद्धि", latin: "buddhi", meaning: "intelecto, discernimiento", type: "sustantivo", cat: "mente" },
+                { word: "बुद्ध", latin: "buddha", meaning: "despierto, iluminado", type: "nombre/adjetivo", cat: "espiritualidad" },
+                { word: "बन्धु", latin: "bandhu", meaning: "pariente, amigo", type: "sustantivo", cat: "familia" },
+                { word: "भक्ति", latin: "bhakti", meaning: "devoción", type: "sustantivo", cat: "espiritualidad" },
+                { word: "भय", latin: "bhaya", meaning: "miedo, temor", type: "sustantivo", cat: "emociones" },
+                { word: "भाव", latin: "bhāva", meaning: "estado, naturaleza, sentimiento, emoción", type: "sustantivo", cat: "emociones" },
+                { word: "भूमि", latin: "bhūmi", meaning: "tierra, suelo", type: "sustantivo", cat: "naturaleza" },
+                { word: "भू", latin: "bhū", meaning: "ser, existir, llegar a ser", type: "verbo", cat: "verbos" },
+
+                { word: "मनस्", latin: "manas", meaning: "mente", type: "sustantivo", cat: "mente" },
+                { word: "मन्त्र", latin: "mantra", meaning: "mantra, fórmula sagrada", type: "sustantivo", cat: "espiritualidad" },
+                { word: "माता", latin: "mātā", meaning: "madre", type: "sustantivo", cat: "familia" },
+                { word: "मित्र", latin: "mitra", meaning: "amigo", type: "sustantivo", cat: "personas" },
+                { word: "मित्रता", latin: "mitratā", meaning: "amistad", type: "sustantivo", cat: "emociones" },
+                { word: "मोक्ष", latin: "mokṣa", meaning: "liberación", type: "sustantivo", cat: "espiritualidad" },
+                { word: "मौन", latin: "mauna", meaning: "silencio", type: "sustantivo", cat: "espiritualidad" },
+                { word: "माया", latin: "māyā", meaning: "poder creador; apariencia, ilusión según contexto", type: "sustantivo", cat: "espiritualidad" },
+
+                /* ---------------------------------------------------------
+                   Y / R / L / V
+                   --------------------------------------------------------- */
+
+                { word: "यज्ञ", latin: "yajña", meaning: "sacrificio, ofrenda ritual", type: "sustantivo", cat: "espiritualidad" },
+                { word: "योग", latin: "yoga", meaning: "unión, disciplina espiritual", type: "sustantivo", cat: "espiritualidad" },
+                { word: "योगिन्", latin: "yogin", meaning: "practicante de yoga", type: "sustantivo", cat: "personas" },
+                { word: "यात्रा", latin: "yātrā", meaning: "viaje, peregrinación", type: "sustantivo", cat: "vida" },
+
+                { word: "रवि", latin: "ravi", meaning: "sol", type: "sustantivo", cat: "naturaleza" },
+                { word: "रात्रि", latin: "rātri", meaning: "noche", type: "sustantivo", cat: "naturaleza" },
+                { word: "रसा", latin: "rasā", meaning: "esencia, savia; corriente", type: "sustantivo", cat: "naturaleza" },
+                { word: "रस", latin: "rasa", meaning: "sabor, esencia, emoción estética, deleite", type: "sustantivo", cat: "emociones" },
+                { word: "रुद्र", latin: "rudra", meaning: "Rudra", type: "nombre", cat: "espiritualidad" },
+                { word: "रूप", latin: "rūpa", meaning: "forma, apariencia", type: "sustantivo", cat: "vida" },
+
+                { word: "लता", latin: "latā", meaning: "enredadera, planta trepadora", type: "sustantivo", cat: "naturaleza" },
+                { word: "लोक", latin: "loka", meaning: "mundo, región, esfera", type: "sustantivo", cat: "naturaleza" },
+                { word: "लोचन", latin: "locana", meaning: "ojo", type: "sustantivo", cat: "cuerpo" },
+
+                { word: "वन", latin: "vana", meaning: "bosque, selva", type: "sustantivo", cat: "naturaleza" },
+                { word: "वनस्पति", latin: "vanaspati", meaning: "planta, árbol", type: "sustantivo", cat: "naturaleza" },
+                { word: "वायु", latin: "vāyu", meaning: "viento, aire", type: "sustantivo", cat: "naturaleza" },
+                { word: "वारि", latin: "vāri", meaning: "agua", type: "sustantivo", cat: "naturaleza" },
+                { word: "वचन", latin: "vacana", meaning: "palabra, discurso", type: "sustantivo", cat: "lengua" },
+                { word: "वाणी", latin: "vāṇī", meaning: "voz, habla, palabra", type: "sustantivo", cat: "lengua" },
+                { word: "विद्या", latin: "vidyā", meaning: "conocimiento, saber", type: "sustantivo", cat: "mente" },
+                { word: "वेद", latin: "veda", meaning: "conocimiento; Veda", type: "sustantivo/nombre", cat: "espiritualidad" },
+                { word: "विश्व", latin: "viśva", meaning: "todo, universo, mundo", type: "adjetivo/sustantivo", cat: "naturaleza" },
+                { word: "विश्वास", latin: "viśvāsa", meaning: "confianza, fe", type: "sustantivo", cat: "emociones" },
+
+                /* ---------------------------------------------------------
+                   Ś / Ṣ / S / H
+                   --------------------------------------------------------- */
+
+                { word: "शक्ति", latin: "śakti", meaning: "poder, energía, potencia", type: "sustantivo", cat: "espiritualidad" },
+                { word: "शान्ति", latin: "śānti", meaning: "paz, tranquilidad", type: "sustantivo", cat: "emociones" },
+                { word: "शिव", latin: "śiva", meaning: "Shiva; auspicioso, benévolo", type: "nombre/adjetivo", cat: "espiritualidad" },
+                { word: "शून्य", latin: "śūnya", meaning: "vacío, cero", type: "adjetivo/sustantivo", cat: "números" },
+                { word: "श्वास", latin: "śvāsa", meaning: "respiración, aliento", type: "sustantivo", cat: "cuerpo" },
+
+                { word: "षड्", latin: "ṣaḍ", meaning: "seis", type: "numeral", cat: "números" },
+
+                { word: "सत्य", latin: "satya", meaning: "verdad, verdadero", type: "sustantivo/adjetivo", cat: "espiritualidad" },
+                { word: "सत्त्व", latin: "sattva", meaning: "ser, existencia; pureza, cualidad de lucidez", type: "sustantivo", cat: "espiritualidad" },
+                { word: "समाधि", latin: "samādhi", meaning: "absorción meditativa, concentración", type: "sustantivo", cat: "espiritualidad" },
+                { word: "समुद्र", latin: "samudra", meaning: "océano, mar", type: "sustantivo", cat: "naturaleza" },
+                { word: "सर्प", latin: "sarpa", meaning: "serpiente", type: "sustantivo", cat: "animales" },
+                { word: "सखा", latin: "sakhā", meaning: "amigo, compañero", type: "sustantivo", cat: "personas" },
+                { word: "सूर्य", latin: "sūrya", meaning: "sol", type: "sustantivo", cat: "naturaleza" },
+                { word: "स्मृति", latin: "smṛti", meaning: "memoria, recuerdo", type: "sustantivo", cat: "mente" },
+                { word: "स्वप्न", latin: "svapna", meaning: "sueño", type: "sustantivo", cat: "mente" },
+                { word: "स्वर", latin: "svara", meaning: "sonido, nota, tono", type: "sustantivo", cat: "arte" },
+                { word: "स्वभाव", latin: "svabhāva", meaning: "naturaleza propia, disposición, estado natural", type: "sustantivo", cat: "espiritualidad" },
+
+                { word: "हरि", latin: "hari", meaning: "epíteto de Viṣṇu", type: "nombre", cat: "espiritualidad" },
+                { word: "हृदय", latin: "hṛdaya", meaning: "corazón", type: "sustantivo", cat: "cuerpo" },
+                { word: "हंस", latin: "haṃsa", meaning: "cisne; ave", type: "sustantivo", cat: "animales" },
+                { word: "हास", latin: "hāsa", meaning: "risa", type: "sustantivo", cat: "emociones" },
+                { word: "हिम", latin: "hima", meaning: "nieve, frío", type: "sustantivo", cat: "naturaleza" },
+
+                /* ---------------------------------------------------------
+                   PRONOMBRES
+                   --------------------------------------------------------- */
+
+                { word: "अहम्", latin: "aham", meaning: "yo", type: "pronombre", cat: "gramática" },
+                { word: "त्वम्", latin: "tvam", meaning: "tú", type: "pronombre", cat: "gramática" },
+                { word: "सः", latin: "saḥ", meaning: "él", type: "pronombre", cat: "gramática" },
+                { word: "सा", latin: "sā", meaning: "ella", type: "pronombre", cat: "gramática" },
+                { word: "तत्", latin: "tat", meaning: "eso, aquello", type: "pronombre", cat: "gramática" },
+                { word: "वयम्", latin: "vayam", meaning: "nosotros", type: "pronombre", cat: "gramática" },
+                { word: "यूयम्", latin: "yūyam", meaning: "vosotros, ustedes", type: "pronombre", cat: "gramática" },
+
+                /* ---------------------------------------------------------
+                   VERBOS
+                   --------------------------------------------------------- */
+
+                { word: "अस्ति", latin: "asti", meaning: "es, existe, está", type: "verbo", cat: "verbos" },
+                { word: "भवति", latin: "bhavati", meaning: "es, llega a ser, sucede", type: "verbo", cat: "verbos" },
+                { word: "गच्छति", latin: "gacchati", meaning: "va, camina", type: "verbo", cat: "verbos" },
+                { word: "आगच्छति", latin: "āgacchati", meaning: "viene, llega", type: "verbo", cat: "verbos" },
+                { word: "करोति", latin: "karoti", meaning: "hace", type: "verbo", cat: "verbos" },
+                { word: "पश्यति", latin: "paśyati", meaning: "ve, observa", type: "verbo", cat: "verbos" },
+                { word: "वदति", latin: "vadati", meaning: "habla, dice", type: "verbo", cat: "verbos" },
+                { word: "वसति", latin: "vasati", meaning: "vive, habita", type: "verbo", cat: "verbos" },
+                { word: "जीवति", latin: "jīvati", meaning: "vive", type: "verbo", cat: "verbos" },
+                { word: "जानाति", latin: "jānāti", meaning: "sabe, conoce", type: "verbo", cat: "verbos" },
+                { word: "इच्छति", latin: "icchati", meaning: "desea, quiere", type: "verbo", cat: "verbos" },
+                { word: "पिबति", latin: "pibati", meaning: "bebe", type: "verbo", cat: "verbos" },
+                { word: "खादति", latin: "khādati", meaning: "come", type: "verbo", cat: "verbos" },
+                { word: "शृणोति", latin: "śṛṇoti", meaning: "oye, escucha", type: "verbo", cat: "verbos" },
+                { word: "स्मरति", latin: "smarati", meaning: "recuerda", type: "verbo", cat: "verbos" },
+                { word: "ध्यायति", latin: "dhyāyati", meaning: "medita, contempla", type: "verbo", cat: "verbos" },
+                { word: "नमति", latin: "namati", meaning: "se inclina, reverencia", type: "verbo", cat: "verbos" },
+                { word: "रक्षति", latin: "rakṣati", meaning: "protege, guarda", type: "verbo", cat: "verbos" },
+                { word: "प्रेम्णाति", latin: "premṇāti", meaning: "ama", type: "verbo", cat: "verbos" },
+
+                /* ---------------------------------------------------------
+                   ADJETIVOS
+                   --------------------------------------------------------- */
+
+                { word: "अच्छ", latin: "accha", meaning: "claro, limpio", type: "adjetivo", cat: "adjetivos" },
+                { word: "सुन्दर", latin: "sundara", meaning: "bello, hermoso", type: "adjetivo", cat: "adjetivos" },
+                { word: "शुभ", latin: "śubha", meaning: "auspicioso, bueno", type: "adjetivo", cat: "adjetivos" },
+                { word: "शुद्ध", latin: "śuddha", meaning: "puro, limpio", type: "adjetivo", cat: "adjetivos" },
+                { word: "पवित्र", latin: "pavitra", meaning: "puro, sagrado", type: "adjetivo", cat: "espiritualidad" },
+                { word: "महान्", latin: "mahān", meaning: "grande, grandioso", type: "adjetivo", cat: "adjetivos" },
+                { word: "लघु", latin: "laghu", meaning: "pequeño, ligero", type: "adjetivo", cat: "adjetivos" },
+                { word: "दीर्घ", latin: "dīrgha", meaning: "largo, prolongado", type: "adjetivo", cat: "adjetivos" },
+                { word: "नव", latin: "nava", meaning: "nuevo", type: "adjetivo", cat: "adjetivos" },
+                { word: "पुरातन", latin: "purātana", meaning: "antiguo", type: "adjetivo", cat: "adjetivos" },
+                { word: "शान्त", latin: "śānta", meaning: "tranquilo, pacífico", type: "adjetivo", cat: "emociones" },
+                { word: "मधुर", latin: "madhura", meaning: "dulce, agradable", type: "adjetivo", cat: "adjetivos" },
+                { word: "बलवान्", latin: "balavān", meaning: "fuerte, poderoso", type: "adjetivo", cat: "adjetivos" },
+                { word: "दयालु", latin: "dayālu", meaning: "compasivo, bondadoso", type: "adjetivo", cat: "emociones" },
+
+                /* ---------------------------------------------------------
+                   NÚMEROS
+                   --------------------------------------------------------- */
+
+                { word: "शून्य", latin: "śūnya", meaning: "cero", type: "numeral", cat: "números" },
+                { word: "एक", latin: "eka", meaning: "uno", type: "numeral", cat: "números" },
+                { word: "द्वि", latin: "dvi", meaning: "dos", type: "numeral", cat: "números" },
+                { word: "त्रि", latin: "tri", meaning: "tres", type: "numeral", cat: "números" },
+                { word: "चतुर्", latin: "catur", meaning: "cuatro", type: "numeral", cat: "números" },
+                { word: "पञ्च", latin: "pañca", meaning: "cinco", type: "numeral", cat: "números" },
+                { word: "षट्", latin: "ṣaṭ", meaning: "seis", type: "numeral", cat: "números" },
+                { word: "सप्त", latin: "sapta", meaning: "siete", type: "numeral", cat: "números" },
+                { word: "अष्ट", latin: "aṣṭa", meaning: "ocho", type: "numeral", cat: "números" },
+                { word: "नव", latin: "nava", meaning: "nueve", type: "numeral", cat: "números" },
+                { word: "दश", latin: "daśa", meaning: "diez", type: "numeral", cat: "números" },
+                { word: "एकादश", latin: "ekādaśa", meaning: "once", type: "numeral", cat: "números" },
+                { word: "द्वादश", latin: "dvādaśa", meaning: "doce", type: "numeral", cat: "números" },
+                { word: "त्रयोदश", latin: "trayodaśa", meaning: "trece", type: "numeral", cat: "números" },
+                { word: "चतुर्दश", latin: "caturdaśa", meaning: "catorce", type: "numeral", cat: "números" },
+                { word: "पञ्चदश", latin: "pañcadaśa", meaning: "quince", type: "numeral", cat: "números" },
+                { word: "षोडश", latin: "ṣoḍaśa", meaning: "dieciséis", type: "numeral", cat: "números" },
+                { word: "सप्तदश", latin: "saptadaśa", meaning: "diecisiete", type: "numeral", cat: "números" },
+                { word: "अष्टादश", latin: "aṣṭādaśa", meaning: "dieciocho", type: "numeral", cat: "números" },
+                { word: "नवदश", latin: "navadaśa", meaning: "diecinueve", type: "numeral", cat: "números" },
+                { word: "विंशति", latin: "viṃśati", meaning: "veinte", type: "numeral", cat: "números" }
+
+            ],
+
+
+            /* =========================================================
+               SIRÍACO CLÁSICO
+               ========================================================= */
+
+            /* =========================================================
+               SIRÍACO CLÁSICO — VOCABULARIO AMPLIADO
+               ========================================================= */
+
+            /* =========================================================
+               SIRÍACO CLÁSICO — VOCABULARIO AMPLIADO
+               ========================================================= */
+
+            syr: [
+
+                /* ---------------------------------------------------------
+                   ܐ — ALAPH
+                   --------------------------------------------------------- */
+
+                { word: "ܐܒܐ", latin: "abbā", meaning: "padre", type: "sustantivo", cat: "familia" },
+                { word: "ܐܡܐ", latin: "emmā", meaning: "madre", type: "sustantivo", cat: "familia" },
+                { word: "ܐܚܐ", latin: "aḥā", meaning: "hermano", type: "sustantivo", cat: "familia" },
+                { word: "ܐܚܘܬܐ", latin: "aḥūṯā", meaning: "hermandad, fraternidad", type: "sustantivo", cat: "familia" },
+                { word: "ܐܢܐ", latin: "ānā", meaning: "yo", type: "pronombre", cat: "gramática" },
+                { word: "ܐܢܬ", latin: "ant", meaning: "tú", type: "pronombre", cat: "gramática" },
+                { word: "ܐܢܬܘܢ", latin: "antūn", meaning: "vosotros, ustedes", type: "pronombre", cat: "gramática" },
+                { word: "ܐܠܗܐ", latin: "Alāhā", meaning: "Dios", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ܐܠܗܘܬܐ", latin: "alāhūṯā", meaning: "divinidad", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ܐܢܫܐ", latin: "nāšā", meaning: "persona, ser humano", type: "sustantivo", cat: "personas" },
+                { word: "ܐܪܥܐ", latin: "arʿā", meaning: "tierra, país", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܐܪܥܐ", latin: "arʿā", meaning: "tierra, suelo", type: "sustantivo", cat: "lugares" },
+                { word: "ܐܪܚܐ", latin: "urḥā", meaning: "camino, camino de viaje", type: "sustantivo", cat: "lugares" },
+                { word: "ܐܘܪܚܐ", latin: "urḥā", meaning: "camino, sendero", type: "sustantivo", cat: "lugares" },
+                { word: "ܐܡܬܐ", latin: "amtā", meaning: "sierva, criada", type: "sustantivo", cat: "personas" },
+
+                /* ---------------------------------------------------------
+                   ܒ — BETH
+                   --------------------------------------------------------- */
+
+                { word: "ܒܝܬܐ", latin: "baytā", meaning: "casa, hogar", type: "sustantivo", cat: "vida" },
+                { word: "ܒܪܐ", latin: "barā", meaning: "hijo", type: "sustantivo", cat: "familia" },
+                { word: "ܒܪܬܐ", latin: "bartā", meaning: "hija", type: "sustantivo", cat: "familia" },
+                { word: "ܒܪܢܫܐ", latin: "barnāšā", meaning: "ser humano, persona", type: "sustantivo", cat: "personas" },
+                { word: "ܒܪܟܐ", latin: "borkā", meaning: "rodilla; bendición según contexto", type: "sustantivo", cat: "cuerpo" },
+                { word: "ܒܘܟܪܐ", latin: "būkrā", meaning: "primogénito", type: "sustantivo", cat: "familia" },
+                { word: "ܒܣܡܐ", latin: "basmā", meaning: "aroma, fragancia", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܒܝܢܬ", latin: "bayn", meaning: "entre, en medio de", type: "preposición", cat: "gramática" },
+                { word: "ܒܫܠܡܐ", latin: "bšlāmā", meaning: "en paz, en tranquilidad", type: "expresión", cat: "saludos" },
+
+                /* ---------------------------------------------------------
+                   ܓ — GAMAL
+                   --------------------------------------------------------- */
+
+                { word: "ܓܒܪܐ", latin: "gabrā", meaning: "hombre, varón", type: "sustantivo", cat: "personas" },
+                { word: "ܓܒܪܬܐ", latin: "gabrṯā", meaning: "mujer", type: "sustantivo", cat: "personas" },
+                { word: "ܓܒܝܠܐ", latin: "gbīlā", meaning: "forma, naturaleza, carácter", type: "sustantivo", cat: "vida" },
+                { word: "ܓܘܫܡܐ", latin: "gūšmā", meaning: "cuerpo, materia", type: "sustantivo", cat: "cuerpo" },
+                { word: "ܓܢܬܐ", latin: "ganttā", meaning: "jardín", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܓܢܒܐ", latin: "ganbā", meaning: "lado, costado", type: "sustantivo", cat: "cuerpo" },
+
+                /* ---------------------------------------------------------
+                   ܕ — DALATH
+                   --------------------------------------------------------- */
+
+                { word: "ܕܪܟܐ", latin: "dorkā", meaning: "camino, vía", type: "sustantivo", cat: "lugares" },
+                { word: "ܕܒܫܐ", latin: "deḇšā", meaning: "miel", type: "sustantivo", cat: "vida" },
+                { word: "ܕܡܐ", latin: "dmā", meaning: "sangre", type: "sustantivo", cat: "cuerpo" },
+                { word: "ܕܚܠܬܐ", latin: "deḥlṯā", meaning: "temor, miedo", type: "sustantivo", cat: "emociones" },
+                { word: "ܕܥܬܐ", latin: "dʿtā", meaning: "conocimiento", type: "sustantivo", cat: "mente" },
+
+                /* ---------------------------------------------------------
+                   ܗ — HE
+                   --------------------------------------------------------- */
+
+                { word: "ܗܘ", latin: "hū", meaning: "él", type: "pronombre", cat: "gramática" },
+                { word: "ܗܝ", latin: "hī", meaning: "ella", type: "pronombre", cat: "gramática" },
+                { word: "ܗܘܢ", latin: "hūn", meaning: "ellos", type: "pronombre", cat: "gramática" },
+                { word: "ܗܢܐ", latin: "hānā", meaning: "este, esto", type: "demostrativo", cat: "gramática" },
+                { word: "ܗܝܡܢܘܬܐ", latin: "haymānūṯā", meaning: "fe, fidelidad", type: "sustantivo", cat: "espiritualidad" },
+
+                /* ---------------------------------------------------------
+                   ܘ — WAW
+                   --------------------------------------------------------- */
+
+                { word: "ܘܪܕܐ", latin: "wardā", meaning: "rosa", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܘܪܕܐ", latin: "wardā", meaning: "flor, rosa", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܘܠܕܐ", latin: "wuldā", meaning: "niño, hijo", type: "sustantivo", cat: "familia" },
+                { word: "ܘܠܕܬܐ", latin: "wuldṯā", meaning: "niña, hija", type: "sustantivo", cat: "familia" },
+
+                /* ---------------------------------------------------------
+                   ܙ — ZAIN
+                   --------------------------------------------------------- */
+
+                { word: "ܙܒܢܐ", latin: "zabnā", meaning: "tiempo, época", type: "sustantivo", cat: "tiempo" },
+                { word: "ܙܗܪܐ", latin: "zahrā", meaning: "brillo, resplandor", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܙܕܝܩܐ", latin: "zaddīqā", meaning: "justo, recto", type: "adjetivo", cat: "adjetivos" },
+
+                /* ---------------------------------------------------------
+                   ܚ — HETH
+                   --------------------------------------------------------- */
+
+                { word: "ܚܘܒܐ", latin: "ḥubbā", meaning: "amor", type: "sustantivo", cat: "emociones" },
+                { word: "ܚܒܝܒܐ", latin: "ḥabībā", meaning: "amado, querido", type: "adjetivo", cat: "emociones" },
+                { word: "ܚܒܪܐ", latin: "ḥabrā", meaning: "amigo, compañero", type: "sustantivo", cat: "personas" },
+                { word: "ܚܝܐ", latin: "ḥayyā", meaning: "vivo", type: "adjetivo", cat: "vida" },
+                { word: "ܚܝܐ", latin: "ḥayyē", meaning: "vida, vida eterna", type: "sustantivo", cat: "vida" },
+                { word: "ܚܝܠܐ", latin: "ḥaylā", meaning: "fuerza, poder", type: "sustantivo", cat: "vida" },
+                { word: "ܚܟܡܬܐ", latin: "ḥekmṯā", meaning: "sabiduría", type: "sustantivo", cat: "mente" },
+                { word: "ܚܟܝܡܐ", latin: "ḥakkīmā", meaning: "sabio", type: "adjetivo", cat: "personas" },
+                { word: "ܚܡܐ", latin: "ḥammā", meaning: "calor", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܚܡܪܐ", latin: "ḥamrā", meaning: "vino", type: "sustantivo", cat: "vida" },
+
+                /* ---------------------------------------------------------
+                   ܛ — TETH
+                   --------------------------------------------------------- */
+
+                { word: "ܛܒܐ", latin: "ṭābā", meaning: "bueno", type: "adjetivo", cat: "adjetivos" },
+                { word: "ܛܒܘܬܐ", latin: "ṭābūṯā", meaning: "bondad", type: "sustantivo", cat: "emociones" },
+                { word: "ܛܒܬܐ", latin: "ṭāḇtā", meaning: "bien, bondad", type: "sustantivo", cat: "emociones" },
+
+                /* ---------------------------------------------------------
+                   ܝ — YOD
+                   --------------------------------------------------------- */
+
+                { word: "ܝܡܐ", latin: "yammā", meaning: "mar", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܝܡܐ", latin: "yammā", meaning: "océano, mar", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܝܘܡܐ", latin: "yawmā", meaning: "día", type: "sustantivo", cat: "tiempo" },
+                { word: "ܝܪܚܐ", latin: "yarḥā", meaning: "mes; luna", type: "sustantivo", cat: "tiempo" },
+                { word: "ܝܕܥܬܐ", latin: "yadʿtā", meaning: "conocimiento", type: "sustantivo", cat: "mente" },
+                { word: "ܝܕܐ", latin: "yadā", meaning: "mano", type: "sustantivo", cat: "cuerpo" },
+
+                /* ---------------------------------------------------------
+                   ܟ — KAPH
+                   --------------------------------------------------------- */
+
+                { word: "ܟܬܒܐ", latin: "ktāḇā", meaning: "libro, escrito", type: "sustantivo", cat: "lengua" },
+                { word: "ܟܬܒܐ", latin: "ktāḇā", meaning: "escritura, libro", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ܟܠܒܐ", latin: "kalbā", meaning: "perro", type: "sustantivo", cat: "animales" },
+                { word: "ܟܘܟܒܐ", latin: "kawkḇā", meaning: "estrella", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܟܪܡܐ", latin: "karmā", meaning: "viña", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܟܠ", latin: "kol", meaning: "todo, cada", type: "pronombre/adjetivo", cat: "gramática" },
+
+                /* ---------------------------------------------------------
+                   ܠ — LAMAD
+                   --------------------------------------------------------- */
+
+                { word: "ܠܒܐ", latin: "lebbā", meaning: "corazón", type: "sustantivo", cat: "cuerpo" },
+                { word: "ܠܒܐ", latin: "lebbā", meaning: "corazón, interior", type: "sustantivo", cat: "emociones" },
+                { word: "ܠܝܠܝܐ", latin: "lelyā", meaning: "noche", type: "sustantivo", cat: "tiempo" },
+                { word: "ܠܫܢܐ", latin: "leššānā", meaning: "lengua, idioma", type: "sustantivo", cat: "lengua" },
+                { word: "ܠܘܚܐ", latin: "luḥā", meaning: "tabla, tablilla", type: "sustantivo", cat: "objetos" },
+
+                /* ---------------------------------------------------------
+                   ܡ — MEM
+                   --------------------------------------------------------- */
+
+                { word: "ܡܝܐ", latin: "mayyā", meaning: "agua", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܡܠܟܐ", latin: "malkā", meaning: "rey", type: "sustantivo", cat: "personas" },
+                { word: "ܡܠܟܘܬܐ", latin: "malkūṯā", meaning: "reino, reinado", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ܡܪܝܐ", latin: "Māryā", meaning: "Señor", type: "título", cat: "espiritualidad" },
+                { word: "ܡܪܐ", latin: "mārā", meaning: "señor, dueño", type: "sustantivo", cat: "personas" },
+                { word: "ܡܪܬܐ", latin: "martā", meaning: "señora", type: "sustantivo", cat: "personas" },
+                { word: "ܡܫܝܚܐ", latin: "Mšīḥā", meaning: "Mesías, Cristo, ungido", type: "título", cat: "espiritualidad" },
+                { word: "ܡܪܕܘܬܐ", latin: "mardūṯā", meaning: "rebeldía", type: "sustantivo", cat: "emociones" },
+                { word: "ܡܠܬܐ", latin: "meltā", meaning: "palabra, asunto", type: "sustantivo", cat: "lengua" },
+                { word: "ܡܠܐܟܐ", latin: "malāḵā", meaning: "ángel, mensajero", type: "sustantivo", cat: "espiritualidad" },
+
+                /* ---------------------------------------------------------
+                   ܢ — NUN
+                   --------------------------------------------------------- */
+
+                { word: "ܢܘܗܪܐ", latin: "nūhrā", meaning: "luz", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܢܘܪܐ", latin: "nūrā", meaning: "fuego", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܢܦܫܐ", latin: "napšā", meaning: "alma, vida, ser", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ܢܦܫܐ", latin: "napšā", meaning: "persona, sí mismo", type: "sustantivo", cat: "personas" },
+                { word: "ܢܗܪܐ", latin: "nahrā", meaning: "río", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܢܗܪܐ", latin: "nahrā", meaning: "río; corriente de agua", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܢܘܚܡܐ", latin: "nūḥāmā", meaning: "consuelo", type: "sustantivo", cat: "emociones" },
+
+                /* ---------------------------------------------------------
+                   ܣ — SEMKATH
+                   --------------------------------------------------------- */
+
+                { word: "ܣܘܪܝܝܐ", latin: "Suryāyā", meaning: "siríaco", type: "adjetivo", cat: "lengua" },
+                { word: "ܣܘܪܝܝܐ", latin: "Suryāyā", meaning: "sirio, arameo siríaco", type: "adjetivo", cat: "lengua" },
+                { word: "ܣܦܪܐ", latin: "sāfrā", meaning: "libro; escritura", type: "sustantivo", cat: "lengua" },
+                { word: "ܣܒܪܐ", latin: "sabrā", meaning: "esperanza", type: "sustantivo", cat: "emociones" },
+                { word: "ܣܒܪܬܐ", latin: "sabrṯā", meaning: "esperanza", type: "sustantivo", cat: "espiritualidad" },
+
+                /* ---------------------------------------------------------
+                   ܥ — E
+                   --------------------------------------------------------- */
+
+                { word: "ܥܝܢܐ", latin: "ʿaynā", meaning: "ojo; fuente", type: "sustantivo", cat: "cuerpo" },
+                { word: "ܥܡܐ", latin: "ʿammā", meaning: "pueblo, nación", type: "sustantivo", cat: "personas" },
+                { word: "ܥܠܡܐ", latin: "ʿālmā", meaning: "mundo, edad, eternidad según contexto", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܥܒܕܐ", latin: "ʿaḇdā", meaning: "siervo, servidor", type: "sustantivo", cat: "personas" },
+                { word: "ܥܒܕ", latin: "ʿḇad", meaning: "hacer, trabajar", type: "verbo", cat: "verbos" },
+                { word: "ܥܡ", latin: "ʿam", meaning: "con", type: "preposición", cat: "gramática" },
+                { word: "ܥܕܢܐ", latin: "ʿednā", meaning: "tiempo, momento", type: "sustantivo", cat: "tiempo" },
+
+                /* ---------------------------------------------------------
+                   ܦ — PE
+                   --------------------------------------------------------- */
+
+                { word: "ܦܓܪܐ", latin: "pagrā", meaning: "cuerpo", type: "sustantivo", cat: "cuerpo" },
+                { word: "ܦܪܚܐ", latin: "praḥā", meaning: "flor", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܦܪܚܐ", latin: "praḥā", meaning: "floración, florecimiento", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܦܪܚ", latin: "praḥ", meaning: "volar, florecer según contexto", type: "verbo", cat: "verbos" },
+                { word: "ܦܪܫܐ", latin: "paršā", meaning: "caballo", type: "sustantivo", cat: "animales" },
+                { word: "ܦܘܡܐ", latin: "pūmā", meaning: "boca", type: "sustantivo", cat: "cuerpo" },
+                { word: "ܦܢܝܐ", latin: "panyā", meaning: "rostro, cara", type: "sustantivo", cat: "cuerpo" },
+
+                /* ---------------------------------------------------------
+                   ܨ — SADHE
+                   --------------------------------------------------------- */
+
+                { word: "ܨܠܘܬܐ", latin: "ṣlōṯā", meaning: "oración, plegaria", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ܨܠܝܒܐ", latin: "ṣlīḇā", meaning: "cruz", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ܨܦܪܐ", latin: "ṣaprā", meaning: "mañana", type: "sustantivo", cat: "tiempo" },
+                { word: "ܨܚܝܐ", latin: "ṣaḥyā", meaning: "claro, brillante", type: "adjetivo", cat: "adjetivos" },
+
+                /* ---------------------------------------------------------
+                   ܩ — QOPH
+                   --------------------------------------------------------- */
+
+                { word: "ܩܠܐ", latin: "qālā", meaning: "voz, sonido", type: "sustantivo", cat: "lengua" },
+                { word: "ܩܕܝܫܐ", latin: "qaddišā", meaning: "santo, sagrado", type: "adjetivo", cat: "espiritualidad" },
+                { word: "ܩܕܝܫܘܬܐ", latin: "qaddišūṯā", meaning: "santidad", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ܩܕܡܝܐ", latin: "qadmāyā", meaning: "primero, antiguo", type: "adjetivo", cat: "tiempo" },
+                { word: "ܩܪܝܒܐ", latin: "qarībā", meaning: "cercano", type: "adjetivo", cat: "lugares" },
+
+                /* ---------------------------------------------------------
+                   ܪ — RESH
+                   --------------------------------------------------------- */
+
+                { word: "ܪܘܚܐ", latin: "rūḥā", meaning: "espíritu, viento", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ܪܘܚܐ", latin: "rūḥā", meaning: "viento, aire", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܪܚܡܐ", latin: "raḥmā", meaning: "misericordia, compasión", type: "sustantivo", cat: "emociones" },
+                { word: "ܪܚܡ", latin: "rḥem", meaning: "amar, tener misericordia", type: "verbo", cat: "verbos" },
+                { word: "ܪܚܡܐ", latin: "raḥmā", meaning: "amor, misericordia", type: "sustantivo", cat: "emociones" },
+                { word: "ܪܒܐ", latin: "rabbā", meaning: "grande, mucho", type: "adjetivo", cat: "adjetivos" },
+                { word: "ܪܒܝ", latin: "rabbī", meaning: "mi maestro, rabino", type: "título", cat: "personas" },
+                { word: "ܪܫܐ", latin: "rēšā", meaning: "cabeza, principio", type: "sustantivo", cat: "cuerpo" },
+
+                /* ---------------------------------------------------------
+                   ܫ — SHIN
+                   --------------------------------------------------------- */
+
+                { word: "ܫܠܡܐ", latin: "šlāmā", meaning: "paz, plenitud", type: "sustantivo", cat: "emociones" },
+                { word: "ܫܠܡ", latin: "šlem", meaning: "estar completo, estar en paz", type: "verbo", cat: "verbos" },
+                { word: "ܫܡܐ", latin: "šmā", meaning: "nombre", type: "sustantivo", cat: "lengua" },
+                { word: "ܫܡܫܐ", latin: "šemšā", meaning: "sol", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܫܡܝܐ", latin: "šmayyā", meaning: "cielo, cielos", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܫܒܚܐ", latin: "šubḥā", meaning: "gloria, alabanza", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ܫܘܦܪܐ", latin: "šūfrā", meaning: "belleza", type: "sustantivo", cat: "adjetivos" },
+                { word: "ܫܘܪܐ", latin: "šūrā", meaning: "muro", type: "sustantivo", cat: "lugares" },
+
+                /* ---------------------------------------------------------
+                   ܬ — TAW
+                   --------------------------------------------------------- */
+
+                { word: "ܬܠܡܝܕܐ", latin: "talmīdā", meaning: "discípulo, estudiante", type: "sustantivo", cat: "personas" },
+                { word: "ܬܠܡܝܕܘܬܐ", latin: "talmīdūṯā", meaning: "discipulado, aprendizaje", type: "sustantivo", cat: "vida" },
+                { word: "ܬܘܕܝܬܐ", latin: "tōdīṯā", meaning: "acción de gracias", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ܬܫܒܘܚܬܐ", latin: "tešbūḥtā", meaning: "alabanza, gloria", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ܬܪܥܐ", latin: "tarʿā", meaning: "puerta", type: "sustantivo", cat: "lugares" },
+                { word: "ܬܪܝܢ", latin: "trēn", meaning: "dos", type: "numeral", cat: "números" },
+                { word: "ܬܠܬܐ", latin: "tlāthā", meaning: "tres", type: "numeral", cat: "números" },
+
+                /* ---------------------------------------------------------
+                   EXPRESIONES Y GRAMÁTICA
+                   --------------------------------------------------------- */
+
+                { word: "ܫܠܡܐ ܥܠܝܟ", latin: "šlāmā ʿlayk", meaning: "paz sobre ti; saludo", type: "expresión", cat: "saludos" },
+                { word: "ܫܠܡ ܠܟ", latin: "šlām lāḵ", meaning: "paz para ti; saludo", type: "expresión", cat: "saludos" },
+                { word: "ܦܘܫ ܒܫܠܡܐ", latin: "pūš bšlāmā", meaning: "permanece en paz", type: "expresión", cat: "saludos" },
+                { word: "ܒܫܝܢܐ", latin: "bšaynā", meaning: "en paz, tranquilamente", type: "expresión", cat: "saludos" },
+                { word: "ܐܝܟܢ", latin: "aykann", meaning: "cómo", type: "adverbio", cat: "gramática" },
+                { word: "ܡܢ", latin: "man", meaning: "quién", type: "pronombre", cat: "gramática" },
+                { word: "ܡܢܐ", latin: "mānā", meaning: "qué", type: "pronombre", cat: "gramática" },
+                { word: "ܐܝܟܐ", latin: "aykā", meaning: "dónde", type: "adverbio", cat: "gramática" },
+                { word: "ܡܛܠ", latin: "meṭṭul", meaning: "por causa de, porque", type: "preposición", cat: "gramática" },
+                { word: "ܥܡ", latin: "ʿam", meaning: "con", type: "preposición", cat: "gramática" },
+                { word: "ܒ", latin: "b-", meaning: "en, con, por", type: "preposición", cat: "gramática" },
+                { word: "ܠ", latin: "l-", meaning: "a, para", type: "preposición", cat: "gramática" },
+                { word: "ܡܢ", latin: "men", meaning: "de, desde", type: "preposición", cat: "gramática" },
+
+                /* ---------------------------------------------------------
+                   VERBOS
+                   --------------------------------------------------------- */
+
+                { word: "ܐܙܠ", latin: "ʾzal", meaning: "ir", type: "verbo", cat: "verbos" },
+                { word: "ܐܬܐ", latin: "ʾtā", meaning: "venir", type: "verbo", cat: "verbos" },
+                { word: "ܚܙܐ", latin: "ḥzā", meaning: "ver", type: "verbo", cat: "verbos" },
+                { word: "ܫܡܥ", latin: "šmaʿ", meaning: "escuchar, oír", type: "verbo", cat: "verbos" },
+                { word: "ܐܡܪ", latin: "ʾmar", meaning: "decir, hablar", type: "verbo", cat: "verbos" },
+                { word: "ܟܬܒ", latin: "ktab", meaning: "escribir", type: "verbo", cat: "verbos" },
+                { word: "ܩܪܐ", latin: "qerā", meaning: "leer; llamar", type: "verbo", cat: "verbos" },
+                { word: "ܝܕܥ", latin: "ydaʿ", meaning: "saber, conocer", type: "verbo", cat: "verbos" },
+                { word: "ܚܝܐ", latin: "ḥyā", meaning: "vivir", type: "verbo", cat: "verbos" },
+                { word: "ܪܚܡ", latin: "rḥem", meaning: "amar, tener misericordia", type: "verbo", cat: "verbos" },
+                { word: "ܥܒܕ", latin: "ʿḇad", meaning: "hacer, trabajar", type: "verbo", cat: "verbos" },
+                { word: "ܪܕܐ", latin: "rda", meaning: "correr, perseguir", type: "verbo", cat: "verbos" },
+                { word: "ܦܪܚ", latin: "praḥ", meaning: "volar, florecer", type: "verbo", cat: "verbos" },
+                { word: "ܪܡܝ", latin: "rmy", meaning: "arrojar, lanzar", type: "verbo", cat: "verbos" },
+                { word: "ܩܘܡ", latin: "qūm", meaning: "levantarse, permanecer de pie", type: "verbo", cat: "verbos" },
+                { word: "ܝܬܒ", latin: "yteb", meaning: "sentarse, habitar", type: "verbo", cat: "verbos" },
+
+                /* ---------------------------------------------------------
+                   CUERPO
+                   --------------------------------------------------------- */
+
+                { word: "ܪܫܐ", latin: "rēšā", meaning: "cabeza", type: "sustantivo", cat: "cuerpo" },
+                { word: "ܥܝܢܐ", latin: "ʿaynā", meaning: "ojo", type: "sustantivo", cat: "cuerpo" },
+                { word: "ܐܕܢܐ", latin: "ednā", meaning: "oído, oreja", type: "sustantivo", cat: "cuerpo" },
+                { word: "ܦܘܡܐ", latin: "pūmā", meaning: "boca", type: "sustantivo", cat: "cuerpo" },
+                { word: "ܠܫܢܐ", latin: "leššānā", meaning: "lengua", type: "sustantivo", cat: "cuerpo" },
+                { word: "ܠܒܐ", latin: "lebbā", meaning: "corazón", type: "sustantivo", cat: "cuerpo" },
+                { word: "ܝܕܐ", latin: "yadā", meaning: "mano", type: "sustantivo", cat: "cuerpo" },
+                { word: "ܐܝܕܐ", latin: "īdā", meaning: "mano", type: "sustantivo", cat: "cuerpo" },
+                { word: "ܪܓܠܐ", latin: "reglā", meaning: "pie, pierna", type: "sustantivo", cat: "cuerpo" },
+                { word: "ܕܡܐ", latin: "dmā", meaning: "sangre", type: "sustantivo", cat: "cuerpo" },
+                { word: "ܦܓܪܐ", latin: "pagrā", meaning: "cuerpo", type: "sustantivo", cat: "cuerpo" },
+                { word: "ܢܦܫܐ", latin: "napšā", meaning: "alma, ser", type: "sustantivo", cat: "espiritualidad" },
+
+                /* ---------------------------------------------------------
+                   NATURALEZA
+                   --------------------------------------------------------- */
+
+                { word: "ܫܡܫܐ", latin: "šemšā", meaning: "sol", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܣܗܪܐ", latin: "sahrā", meaning: "luna", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܟܘܟܒܐ", latin: "kawkḇā", meaning: "estrella", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܫܡܝܐ", latin: "šmayyā", meaning: "cielo", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܐܪܥܐ", latin: "arʿā", meaning: "tierra", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܡܝܐ", latin: "mayyā", meaning: "agua", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܢܘܪܐ", latin: "nūrā", meaning: "fuego", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܪܘܚܐ", latin: "rūḥā", meaning: "viento", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܢܗܪܐ", latin: "nahrā", meaning: "río", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܝܡܐ", latin: "yammā", meaning: "mar", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܐܝܠܢܐ", latin: "īlānā", meaning: "árbol", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܦܪܚܐ", latin: "praḥā", meaning: "flor", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܘܪܕܐ", latin: "wardā", meaning: "rosa", type: "sustantivo", cat: "naturaleza" },
+                { word: "ܓܢܬܐ", latin: "ganttā", meaning: "jardín", type: "sustantivo", cat: "naturaleza" },
+
+                /* ---------------------------------------------------------
+                   ANIMALES
+                   --------------------------------------------------------- */
+
+                { word: "ܟܠܒܐ", latin: "kalbā", meaning: "perro", type: "sustantivo", cat: "animales" },
+                { word: "ܚܡܪܐ", latin: "ḥmarā", meaning: "burro", type: "sustantivo", cat: "animales" },
+                { word: "ܣܘܣܝܐ", latin: "sūsiyā", meaning: "caballo", type: "sustantivo", cat: "animales" },
+                { word: "ܐܪܝܐ", latin: "aryā", meaning: "león", type: "sustantivo", cat: "animales" },
+                { word: "ܢܡܪܐ", latin: "nemrā", meaning: "leopardo", type: "sustantivo", cat: "animales" },
+                { word: "ܢܚܫܐ", latin: "neḥšā", meaning: "serpiente", type: "sustantivo", cat: "animales" },
+                { word: "ܛܠܝܐ", latin: "ṭalyā", meaning: "cordero, joven", type: "sustantivo", cat: "animales" },
+                { word: "ܨܦܪܐ", latin: "ṣaprā", meaning: "pájaro; mañana según contexto", type: "sustantivo", cat: "animales" },
+
+                /* ---------------------------------------------------------
+                   FAMILIA
+                   --------------------------------------------------------- */
+
+                { word: "ܐܒܐ", latin: "abbā", meaning: "padre", type: "sustantivo", cat: "familia" },
+                { word: "ܐܡܐ", latin: "emmā", meaning: "madre", type: "sustantivo", cat: "familia" },
+                { word: "ܐܚܐ", latin: "aḥā", meaning: "hermano", type: "sustantivo", cat: "familia" },
+                { word: "ܚܬܐ", latin: "ḥāṯā", meaning: "hermana", type: "sustantivo", cat: "familia" },
+                { word: "ܒܪܐ", latin: "barā", meaning: "hijo", type: "sustantivo", cat: "familia" },
+                { word: "ܒܪܬܐ", latin: "bartā", meaning: "hija", type: "sustantivo", cat: "familia" },
+                { word: "ܐܒܗܐ", latin: "āḇāhā", meaning: "padre, antepasado", type: "sustantivo", cat: "familia" },
+                { word: "ܒܢܝܐ", latin: "bnayyā", meaning: "hijo, descendiente", type: "sustantivo", cat: "familia" },
+
+                /* ---------------------------------------------------------
+                   ESPIRITUALIDAD
+                   --------------------------------------------------------- */
+
+                { word: "ܐܠܗܐ", latin: "Alāhā", meaning: "Dios", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ܡܪܝܐ", latin: "Māryā", meaning: "Señor", type: "título", cat: "espiritualidad" },
+                { word: "ܡܫܝܚܐ", latin: "Mšīḥā", meaning: "Mesías, Cristo, ungido", type: "título", cat: "espiritualidad" },
+                { word: "ܡܠܐܟܐ", latin: "malāḵā", meaning: "ángel, mensajero", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ܪܘܚܐ", latin: "rūḥā", meaning: "espíritu", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ܢܦܫܐ", latin: "napšā", meaning: "alma, ser, vida", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ܨܠܘܬܐ", latin: "ṣlōṯā", meaning: "oración, plegaria", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ܩܕܝܫܐ", latin: "qaddišā", meaning: "santo, sagrado", type: "adjetivo", cat: "espiritualidad" },
+                { word: "ܩܕܝܫܘܬܐ", latin: "qaddišūṯā", meaning: "santidad", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ܬܘܕܝܬܐ", latin: "tōdīṯā", meaning: "acción de gracias", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ܫܒܚܐ", latin: "šubḥā", meaning: "gloria, alabanza", type: "sustantivo", cat: "espiritualidad" },
+                { word: "ܗܝܡܢܘܬܐ", latin: "haymānūṯā", meaning: "fe, fidelidad", type: "sustantivo", cat: "espiritualidad" },
+
+                /* ---------------------------------------------------------
+                   EMOCIONES
+                   --------------------------------------------------------- */
+
+                { word: "ܚܘܒܐ", latin: "ḥubbā", meaning: "amor", type: "sustantivo", cat: "emociones" },
+                { word: "ܪܚܡܐ", latin: "raḥmā", meaning: "misericordia, compasión", type: "sustantivo", cat: "emociones" },
+                { word: "ܫܠܡܐ", latin: "šlāmā", meaning: "paz, plenitud", type: "sustantivo", cat: "emociones" },
+                { word: "ܣܒܪܐ", latin: "sabrā", meaning: "esperanza", type: "sustantivo", cat: "emociones" },
+                { word: "ܚܕܘܬܐ", latin: "ḥdūṯā", meaning: "alegría, felicidad", type: "sustantivo", cat: "emociones" },
+                { word: "ܟܪܝܘܬܐ", latin: "keryūṯā", meaning: "tristeza", type: "sustantivo", cat: "emociones" },
+                { word: "ܪܓܬܐ", latin: "regtā", meaning: "deseo, anhelo", type: "sustantivo", cat: "emociones" },
+                { word: "ܣܘܒܪܐ", latin: "sūbrā", meaning: "paciencia, resistencia", type: "sustantivo", cat: "emociones" },
+
+                /* ---------------------------------------------------------
+                   ADJETIVOS
+                   --------------------------------------------------------- */
+
+                { word: "ܛܒܐ", latin: "ṭāḇā", meaning: "bueno", type: "adjetivo", cat: "adjetivos" },
+                { word: "ܒܝܫܐ", latin: "bīšā", meaning: "malo", type: "adjetivo", cat: "adjetivos" },
+                { word: "ܪܒܐ", latin: "rabbā", meaning: "grande, mucho", type: "adjetivo", cat: "adjetivos" },
+                { word: "ܙܥܘܪܐ", latin: "zeʿūrā", meaning: "pequeño", type: "adjetivo", cat: "adjetivos" },
+                { word: "ܩܕܝܫܐ", latin: "qaddišā", meaning: "santo, sagrado", type: "adjetivo", cat: "espiritualidad" },
+                { word: "ܚܟܝܡܐ", latin: "ḥakkīmā", meaning: "sabio", type: "adjetivo", cat: "adjetivos" },
+                { word: "ܫܦܝܪܐ", latin: "šappīrā", meaning: "hermoso, bello", type: "adjetivo", cat: "adjetivos" },
+                { word: "ܢܘܗܪܢܐ", latin: "nūhrānā", meaning: "luminoso, brillante", type: "adjetivo", cat: "adjetivos" },
+
+                /* ---------------------------------------------------------
+                   NÚMEROS
+                   --------------------------------------------------------- */
+
+                { word: "ܚܕ", latin: "ḥad", meaning: "uno", type: "numeral", cat: "números" },
+                { word: "ܬܪܝܢ", latin: "trēn", meaning: "dos", type: "numeral", cat: "números" },
+                { word: "ܬܠܬܐ", latin: "tlāthā", meaning: "tres", type: "numeral", cat: "números" },
+                { word: "ܐܪܒܥܐ", latin: "arbaʿā", meaning: "cuatro", type: "numeral", cat: "números" },
+                { word: "ܚܡܫܐ", latin: "ḥamšā", meaning: "cinco", type: "numeral", cat: "números" },
+                { word: "ܫܬܐ", latin: "eštā", meaning: "seis", type: "numeral", cat: "números" },
+                { word: "ܫܒܥܐ", latin: "šḇaʿā", meaning: "siete", type: "numeral", cat: "números" },
+                { word: "ܬܡܢܝܐ", latin: "tmanyā", meaning: "ocho", type: "numeral", cat: "números" },
+                { word: "ܬܫܥܐ", latin: "tšaʿā", meaning: "nueve", type: "numeral", cat: "números" },
+                { word: "ܥܣܪܐ", latin: "ʿesrā", meaning: "diez", type: "numeral", cat: "números" },
+
+                /* ---------------------------------------------------------
+                   TIEMPO
+                   --------------------------------------------------------- */
+
+                { word: "ܝܘܡܐ", latin: "yawmā", meaning: "día", type: "sustantivo", cat: "tiempo" },
+                { word: "ܠܝܠܝܐ", latin: "lelyā", meaning: "noche", type: "sustantivo", cat: "tiempo" },
+                { word: "ܨܦܪܐ", latin: "ṣaprā", meaning: "mañana, amanecer", type: "sustantivo", cat: "tiempo" },
+                { word: "ܪܡܫܐ", latin: "ramšā", meaning: "tarde, atardecer", type: "sustantivo", cat: "tiempo" },
+                { word: "ܙܒܢܐ", latin: "zabnā", meaning: "tiempo, época", type: "sustantivo", cat: "tiempo" },
+                { word: "ܥܕܢܐ", latin: "ʿednā", meaning: "momento, tiempo", type: "sustantivo", cat: "tiempo" },
+                { word: "ܫܥܬܐ", latin: "šāʿtā", meaning: "hora", type: "sustantivo", cat: "tiempo" },
+                { word: "ܝܪܚܐ", latin: "yarḥā", meaning: "mes; luna", type: "sustantivo", cat: "tiempo" },
+
+                /* ---------------------------------------------------------
+                   PALABRAS ABSTRACTAS
+                   --------------------------------------------------------- */
+
+                { word: "ܚܟܡܬܐ", latin: "ḥekmṯā", meaning: "sabiduría", type: "sustantivo", cat: "mente" },
+                { word: "ܝܕܥܬܐ", latin: "yadʿtā", meaning: "conocimiento", type: "sustantivo", cat: "mente" },
+                { word: "ܪܥܝܢܐ", latin: "reʿyānā", meaning: "pensamiento, idea", type: "sustantivo", cat: "mente" },
+                { word: "ܡܕܥܐ", latin: "maddeʿā", meaning: "conocimiento, entendimiento", type: "sustantivo", cat: "mente" },
+                { word: "ܚܐܪܘܬܐ", latin: "ḥērūṯā", meaning: "libertad", type: "sustantivo", cat: "vida" },
+                { word: "ܚܝܘܬܐ", latin: "ḥayyūṯā", meaning: "vida, vitalidad", type: "sustantivo", cat: "vida" },
+                { word: "ܐܘܝܘܬܐ", latin: "awiyūṯā", meaning: "unidad, armonía, concordia", type: "sustantivo", cat: "emociones" },
+                { word: "ܫܘܝܘܬܐ", latin: "šwīyūṯā", meaning: "igualdad, equilibrio", type: "sustantivo", cat: "vida" }
+
+            ],
+
+
+        }
+        /* =========================================================
+           NÚMEROS
+           ========================================================= */
+
+        const NUMBERS = {
+
+            es: [
+                ["0", "cero"], ["1", "uno"], ["2", "dos"], ["3", "tres"], ["4", "cuatro"],
+                ["5", "cinco"], ["6", "seis"], ["7", "siete"], ["8", "ocho"], ["9", "nueve"],
+                ["10", "diez"], ["11", "once"], ["12", "doce"], ["13", "trece"], ["14", "catorce"],
+                ["15", "quince"], ["16", "dieciséis"], ["17", "diecisiete"], ["18", "dieciocho"],
+                ["19", "diecinueve"], ["20", "veinte"]
+            ],
+
+            map: [
+                ["0", "sero"], ["1", "kiñe"], ["2", "epu"], ["3", "küla"], ["4", "meli"],
+                ["5", "kechu"], ["6", "kayu"], ["7", "reqle"], ["8", "pura"], ["9", "aylla"],
+                ["10", "mari"], ["11", "mari kiñe"], ["12", "mari epu"], ["13", "mari küla"],
+                ["14", "mari meli"], ["15", "mari kechu"], ["16", "mari kayu"],
+                ["17", "mari reqle"], ["18", "mari pura"], ["19", "mari aylla"], ["20", "epu mari"]
+            ],
+
+            sa: [
+                ["0", "० — śūnya"], ["1", "१ — eka"], ["2", "२ — dvi"], ["3", "३ — tri"],
+                ["4", "४ — catur"], ["5", "५ — pañca"], ["6", "६ — ṣaṣ"],
+                ["7", "७ — sapta"], ["8", "८ — aṣṭa"], ["9", "९ — nava"],
+                ["10", "१० — daśa"], ["11", "११ — ekādaśa"], ["12", "१२ — dvādaśa"],
+                ["13", "१३ — trayodaśa"], ["14", "१४ — caturdaśa"],
+                ["15", "१५ — pañcadaśa"], ["16", "१६ — ṣoḍaśa"],
+                ["17", "१७ — saptadaśa"], ["18", "१८ — aṣṭādaśa"],
+                ["19", "१९ — navadaśa"], ["20", "२० — viṃśati"]
+            ],
+
+            syr: [
+                ["0", "ܐܦܣ — ʾeps"],
+
+                ["1", "ܚܕ — ḥad"],
+                ["2", "ܬܪܝܢ — trēn"],
+                ["3", "ܬܠܬܐ — tlāthā"],
+                ["4", "ܐܪܒܥܐ — arbaʿā"],
+                ["5", "ܚܡܫܐ — ḥamshā"],
+                ["6", "ܫܬܐ — eshtā"],
+                ["7", "ܫܒܥܐ — shwaʿā"],
+                ["8", "ܬܡܢܝܐ — tmanyā"],
+                ["9", "ܬܫܥܐ — tshaʿā"],
+                ["10", "ܥܣܪܐ — ʿasrā"]
+            ]
+
+        };
+
+
+        /* =========================================================
+           ESTADO
+           ========================================================= */
+
+        let currentLang = "es";
+        let currentLetter = "ALL";
+        let currentCategory = "TODAS";
+        let currentSearch = "";
+
+
+        /* =========================================================
+           ELEMENTOS
+           ========================================================= */
+
+        const alphabetEl = document.getElementById("alphabet");
+        const categoriesEl = document.getElementById("categories");
+        const resultsEl = document.getElementById("results");
+        const countEl = document.getElementById("count");
+        const searchEl = document.getElementById("search");
+        const sectionTitle = document.getElementById("sectionTitle");
+        const numbersSection = document.getElementById("numbersSection");
+        const numbersEl = document.getElementById("numbers");
+        const compareBox = document.getElementById("compareBox");
+
+
+        /* =========================================================
+           NORMALIZAR TEXTO
+           ========================================================= */
+
+        function normalize(text) {
+
+            return text
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
+
+        }
+
+
+        /* =========================================================
+           INICIAL DE PALABRA
+           ========================================================= */
+
+        function getInitial(entry) {
+
+            const word = entry.word;
+
+            if (currentLang === "map") {
+
+                const lower = word.toLowerCase();
+
+                if (lower.startsWith("ng")) return "Ng";
+                if (lower.startsWith("ch")) return "Ch";
+                if (lower.startsWith("tr")) return "Tr";
+
+                return word.charAt(0).toUpperCase();
+            }
+
+            if (currentLang === "sa") {
+                return word.charAt(0);
+            }
+
+            if (currentLang === "syr") {
+                return word.charAt(0);
+            }
+
+            return normalize(word).charAt(0).toUpperCase();
+        }
+
+
+        /* =========================================================
+           ALFABETO
+           ========================================================= */
+
+        function renderAlphabet() {
+
+            alphabetEl.innerHTML = "";
+
+            const letters = LANGS[currentLang].alphabet;
+
+            const all = document.createElement("button");
+            all.className = "letter " + (currentLetter === "ALL" ? "active" : "");
+            all.textContent = "★";
+
+            all.onclick = () => {
+                currentLetter = "ALL";
+                render();
+            };
+
+            alphabetEl.appendChild(all);
+
+            letters.forEach(letter => {
+
+                const btn = document.createElement("button");
+
+                btn.className =
+                    "letter " +
+                    (currentLetter === letter ? "active" : "");
+
+                btn.textContent = letter;
+
+                btn.onclick = () => {
+
+                    currentLetter = letter;
+                    render();
+
+                };
+
+                alphabetEl.appendChild(btn);
+
+            });
+
+        }
+
+
+        /* =========================================================
+           CATEGORÍAS
+           ========================================================= */
+
+        function renderCategories() {
+
+            categoriesEl.innerHTML = "";
+
+            const cats = [
+                "TODAS",
+                "naturaleza",
+                "animales",
+                "personas",
+                "familia",
+                "cuerpo",
+                "emociones",
+                "verbos",
+                "adjetivos",
+                "vida",
+                "espiritualidad",
+                "gramática",
+                "lugares",
+                "números"
+            ];
+
+            cats.forEach(cat => {
+
+                const button = document.createElement("button");
+
+                button.className =
+                    "category " +
+                    (currentCategory === cat ? "active" : "");
+
+                button.textContent =
+                    cat.charAt(0).toUpperCase() + cat.slice(1);
+
+                button.onclick = () => {
+
+                    currentCategory = cat;
+                    render();
+
+                };
+
+                categoriesEl.appendChild(button);
+
+            });
+
+        }
+
+
+        /* =========================================================
+           RENDERIZAR PALABRAS
+           ========================================================= */
+
+        function renderWords() {
+
+            resultsEl.innerHTML = "";
+
+            let data = DATA[currentLang] || [];
+
+            let filtered = data.filter(entry => {
+
+                const matchesLetter =
+                    currentLetter === "ALL" ||
+                    getInitial(entry) === currentLetter;
+
+                const matchesCategory =
+                    currentCategory === "TODAS" ||
+                    entry.cat === currentCategory;
+
+                const q = normalize(currentSearch);
+
+                const matchesSearch =
+                    !q ||
+                    normalize(entry.word).includes(q) ||
+                    normalize(entry.meaning).includes(q) ||
+                    normalize(entry.latin || "").includes(q);
+
+                return matchesLetter &&
+                    matchesCategory &&
+                    matchesSearch;
+
+            });
+
+            countEl.textContent =
+                filtered.length + " entradas";
+
+            if (currentSearch) {
+                sectionTitle.textContent = "Resultados";
+            } else if (currentLetter !== "ALL") {
+                sectionTitle.textContent = "Letra " + currentLetter;
+            } else {
+                sectionTitle.textContent = "Palabras";
+            }
+
+            if (!filtered.length) {
+
+                resultsEl.innerHTML = `
+      <div class="empty">
+        No hay entradas para esta búsqueda.
+      </div>
+    `;
+
+                return;
+            }
+
+            filtered.forEach(entry => {
+
+                const card = document.createElement("article");
+
+                card.className = "card";
+
+                card.innerHTML = `
+
+      <div class="word">${entry.word}</div>
+
+      ${entry.latin
+                        ? `<div class="translit">${entry.latin}</div>`
+                        : ""
+                    }
+
+      <div class="meaning">${entry.meaning}</div>
+
+      <div class="type">${entry.type}</div>
+
+    `;
+
+                card.onclick = () => openModal(entry);
+
+                resultsEl.appendChild(card);
+
+            });
+
+        }
+
+
+        /* =========================================================
+           NÚMEROS
+           ========================================================= */
+
+        function renderNumbers() {
+
+            numbersEl.innerHTML = "";
+
+            const nums = NUMBERS[currentLang] || [];
+
+            nums.forEach(item => {
+
+                const div = document.createElement("div");
+
+                div.className = "number";
+
+                div.innerHTML = `
+      <div class="numberValue">${item[0]}</div>
+      <div class="numberWord">${item[1]}</div>
+    `;
+
+                numbersEl.appendChild(div);
+
+            });
+
+        }
+
+
+        /* =========================================================
+           COMPARADOR
+           ========================================================= */
+
+        function renderCompare() {
+
+            compareBox.innerHTML = "";
+
+            if (!currentSearch.trim()) {
+
+                compareBox.innerHTML = `
+      <div class="empty" style="grid-column:1/-1">
+        Escribe una palabra o significado para comparar
+        las cuatro lenguas.
+      </div>
+    `;
+
+                return;
+            }
+
+            const q = normalize(currentSearch);
+
+            const langs = ["es", "map", "sa", "syr"];
+
+            langs.forEach(lang => {
+
+                const data = DATA[lang];
+
+                const found = data.find(entry =>
+
+                    normalize(entry.word).includes(q) ||
+                    normalize(entry.meaning).includes(q) ||
+                    normalize(entry.latin || "").includes(q)
+
+                );
+
+                const div = document.createElement("div");
+
+                div.className = "compareItem";
+
+                if (found) {
+
+                    div.innerHTML = `
+
+        <div class="compareLang">
+          ${LANGS[lang].symbol}
+          ${LANGS[lang].name}
+        </div>
+
+        <div class="compareWord">
+          ${found.word}
+        </div>
+
+        ${found.latin
+                            ? `<div class="translit">${found.latin}</div>`
+                            : ""
+                        }
+
+        <div>${found.meaning}</div>
+      `;
+
+                } else {
+
+                    div.innerHTML = `
+
+        <div class="compareLang">
+          ${LANGS[lang].symbol}
+          ${LANGS[lang].name}
+        </div>
+
+        <div class="compareWord">—</div>
+
+        <div class="compareLang">
+          No encontrada
+        </div>
+
+      `;
+
+                }
+
+                compareBox.appendChild(div);
+
+            });
+
+        }
+
+
+        /* =========================================================
+           MODAL
+           ========================================================= */
+
+        function openModal(entry) {
+
+            document.getElementById("modalWord").textContent =
+                entry.word;
+
+            document.getElementById("modalTranslit").textContent =
+                entry.latin || "";
+
+            document.getElementById("modalMeaning").textContent =
+                entry.meaning;
+
+            document.getElementById("modalInfo").innerHTML = `
+
+    <strong>Idioma:</strong>
+    ${LANGS[currentLang].name}
+    <br>
+
+    <strong>Categoría:</strong>
+    ${entry.cat}
+    <br>
+
+    <strong>Tipo:</strong>
+    ${entry.type}
+
+  `;
+
+            document.getElementById("modal").classList.add("show");
+
+        }
+
+        document.getElementById("closeModal").onclick = () => {
+
+            document.getElementById("modal").classList.remove("show");
+
+        };
+
+        document.getElementById("modal").onclick = e => {
+
+            if (e.target.id === "modal") {
+
+                document.getElementById("modal").classList.remove("show");
+
+            }
+
+        };
+
+
+        /* =========================================================
+           CAMBIO DE IDIOMA
+           ========================================================= */
+
+        document.querySelectorAll(".lang").forEach(button => {
+
+            button.onclick = () => {
+
+                document.querySelectorAll(".lang")
+                    .forEach(b => b.classList.remove("active"));
+
+                button.classList.add("active");
+
+                currentLang = button.dataset.lang;
+
+                currentLetter = "ALL";
+                currentCategory = "TODAS";
+
+                searchEl.value = "";
+                currentSearch = "";
+
+                render();
+
+            };
+
+        });
+
+
+        /* =========================================================
+           BUSCADOR
+           ========================================================= */
+
+        searchEl.addEventListener("input", () => {
+
+            currentSearch = searchEl.value;
+
+            render();
+
+        });
+
+
+        /* =========================================================
+           RENDER PRINCIPAL
+           ========================================================= */
+
+        function render() {
+
+            renderAlphabet();
+            renderCategories();
+            renderWords();
+            renderNumbers();
+            renderCompare();
+
+        }
+
+
+        /* =========================================================
+           INICIAR
+           ========================================================= */
+
+        render();
+
+    </script>
+
+</body>
+
+</html>
